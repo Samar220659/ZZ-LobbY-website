@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { paypalApi } from "../services/api";
+import LegalFooter from "./legal/LegalFooter";
 
 export default function PayPalPayment() {
   const navigate = useNavigate();

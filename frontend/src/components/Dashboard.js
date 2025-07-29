@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { dashboardApi } from "../services/api";
+import LegalFooter from "./legal/LegalFooter";
 
 export default function Dashboard() {
   const navigate = useNavigate();

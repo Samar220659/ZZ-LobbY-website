@@ -6,8 +6,6 @@ import qrcode
 from io import BytesIO
 from typing import Optional, Dict, Any
 from datetime import datetime
-from paypalcheckoutsdk.core import PayPalHttpClient, SandboxEnvironment, LiveEnvironment
-from paypalcheckoutsdk.orders import OrdersCreateRequest, OrdersGetRequest
 from models import PaymentDocument, PaymentStatus, PaymentResponse
 
 class PayPalService:
@@ -28,17 +26,15 @@ class PayPalService:
             print(f"PayPal Client Secret: {self.client_secret}")
             raise ValueError("PayPal credentials not found in environment variables")
         
-        # Initialize PayPal client
+        # Set base URL based on environment
         if self.mode == 'sandbox':
-            environment = SandboxEnvironment(client_id=self.client_id, client_secret=self.client_secret)
+            self.base_url = "https://api.sandbox.paypal.com"
         else:
-            environment = LiveEnvironment(client_id=self.client_id, client_secret=self.client_secret)
-        
-        self.client = PayPalHttpClient(environment)
+            self.base_url = "https://api.paypal.com"
         
     def get_access_token(self) -> str:
         """Get PayPal API access token"""
-        url = "https://api.sandbox.paypal.com/v1/oauth2/token" if self.mode == 'sandbox' else "https://api.paypal.com/v1/oauth2/token"
+        url = f"{self.base_url}/v1/oauth2/token"
         
         headers = {
             'Accept': 'application/json',
@@ -54,13 +50,16 @@ class PayPalService:
         return response.json()['access_token']
     
     def create_payment_link(self, amount: float, description: str) -> str:
-        """Create PayPal.me payment link"""
+        """Create PayPal.me payment link for simple payments"""
         # For sandbox testing, we'll use a simplified approach
         # In production, you might want to use proper PayPal checkout flow
         
         # Format: https://www.paypal.me/username/amount
         # For sandbox testing, we'll create a mock URL structure
-        base_url = "https://www.sandbox.paypal.com/paypalme" if self.mode == 'sandbox' else "https://www.paypal.com/paypalme"
+        if self.mode == 'sandbox':
+            base_url = "https://www.sandbox.paypal.com/paypalme"
+        else:
+            base_url = "https://www.paypal.com/paypalme"
         
         # Create a simplified payment link for testing
         payment_link = f"{base_url}/zzlobby/{amount:.2f}EUR"
@@ -68,11 +67,18 @@ class PayPalService:
         return payment_link
     
     def create_order(self, amount: float, description: str) -> Dict[str, Any]:
-        """Create PayPal order"""
-        request = OrdersCreateRequest()
-        request.prefer("return=representation")
+        """Create PayPal order using REST API"""
+        access_token = self.get_access_token()
         
-        request.request_body({
+        url = f"{self.base_url}/v2/checkout/orders"
+        
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {access_token}',
+            'Prefer': 'return=representation'
+        }
+        
+        order_data = {
             "intent": "CAPTURE",
             "purchase_units": [{
                 "amount": {
@@ -85,11 +91,12 @@ class PayPalService:
                 "return_url": "https://example.com/return",
                 "cancel_url": "https://example.com/cancel"
             }
-        })
+        }
         
         try:
-            response = self.client.execute(request)
-            return response.result.__dict__
+            response = requests.post(url, headers=headers, json=order_data)
+            response.raise_for_status()
+            return response.json()
         except Exception as e:
             print(f"PayPal order creation error: {e}")
             raise
@@ -117,8 +124,23 @@ class PayPalService:
     def create_payment(self, amount: float, description: str) -> PaymentResponse:
         """Create a new payment with PayPal integration"""
         try:
-            # Create payment link
+            # Create payment link (for simple payments)
             payment_url = self.create_payment_link(amount, description)
+            
+            # Try to create actual PayPal order for tracking
+            try:
+                order_result = self.create_order(amount, description)
+                order_id = order_result.get('id', '')
+                # Get approval URL from links
+                approval_url = payment_url
+                for link in order_result.get('links', []):
+                    if link.get('rel') == 'approve':
+                        approval_url = link.get('href', payment_url)
+                        break
+                payment_url = approval_url
+            except Exception as e:
+                print(f"Failed to create PayPal order, using simple payment link: {e}")
+                order_id = f"pay_{int(datetime.now().timestamp())}"
             
             # Generate QR code
             qr_code = self.generate_qr_code(payment_url, amount)
@@ -127,6 +149,7 @@ class PayPalService:
             payment_doc = PaymentDocument(
                 amount=amount,
                 description=description,
+                paypalPaymentId=order_id,
                 paypalPaymentUrl=payment_url,
                 status=PaymentStatus.ACTIVE
             )
@@ -152,10 +175,18 @@ class PayPalService:
     def verify_payment(self, payment_id: str) -> bool:
         """Verify payment status with PayPal"""
         try:
-            request = OrdersGetRequest(payment_id)
-            response = self.client.execute(request)
+            access_token = self.get_access_token()
+            url = f"{self.base_url}/v2/checkout/orders/{payment_id}"
             
-            result = response.result.__dict__
+            headers = {
+                'Content-Type': 'application/json',
+                'Authorization': f'Bearer {access_token}'
+            }
+            
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
+            
+            result = response.json()
             return result.get('status') == 'COMPLETED'
             
         except Exception as e:

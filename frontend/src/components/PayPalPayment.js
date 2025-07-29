@@ -362,6 +362,9 @@ export default function PayPalPayment() {
           </CardContent>
         </Card>
       </div>
+      
+      {/* Legal Footer */}
+      <LegalFooter />
     </div>
   );
 }

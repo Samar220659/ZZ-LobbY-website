@@ -26,3 +26,4 @@ typer>=0.9.0
 paypal-server-sdk>=1.1.0
 qrcode>=8.0
 Pillow>=10.0.0
+psutil>=5.9.0

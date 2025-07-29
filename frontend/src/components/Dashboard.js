@@ -294,6 +294,9 @@ export default function Dashboard() {
           </Card>
         </div>
       </div>
+      
+      {/* Legal Footer */}
+      <LegalFooter />
     </div>
   );
 }

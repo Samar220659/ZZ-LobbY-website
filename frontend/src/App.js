@@ -66,9 +66,19 @@ const ZZLobbyElite = () => {
 
   const handlePurchase = async (productId) => {
     try {
+      // Map display product IDs to backend IDs
+      const productIdMap = {
+        [products.find(p => p.name.includes("Starter"))?.id]: "zz_starter",
+        [products.find(p => p.name.includes("PRO"))?.id]: "zz_pro", 
+        [products.find(p => p.name.includes("ULTIMATE"))?.id]: "zz_elite",
+        [products.find(p => p.name.includes("VIP"))?.id]: "zz_vip_coaching"
+      };
+      
+      const backendProductId = productIdMap[productId] || "zz_starter";
+      
       const orderData = {
         customer_email: "kunde@example.com", // Would be from form
-        product_id: productId,
+        product_id: backendProductId,
         payment_method: "paypal",
         conversion_source: "landing_page"
       };

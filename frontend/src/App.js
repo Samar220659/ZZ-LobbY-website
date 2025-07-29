@@ -10,6 +10,12 @@ import ControlCenter from "./components/ControlCenter";
 import AutomationControl from "./components/AutomationControl";
 import EasyAutomation from "./components/EasyAutomation";
 import AIMarketingHub from "./components/AIMarketingHub";
+// Legal Components
+import Impressum from "./components/legal/Impressum";
+import Datenschutz from "./components/legal/Datenschutz";
+import AGB from "./components/legal/AGB";
+import Widerruf from "./components/legal/Widerruf";
+import CookieBanner from "./components/legal/CookieBanner";
 import "./App.css";
 
 function App() {
@@ -26,8 +32,15 @@ function App() {
           <Route path="/automation-control" element={<AutomationControl />} />
           <Route path="/easy-automation" element={<EasyAutomation />} />
           <Route path="/ai-marketing" element={<AIMarketingHub />} />
+          {/* Legal Routes */}
+          <Route path="/impressum" element={<Impressum />} />
+          <Route path="/datenschutz" element={<Datenschutz />} />
+          <Route path="/agb" element={<AGB />} />
+          <Route path="/widerruf" element={<Widerruf />} />
         </Routes>
         <Toaster />
+        {/* Cookie Banner appears on all pages */}
+        <CookieBanner />
       </BrowserRouter>
     </div>
   );

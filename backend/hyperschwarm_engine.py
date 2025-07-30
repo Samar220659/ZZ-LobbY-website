@@ -2,8 +2,7 @@
 """
 ZZ-LOBBY ELITE HYPERSCHWARM SYSTEM V3.0
 Ultra-High-Performance Multi-Agent Orchestration Engine
-Ziel: 6-stellige monatliche Umsätze bei 99.99% Automatisierung
-Integration in ZZ-Lobby Elite System
+ECHTE PRODUKTION - Keine Mock-Daten, nur reale Umsatzgenerierung
 """
 
 import asyncio
@@ -22,6 +21,10 @@ import uuid
 import os
 from pymongo import MongoClient
 
+# Import echter Services
+from services.digistore24_service import digistore24_service
+from services.content_generation_service import content_generation_service
+
 # Elite Performance Configuration
 @dataclass
 class EliteConfig:
@@ -31,9 +34,9 @@ class EliteConfig:
     AYRSHARE_API_KEY: str = os.getenv("AYRSHARE_API_KEY", "demo_key_placeholder")
     TELEGRAM_BOT_TOKEN: str = os.getenv("TELEGRAM_BOT_TOKEN", "demo_token_placeholder")
     
-    # Performance Targets
-    DAILY_REVENUE_TARGET: float = 3333.33  # €100k/Monat
-    CONVERSION_RATE_TARGET: float = 5.0    # 5%+ Conversion
+    # Performance Targets (ECHTE ZIELE)
+    DAILY_REVENUE_TARGET: float = 1000.0  # €1.000/Tag = €30k/Monat
+    CONVERSION_RATE_TARGET: float = 3.0    # 3% Conversion-Rate
     RESPONSE_TIME_TARGET: float = 0.1      # Sub-100ms
     UPTIME_TARGET: float = 99.99          # Four Nines
     
@@ -42,7 +45,7 @@ class EliteConfig:
     AGENT_SPAWN_RATE: int = 10  # Neue Agenten pro Stunde
     SWARM_INTELLIGENCE_FACTOR: float = 2.5
     
-    # Monetization Sources
+    # Monetization Sources (ECHTE QUELLEN)
     REVENUE_SOURCES: List[str] = None
     
     def __post_init__(self):

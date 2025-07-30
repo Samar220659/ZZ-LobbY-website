@@ -928,7 +928,7 @@ class BackendTester:
         print(f"API Base: {API_BASE}")
         print("=" * 60)
         
-        # Test in priority order
+        # Test in priority order - existing tests
         self.test_paypal_integration()      # High priority
         self.test_database_service()        # High priority
         self.test_dashboard_stats_api()     # Medium priority
@@ -936,12 +936,20 @@ class BackendTester:
         self.test_analytics_api()           # Medium priority
         self.test_saas_status_api()         # Low priority
         
-        # HYPERSCHWARM System V3.0 Tests
+        # HYPERSCHWARM System V3.0 Tests - existing
         self.test_hyperschwarm_status()     # High priority
         self.test_hyperschwarm_agents()     # High priority
         self.test_hyperschwarm_strategy_execution()  # High priority
         self.test_hyperschwarm_performance_metrics() # Medium priority
         self.test_hyperschwarm_agent_optimization()  # Medium priority
+        
+        # NEW HYPERSCHWARM Google Opal + Claude AI Integration Tests
+        self.test_hyperschwarm_opal_templates()      # High priority
+        self.test_hyperschwarm_opal_create_app()     # High priority
+        self.test_hyperschwarm_opal_landing_page()   # High priority
+        self.test_hyperschwarm_claude_tiktok()       # High priority
+        self.test_hyperschwarm_claude_email()        # High priority
+        self.test_hyperschwarm_integrated_campaign() # High priority
         
         return self.results
 

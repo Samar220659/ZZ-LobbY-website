@@ -27,7 +27,13 @@ class BackendTester:
             "hyperschwarm_agents": {"status": "unknown", "details": []},
             "hyperschwarm_strategy": {"status": "unknown", "details": []},
             "hyperschwarm_performance": {"status": "unknown", "details": []},
-            "hyperschwarm_optimization": {"status": "unknown", "details": []}
+            "hyperschwarm_optimization": {"status": "unknown", "details": []},
+            "hyperschwarm_opal_templates": {"status": "unknown", "details": []},
+            "hyperschwarm_opal_create_app": {"status": "unknown", "details": []},
+            "hyperschwarm_opal_landing_page": {"status": "unknown", "details": []},
+            "hyperschwarm_claude_tiktok": {"status": "unknown", "details": []},
+            "hyperschwarm_claude_email": {"status": "unknown", "details": []},
+            "hyperschwarm_integrated_campaign": {"status": "unknown", "details": []}
         }
         self.session = requests.Session()
         self.session.headers.update({

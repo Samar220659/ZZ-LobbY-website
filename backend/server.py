@@ -19,6 +19,11 @@ from models import (
 from services.paypal_service import paypal_service
 from services.database_service import db_service
 
+# Import new services for 100% completion
+from services.revenue_priority_service import revenue_priority_service
+from services.ayrshare_service import ayrshare_service
+from services.klaviyo_service import klaviyo_service
+
 # Import automation engine
 from automation_engine import automation_router
 

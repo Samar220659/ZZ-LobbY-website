@@ -12,6 +12,7 @@ import EasyAutomation from "./components/EasyAutomation";
 import AIMarketingHub from "./components/AIMarketingHub";
 import HyperschwarmDashboard from "./components/HyperschwarmDashboard";
 import EliteControlCenter from "./components/EliteControlCenter";
+import EliteRoadmap from "./components/EliteRoadmap";
 // Legal Components
 import Impressum from "./components/legal/Impressum";
 import Datenschutz from "./components/legal/Datenschutz";

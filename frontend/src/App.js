@@ -37,6 +37,7 @@ function App() {
           <Route path="/ai-marketing" element={<AIMarketingHub />} />
           <Route path="/hyperschwarm" element={<HyperschwarmDashboard />} />
           <Route path="/elite-control" element={<EliteControlCenter />} />
+          <Route path="/elite-roadmap" element={<EliteRoadmap />} />
           {/* Legal Routes */}
           <Route path="/impressum" element={<Impressum />} />
           <Route path="/datenschutz" element={<Datenschutz />} />

@@ -214,6 +214,84 @@ export default function Dashboard() {
           </Card>
         </div>
 
+        {/* HYPERSCHWARM Elite System */}
+        <Card className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 border-purple-500/50 hover:from-purple-600/30 hover:to-pink-600/30 transition-all duration-300 cursor-pointer mb-8"
+              onClick={() => handleNavigation('/hyperschwarm')}>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <Bot className="h-12 w-12 text-purple-400" />
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full flex items-center justify-center">
+                    <Crown className="h-2.5 w-2.5 text-black" />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    HYPERSCHWARM SYSTEM V3.0
+                  </h3>
+                  <p className="text-sm text-gray-300">Ultra-High-Performance Multi-Agent Orchestration Engine</p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <Badge variant="outline" className="text-yellow-400 border-yellow-400 text-xs">
+                      20+ Elite Agenten
+                    </Badge>
+                    <Badge variant="outline" className="text-green-400 border-green-400 text-xs">
+                      99.99% Automatisierung
+                    </Badge>
+                    <Badge variant="outline" className="text-purple-400 border-purple-400 text-xs">
+                      6-stelliger Umsatz
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-3xl font-bold text-purple-400">€25K/Mo</div>
+                <div className="text-sm text-gray-400">Zielumsatz</div>
+                <div className="flex items-center justify-end gap-1 mt-1">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-xs text-green-400">System AKTIV</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-3 gap-4 mb-4">
+              <div className="text-center">
+                <div className="text-lg font-bold text-blue-400">20+</div>
+                <div className="text-xs text-gray-400">Spezial-Agenten</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-bold text-green-400">98.5%</div>
+                <div className="text-xs text-gray-400">Performance</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-bold text-yellow-400">24/7</div>
+                <div className="text-xs text-gray-400">Orchestrierung</div>
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-between pt-4 border-t border-purple-500/20">
+              <div>
+                <p className="text-sm text-gray-300 mb-1">
+                  <span className="font-semibold">Marketing • Sales • Traffic • Analytics • Automation</span>
+                </p>
+                <p className="text-xs text-gray-400">
+                  Koordinierte Multi-Agent-Strategien für exponentielles Wachstum
+                </p>
+              </div>
+              <Button 
+                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleNavigation('/hyperschwarm');
+                }}
+              >
+                <Zap className="mr-2 h-4 w-4" />
+                System starten
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* SaaS System Status */}
         <Card className="bg-black/40 border-white/10 mb-8">
           <CardHeader>

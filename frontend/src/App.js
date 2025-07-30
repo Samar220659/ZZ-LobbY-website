@@ -10,6 +10,7 @@ import ControlCenter from "./components/ControlCenter";
 import AutomationControl from "./components/AutomationControl";
 import EasyAutomation from "./components/EasyAutomation";
 import AIMarketingHub from "./components/AIMarketingHub";
+import HyperschwarmDashboard from "./components/HyperschwarmDashboard";
 // Legal Components
 import Impressum from "./components/legal/Impressum";
 import Datenschutz from "./components/legal/Datenschutz";

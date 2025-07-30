@@ -1163,7 +1163,7 @@ class BackendTester:
             }
             
             journey_response = self.session.post(f"{API_BASE}/automation/complete-customer-journey", 
-                                               params=journey_data)
+                                               json=journey_data)
             
             if journey_response.status_code == 200:
                 journey_result = journey_response.json()

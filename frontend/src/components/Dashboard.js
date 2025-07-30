@@ -292,6 +292,131 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
+        {/* ELITE CONTROL CENTER - 20er Jahre Deutschland Design */}
+        <Card className="bg-gradient-to-br from-yellow-900/30 to-amber-900/20 border-2 border-yellow-400/50 hover:from-yellow-900/40 hover:to-amber-900/30 transition-all duration-300 cursor-pointer mb-8 relative overflow-hidden"
+              onClick={() => handleNavigation('/elite-control')}
+              style={{
+                backgroundImage: `
+                  radial-gradient(circle at 20% 80%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 20%, rgba(255, 215, 0, 0.1) 0%, transparent 50%)
+                `,
+                backdropFilter: 'blur(10px)',
+                boxShadow: '0 0 30px rgba(255, 215, 0, 0.2)'
+              }}>
+          {/* Art Deco Pattern Background */}
+          <div className="absolute inset-0 opacity-5">
+            <div className="w-full h-full" style={{
+              backgroundImage: `
+                repeating-linear-gradient(
+                  45deg,
+                  transparent,
+                  transparent 10px,
+                  rgba(255, 215, 0, 0.1) 10px,
+                  rgba(255, 215, 0, 0.1) 20px
+                )
+              `
+            }}></div>
+          </div>
+          
+          <CardContent className="p-8 relative z-10">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-6">
+                <div className="relative">
+                  <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-xl">
+                    <Crown className="h-8 w-8 text-black" />
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center border-2 border-black">
+                    <span className="text-black text-xs font-bold">•</span>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-yellow-200 to-yellow-400 mb-2"
+                      style={{
+                        fontFamily: 'serif',
+                        textShadow: '2px 2px 4px rgba(0,0,0,0.3)',
+                        letterSpacing: '0.1em'
+                      }}>
+                    ELITE KONTROLLZENTRUM
+                  </h3>
+                  <p className="text-yellow-200 text-sm font-light mb-2" style={{ fontFamily: 'serif' }}>
+                    Goldene Zwanziger Edition • Vollständige Systemkontrolle
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-xs">
+                      <Settings className="w-3 h-3 mr-1" />
+                      Master Control
+                    </Badge>
+                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-xs">
+                      <DollarSign className="w-3 h-3 mr-1" />
+                      Auto-Auszahlung
+                    </Badge>
+                    <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs">
+                      <BarChart3 className="w-3 h-3 mr-1" />
+                      Live-Monitoring
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-4xl font-bold text-yellow-400 mb-1" style={{ fontFamily: 'serif' }}>€2.250</div>
+                <div className="text-sm text-yellow-200">Ausstehende Auszahlung</div>
+                <div className="flex items-center justify-end gap-2 mt-2">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-xs text-green-400 font-semibold">BEREIT FÜR AUSZAHLUNG</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Art Deco Divider */}
+            <div className="flex items-center justify-center mb-6">
+              <div className="h-px bg-gradient-to-r from-transparent via-yellow-400 to-transparent w-20"></div>
+              <div className="mx-4 w-2 h-2 bg-yellow-400 rounded-full"></div>
+              <div className="h-px bg-gradient-to-r from-transparent via-yellow-400 to-transparent w-20"></div>
+            </div>
+            
+            <div className="grid grid-cols-4 gap-6 mb-6">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-yellow-400" style={{ fontFamily: 'serif' }}>20/20</div>
+                <div className="text-xs text-yellow-200">Agenten Aktiv</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-400" style={{ fontFamily: 'serif' }}>99.99%</div>
+                <div className="text-xs text-green-200">System Health</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-blue-400" style={{ fontFamily: 'serif' }}>€67.5K</div>
+                <div className="text-xs text-blue-200">Täglich Proj.</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-purple-400" style={{ fontFamily: 'serif' }}>AUTO</div>
+                <div className="text-xs text-purple-200">Auszahlung</div>
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-between pt-4 border-t border-yellow-400/20">
+              <div>
+                <p className="text-yellow-200 mb-2" style={{ fontFamily: 'serif', fontSize: '0.9rem' }}>
+                  <span className="font-semibold">Master-Kontrolle • Agenten-Steuerung • Automatische Auszahlungen</span>
+                </p>
+                <p className="text-xs text-yellow-300/70">
+                  Vollständige Kontrolle über Ihr HYPERSCHWARM System im eleganten 20er Jahre Design
+                </p>
+              </div>
+              <Button 
+                className="bg-gradient-to-r from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800 text-black font-bold px-6 py-3"
+                style={{ fontFamily: 'serif' }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleNavigation('/elite-control');
+                }}
+              >
+                <Crown className="mr-2 h-5 w-5" />
+                KONTROLLZENTRUM ÖFFNEN
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* SaaS System Status */}
         <Card className="bg-black/40 border-white/10 mb-8">
           <CardHeader>

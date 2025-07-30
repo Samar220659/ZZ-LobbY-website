@@ -155,7 +155,7 @@ class HyperschwarmOrchestrator:
             optimization_report = await self._optimize_performance(execution_results)
             
             # Phase 5: Speichern in Datenbank
-            if self.db:
+            if self.db is not None:
                 await self._save_strategy_results(strategy_id, {
                     "objective": objective,
                     "market_analysis": market_analysis,

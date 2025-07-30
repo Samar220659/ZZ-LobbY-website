@@ -149,6 +149,91 @@ export default function AIMarketingHub() {
     }
   };
 
+  const createOpalApp = async (templateId) => {
+    if (!opalFormData.product_name) {
+      toast.error('Bitte Produktname eingeben');
+      return;
+    }
+
+    setCreatingOpalApp(true);
+    
+    try {
+      const response = await axios.post(`${API_BASE}/hyperschwarm/opal/create-app`, {
+        app_type: templateId,
+        product_name: opalFormData.product_name,
+        product_price: opalFormData.product_price,
+        target_audience: opalFormData.target_audience,
+        campaign_config: {
+          hook: `Entdecke ${opalFormData.product_name} - Das System das alles verändert`,
+          urgency: "Limitiertes Angebot - Nur 48 Stunden",
+          social_proof: "5000+ erfolgreiche Nutzer"
+        }
+      });
+      
+      if (response.data.success) {
+        const newApp = response.data.opal_app;
+        setOpalApps(prev => [...prev, newApp]);
+        toast.success(`🚀 Google Opal ${templateId.replace('_', ' ')} App erstellt!`);
+        
+        // Reset form
+        setSelectedTemplate(null);
+      }
+    } catch (error) {
+      console.error('Error creating Opal app:', error);
+      toast.error('Fehler beim Erstellen der Opal App');
+    } finally {
+      setCreatingOpalApp(false);
+    }
+  };
+
+  const createIntegratedCampaign = async () => {
+    if (!opalFormData.product_name) {
+      toast.error('Bitte Produktname eingeben');
+      return;
+    }
+
+    setCreatingOpalApp(true);
+    
+    try {
+      const response = await axios.post(`${API_BASE}/hyperschwarm/integrated-campaign`, {
+        product_name: opalFormData.product_name,
+        product_price: opalFormData.product_price,
+        target_audience: opalFormData.target_audience
+      });
+      
+      if (response.data.success) {
+        const campaign = response.data.integrated_campaign;
+        toast.success('🔥 Integrierte AI-Kampagne erfolgreich erstellt!');
+        
+        // Show campaign results
+        setCampaignResults({
+          success: true,
+          campaign_summary: campaign.campaign_summary,
+          tiktok_generated: campaign.tiktok_content.generated,
+          email_generated: campaign.email_campaign.generated,
+          landing_page_url: campaign.landing_page.app_url,
+          projected_reach: campaign.campaign_summary.projected_reach
+        });
+      }
+    } catch (error) {
+      console.error('Error creating integrated campaign:', error);
+      toast.error('Fehler beim Erstellen der integrierten Kampagne');
+    } finally {
+      setCreatingOpalApp(false);
+    }
+  };
+
+  const getTemplateIcon = (templateId) => {
+    const iconMap = {
+      'landing_page': <Layout className="w-5 h-5" />,
+      'quiz_funnel': <Brain className="w-5 h-5" />,
+      'calculator': <Calculator className="w-5 h-5" />,
+      'webinar_registration': <Calendar className="w-5 h-5" />,
+      'viral_contest': <Trophy className="w-5 h-5" />
+    };
+    return iconMap[templateId] || <Sparkles className="w-5 h-5" />;
+  };
+
   const getStatusColor = (status) => {
     switch (status) {
       case 'new': return 'bg-blue-500/20 text-blue-400 border-blue-500/30';

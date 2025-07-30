@@ -34,6 +34,7 @@ class KlaviyoEmailService:
                 "revision": self.revision
             }
             
+            # Correct Klaviyo API v2024 format
             profile_data = {
                 "data": {
                     "type": "profile",
@@ -51,13 +52,16 @@ class KlaviyoEmailService:
                 profile_data["data"]["attributes"]["phone_number"] = phone
             
             # Add custom properties for ZZ-Lobby Elite
+            custom_properties = {
+                "source": "ZZ-Lobby Elite",
+                "system": "HYPERSCHWARM V3.0",
+                "created_at": datetime.now().isoformat()
+            }
+            
             if properties:
-                profile_data["data"]["attributes"]["properties"] = {
-                    **properties,
-                    "source": "ZZ-Lobby Elite",
-                    "system": "HYPERSCHWARM V3.0",
-                    "created_at": datetime.now().isoformat()
-                }
+                custom_properties.update(properties)
+            
+            profile_data["data"]["attributes"]["properties"] = custom_properties
             
             async with aiohttp.ClientSession() as session:
                 async with session.post(
@@ -75,11 +79,22 @@ class KlaviyoEmailService:
                             "created": response.status == 201,
                             "klaviyo_response": result
                         }
+                    elif response.status == 409:
+                        # Profile already exists - this is not an error
+                        return {
+                            "success": True,
+                            "profile_id": "existing",
+                            "email": email,
+                            "created": False,
+                            "message": "Profile already exists"
+                        }
                     else:
                         error_text = await response.text()
+                        logger.error(f"Klaviyo API error: {response.status} - {error_text}")
                         return {
                             "success": False,
-                            "error": f"Klaviyo API error: {response.status} - {error_text}"
+                            "error": f"Klaviyo API error: {response.status} - {error_text}",
+                            "payload_sent": profile_data  # For debugging
                         }
         
         except Exception as e:

@@ -15,7 +15,14 @@ import {
   Settings,
   BarChart3,
   Zap,
-  Crown
+  Crown,
+  Route,
+  Flag,
+  Target,
+  Trophy,
+  CheckCircle,
+  XCircle,
+  Calendar
 } from "lucide-react";
 import { toast } from "sonner";
 import { dashboardApi } from "../services/api";

@@ -63,16 +63,17 @@ class BackendTester:
             print(f"  Data keys: {list(data.keys())}")
 
     def test_paypal_integration(self):
-        """Test PayPal Integration Service"""
-        print("\n=== Testing PayPal Integration Service ===")
+        """🔥 CRITICAL: Test LIVE PayPal Integration - REAL MONEY SYSTEM"""
+        print("\n🔥 === CRITICAL: TESTING LIVE PAYPAL INTEGRATION - REAL MONEY SYSTEM ===")
         
         try:
-            # Test payment creation
+            # 🚨 LIVE PAYPAL VERIFICATION - Test payment creation with €25.00 (REAL payment)
             payment_data = {
                 "amount": 25.00,
-                "description": "Test Payment"
+                "description": "LIVE PayPal Test Payment - ZZ-Lobby Elite"
             }
             
+            print("🔥 TESTING LIVE PAYPAL: Creating €25.00 REAL payment...")
             response = self.session.post(f"{API_BASE}/paypal/create-payment", json=payment_data)
             
             if response.status_code == 200:
@@ -80,31 +81,58 @@ class BackendTester:
                 required_fields = ['id', 'amount', 'description', 'paymentUrl', 'qrCode', 'status', 'createdAt']
                 
                 if all(field in data for field in required_fields):
-                    # Verify QR code is generated
-                    if data['qrCode'].startswith('data:image/png;base64,'):
-                        self.log_result("paypal_integration", True, 
-                                      f"Payment created successfully with ID: {data['id']}", data)
+                    # 🚨 CRITICAL: Verify this is LIVE PayPal (not sandbox)
+                    payment_url = data['paymentUrl']
+                    
+                    # Check for LIVE PayPal URLs (should be paypal.com/paypalme/zzlobby, NOT sandbox)
+                    if 'sandbox' in payment_url.lower():
+                        self.log_result("paypal_integration", False, 
+                                      f"❌ CRITICAL ERROR: PayPal is in SANDBOX mode! URL: {payment_url}")
+                        return
+                    elif 'paypal.com/paypalme/zzlobby' in payment_url.lower():
+                        # ✅ LIVE PayPal confirmed
+                        print(f"✅ LIVE PAYPAL CONFIRMED: {payment_url}")
                         
-                        # Test getting payments list
-                        payments_response = self.session.get(f"{API_BASE}/paypal/payments")
-                        if payments_response.status_code == 200:
-                            payments = payments_response.json()
+                        # Verify QR code is generated for LIVE payment
+                        if data['qrCode'].startswith('data:image/png;base64,'):
                             self.log_result("paypal_integration", True, 
-                                          f"Retrieved {len(payments)} payments from database")
+                                          f"🔥 LIVE PAYPAL SUCCESS: €25.00 REAL payment created! ID: {data['id']}, URL: {payment_url}", 
+                                          {
+                                              "payment_id": data['id'],
+                                              "amount": data['amount'],
+                                              "live_payment_url": payment_url,
+                                              "qr_code_generated": True,
+                                              "paypal_mode": "LIVE_PRODUCTION"
+                                          })
+                            
+                            # Test getting LIVE payments list
+                            payments_response = self.session.get(f"{API_BASE}/paypal/payments")
+                            if payments_response.status_code == 200:
+                                payments = payments_response.json()
+                                
+                                # Verify payments show LIVE transactions
+                                live_payments = [p for p in payments if 'sandbox' not in p.get('paymentUrl', '').lower()]
+                                
+                                self.log_result("paypal_integration", True, 
+                                              f"🔥 LIVE PAYMENTS VERIFIED: Retrieved {len(payments)} total payments, {len(live_payments)} LIVE payments")
+                            else:
+                                self.log_result("paypal_integration", False, 
+                                              f"Failed to retrieve LIVE payments: {payments_response.status_code}")
                         else:
                             self.log_result("paypal_integration", False, 
-                                          f"Failed to retrieve payments: {payments_response.status_code}")
+                                          "❌ QR code not properly generated for LIVE payment")
                     else:
-                        self.log_result("paypal_integration", False, "QR code not properly generated")
+                        self.log_result("paypal_integration", False, 
+                                      f"❌ CRITICAL: PayPal URL format unexpected: {payment_url}")
                 else:
                     missing = [f for f in required_fields if f not in data]
-                    self.log_result("paypal_integration", False, f"Missing required fields: {missing}")
+                    self.log_result("paypal_integration", False, f"❌ Missing required fields: {missing}")
             else:
                 self.log_result("paypal_integration", False, 
-                              f"Payment creation failed: {response.status_code} - {response.text}")
+                              f"❌ LIVE PayPal payment creation failed: {response.status_code} - {response.text}")
                 
         except Exception as e:
-            self.log_result("paypal_integration", False, f"PayPal integration error: {str(e)}")
+            self.log_result("paypal_integration", False, f"❌ LIVE PayPal integration error: {str(e)}")
 
     def test_database_service(self):
         """Test Database Service with MongoDB"""

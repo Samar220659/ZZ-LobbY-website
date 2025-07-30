@@ -51,8 +51,12 @@ class TelegramService:
                         return False
                         
         except Exception as e:
-            self.logger.error(f"Telegram Service Fehler: {str(e)}")
+            self.logger.error(f"Telegram-Fehler: {str(e)}")
             return False
+    
+    async def send_notification(self, message: str, chat_id: str = None) -> bool:
+        """Alias für send_message - für Kompatibilität mit Revenue Priority Service"""
+        return await self.send_message(message, chat_id)
     
     async def send_revenue_notification(self, revenue_data: Dict[str, Any]) -> bool:
         """Sendet Revenue-Benachrichtigung"""

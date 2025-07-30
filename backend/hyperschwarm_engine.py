@@ -71,8 +71,8 @@ class HyperschwarmOrchestrator:
         self.system_health = 99.99
         self.mongo_client = mongo_client
         self.db = mongo_client.zzlobby if mongo_client else None
-        self._initialize_full_swarm()
         self._setup_logging()
+        self._initialize_full_swarm()
     
     def _setup_logging(self):
         """Initialisiert Logging für HYPERSCHWARM"""

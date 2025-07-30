@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 class StableMarketingAutomation:
     def __init__(self):
-        self.api_base = "https://d6ff1132-6aed-4355-bdf4-9afa5a453416.preview.emergentagent.com/api"
+        self.api_base = "https://af61faa8-d979-40f7-813a-366cb03a46e8.preview.emergentagent.com/api"
         self.running = True
         self.campaign_count = 0
         

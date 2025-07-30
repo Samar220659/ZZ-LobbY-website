@@ -424,6 +424,145 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
+        {/* ELITE ROADMAP - Masterplan zum Firmenchef */}
+        <Card className="bg-gradient-to-br from-indigo-900/30 to-purple-900/30 border-2 border-indigo-400/50 hover:from-indigo-900/40 hover:to-purple-900/40 transition-all duration-300 cursor-pointer mb-8 relative overflow-hidden"
+              onClick={() => handleNavigation('/elite-roadmap')}
+              style={{
+                backgroundImage: `
+                  radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 20%, rgba(147, 51, 234, 0.1) 0%, transparent 50%)
+                `,
+                backdropFilter: 'blur(10px)',
+                boxShadow: '0 0 30px rgba(99, 102, 241, 0.2)'
+              }}>
+          {/* Roadmap Pattern Background */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="w-full h-full" style={{
+              backgroundImage: `
+                repeating-linear-gradient(
+                  90deg,
+                  transparent,
+                  transparent 20px,
+                  rgba(99, 102, 241, 0.2) 20px,
+                  rgba(99, 102, 241, 0.2) 21px
+                )
+              `
+            }}></div>
+          </div>
+          
+          <CardContent className="p-8 relative z-10">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-6">
+                <div className="relative">
+                  <div className="w-16 h-16 bg-gradient-to-br from-indigo-400 to-purple-600 rounded-full flex items-center justify-center shadow-xl">
+                    <Route className="h-8 w-8 text-white" />
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
+                    <Crown className="h-3 w-3 text-black" />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 mb-2"
+                      style={{
+                        fontFamily: 'serif',
+                        textShadow: '2px 2px 4px rgba(0,0,0,0.3)',
+                        letterSpacing: '0.05em'
+                      }}>
+                    ELITE ROADMAP
+                  </h3>
+                  <p className="text-indigo-200 text-sm font-light mb-2" style={{ fontFamily: 'serif' }}>
+                    Von Arbeitslos zum Firmenchef • Der komplette Masterplan
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <Badge className="bg-indigo-500/20 text-indigo-400 border-indigo-500/30 text-xs">
+                      <Flag className="w-3 h-3 mr-1" />
+                      6 Phasen
+                    </Badge>
+                    <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 text-xs">
+                      <Target className="w-3 h-3 mr-1" />
+                      Konkrete Schritte
+                    </Badge>
+                    <Badge className="bg-pink-500/20 text-pink-400 border-pink-500/30 text-xs">
+                      <Trophy className="w-3 h-3 mr-1" />
+                      Bewährt
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-4xl font-bold text-indigo-400 mb-1" style={{ fontFamily: 'serif' }}>€50K+</div>
+                <div className="text-sm text-indigo-200">Monatliches Ziel</div>
+                <div className="flex items-center justify-end gap-2 mt-2">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-xs text-green-400 font-semibold">TRANSFORMATION READY</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Roadmap Preview */}
+            <div className="grid grid-cols-6 gap-2 mb-6">
+              {[
+                { phase: "Start", label: "Arbeitslos", color: "bg-red-400", icon: "🏁" },
+                { phase: "Phase 1", label: "Freelancer", color: "bg-orange-400", icon: "💼" },
+                { phase: "Phase 2", label: "Services", color: "bg-blue-400", icon: "📈" },
+                { phase: "Phase 3", label: "Digital", color: "bg-purple-400", icon: "🚀" },
+                { phase: "Phase 4", label: "Business", color: "bg-green-400", icon: "🏢" },
+                { phase: "Ziel", label: "Firmenchef", color: "bg-yellow-400", icon: "👑" }
+              ].map((step, index) => (
+                <div key={index} className="text-center">
+                  <div className={`w-12 h-12 ${step.color} rounded-full flex items-center justify-center text-black font-bold mb-1 mx-auto shadow-lg`}>
+                    <span className="text-lg">{step.icon}</span>
+                  </div>
+                  <div className="text-xs text-gray-300">{step.phase}</div>
+                  <div className="text-xs text-gray-400">{step.label}</div>
+                </div>
+              ))}
+            </div>
+            
+            {/* Key Features */}
+            <div className="grid grid-cols-2 gap-4 mb-6 text-sm">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-green-400" />
+                <span className="text-gray-300">✅ JACK - Was Sie machen müssen</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <XCircle className="w-4 h-4 text-red-400" />
+                <span className="text-gray-300">❌ JACK NICHT - Was zu vermeiden ist</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-blue-400" />
+                <span className="text-gray-300">📅 Konkrete Zeitpläne pro Phase</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <DollarSign className="w-4 h-4 text-green-400" />
+                <span className="text-gray-300">💰 Einkommensziele & Strategien</span>
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-between pt-4 border-t border-indigo-400/20">
+              <div>
+                <p className="text-indigo-200 mb-2" style={{ fontFamily: 'serif', fontSize: '0.9rem' }}>
+                  <span className="font-semibold">Der bewährte Weg: Arbeitslos → Freelancer → Skalierung → Firmenchef</span>
+                </p>
+                <p className="text-xs text-indigo-300/70">
+                  Kompletter Fahrplan mit Do's & Don'ts für jede Phase Ihrer Transformation
+                </p>
+              </div>
+              <Button 
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold px-6 py-3"
+                style={{ fontFamily: 'serif' }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleNavigation('/elite-roadmap');
+                }}
+              >
+                <Route className="mr-2 h-5 w-5" />
+                ROADMAP STARTEN
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* SaaS System Status */}
         <Card className="bg-black/40 border-white/10 mb-8">
           <CardHeader>

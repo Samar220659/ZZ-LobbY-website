@@ -262,7 +262,7 @@ class HyperschwarmOrchestrator:
     async def _save_strategy_results(self, strategy_id: str, results: Dict[str, Any]):
         """Speichert Strategie-Ergebnisse in MongoDB"""
         try:
-            if self.db:
+            if self.db is not None:
                 strategy_collection = self.db.hyperschwarm_strategies
                 strategy_collection.insert_one({
                     "strategy_id": strategy_id,

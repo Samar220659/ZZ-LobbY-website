@@ -22,7 +22,12 @@ class BackendTester:
             "dashboard_stats": {"status": "unknown", "details": []},
             "automations_api": {"status": "unknown", "details": []},
             "analytics_api": {"status": "unknown", "details": []},
-            "saas_status": {"status": "unknown", "details": []}
+            "saas_status": {"status": "unknown", "details": []},
+            "hyperschwarm_status": {"status": "unknown", "details": []},
+            "hyperschwarm_agents": {"status": "unknown", "details": []},
+            "hyperschwarm_strategy": {"status": "unknown", "details": []},
+            "hyperschwarm_performance": {"status": "unknown", "details": []},
+            "hyperschwarm_optimization": {"status": "unknown", "details": []}
         }
         self.session = requests.Session()
         self.session.headers.update({

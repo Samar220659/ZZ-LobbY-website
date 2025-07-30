@@ -25,6 +25,7 @@ from pymongo import MongoClient
 from services.digistore24_service import digistore24_service
 from services.content_generation_service import content_generation_service
 from services.claude_ai_service import claude_ai_service
+from services.google_opal_service import google_opal_service
 
 # Elite Performance Configuration
 @dataclass

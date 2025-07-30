@@ -25,8 +25,8 @@ logger = logging.getLogger(__name__)
 
 class EnterpriseAutomationMaster:
     def __init__(self):
-        self.system_url = "https://af61faa8-d979-40f7-813a-366cb03a46e8.preview.emergentagent.com"
-        self.api_base = "https://af61faa8-d979-40f7-813a-366cb03a46e8.preview.emergentagent.com/api"
+        self.system_url = "https://3dd1d4de-4dab-4256-a879-82933a5d321a.preview.emergentagent.com"
+        self.api_base = "https://3dd1d4de-4dab-4256-a879-82933a5d321a.preview.emergentagent.com/api"
         
         # Enterprise Agents
         self.enterprise_agents = {}

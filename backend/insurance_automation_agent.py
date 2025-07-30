@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 class InsuranceAutomationAgent:
     def __init__(self):
-        self.api_base = "https://af61faa8-d979-40f7-813a-366cb03a46e8.preview.emergentagent.com/api"
+        self.api_base = "https://3dd1d4de-4dab-4256-a879-82933a5d321a.preview.emergentagent.com/api"
         self.running = True
         
         # Versicherungsportfolio für Daniel Oettel / ZZ Lobby

@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 class MasterAutomationLauncher:
     def __init__(self):
-        self.api_base = "https://af61faa8-d979-40f7-813a-366cb03a46e8.preview.emergentagent.com/api"
+        self.api_base = "https://3dd1d4de-4dab-4256-a879-82933a5d321a.preview.emergentagent.com/api"
         self.automation_processes = {}
         self.system_active = True
         

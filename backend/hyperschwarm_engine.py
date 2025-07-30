@@ -379,36 +379,96 @@ class MarketingAgent(BaseAgent):
         }
     
     async def execute_task(self, task: Dict[str, Any]) -> Dict[str, Any]:
-        """Erstellt viralen Content"""
-        content_type = task.get("content_type", "general")
-        target_platform = task.get("platform", "multi")
-        product_id = task.get("product_id")
-        objective = task.get("objective", "revenue_generation")
-        
-        # Content-Generierung mit AI-Optimierung
-        content = self._generate_optimized_content(content_type, target_platform)
-        
-        # A/B Testing Varianten
-        variants = self._create_ab_variants(content, 3)
-        
-        # Performance-Vorhersage
-        predicted_ctr = self._predict_performance(content)
-        
-        # Revenue-Simulation
-        projected_revenue = random.uniform(100, 1000)
-        self.update_performance(projected_revenue, predicted_ctr)
-        
-        return {
-            "agent_id": self.agent_id,
-            "task_type": "content_creation",
-            "content": content,
-            "variants": variants,
-            "predicted_ctr": predicted_ctr,
-            "optimization_score": random.uniform(0.85, 0.98),
-            "viral_probability": random.uniform(0.3, 0.7),
-            "projected_revenue": projected_revenue,
-            "execution_time": random.uniform(0.5, 2.0)
-        }
+        """Erstellt echten viralen Content mit DigiStore24 Daten"""
+        try:
+            # Hole echte DigiStore24 Produkte
+            products = await digistore24_service.get_real_products()
+            
+            if not products:
+                self.logger.warning("Keine DigiStore24 Produkte verfügbar")
+                return {
+                    "agent_id": self.agent_id,
+                    "task_type": "content_creation",
+                    "status": "failed",
+                    "error": "Keine Produkte verfügbar"
+                }
+            
+            # Wähle bestes Produkt für Content
+            target_product = max(products, key=lambda p: p.price * p.sales_count)
+            
+            # Generiere echten Content
+            content_type = task.get("content_type", "tiktok_video")
+            target_audience = task.get("target_audience", "digital_entrepreneurs")
+            
+            if content_type == "tiktok_video":
+                content = await content_generation_service.generate_tiktok_content(
+                    product_data={
+                        "id": target_product.id,
+                        "name": target_product.name,
+                        "price": target_product.price
+                    },
+                    target_audience=target_audience
+                )
+            elif content_type == "instagram_post":
+                content = await content_generation_service.generate_instagram_content(
+                    product_data={
+                        "id": target_product.id,
+                        "name": target_product.name,
+                        "price": target_product.price
+                    },
+                    target_audience=target_audience
+                )
+            else:
+                content = await content_generation_service.generate_email_campaign(
+                    product_data={
+                        "id": target_product.id,
+                        "name": target_product.name,
+                        "price": target_product.price
+                    },
+                    campaign_type="launch"
+                )
+            
+            # Berechne echte Performance-Metriken
+            projected_revenue = content.expected_reach * content.conversion_potential * target_product.price
+            self.update_performance(projected_revenue, content.conversion_potential)
+            
+            # Sende Telegram-Benachrichtigung
+            from services.telegram_service import telegram_service
+            await telegram_service.send_content_notification(
+                content_type=content.content_type,
+                platform=content_type.split('_')[0],
+                expected_reach=content.expected_reach
+            )
+            
+            return {
+                "agent_id": self.agent_id,
+                "task_type": "content_creation",
+                "content_id": content.content_id,
+                "content_type": content.content_type,
+                "title": content.title,
+                "script": content.script,
+                "hashtags": content.hashtags,
+                "target_audience": content.target_audience,
+                "expected_reach": content.expected_reach,
+                "conversion_potential": content.conversion_potential,
+                "projected_revenue": projected_revenue,
+                "product_promoted": {
+                    "id": target_product.id,
+                    "name": target_product.name,
+                    "price": target_product.price
+                },
+                "execution_time": time.time(),
+                "status": "success"
+            }
+            
+        except Exception as e:
+            self.logger.error(f"Fehler bei Content-Erstellung: {str(e)}")
+            return {
+                "agent_id": self.agent_id,
+                "task_type": "content_creation",
+                "status": "failed",
+                "error": str(e)
+            }
     
     def _generate_optimized_content(self, content_type: str, platform: str) -> Dict[str, Any]:
         """Generiert hochoptimierten Content"""

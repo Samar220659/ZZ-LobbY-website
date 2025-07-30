@@ -488,7 +488,14 @@ metadata:
   run_ui: true
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Revenue Priority Service"
+    - "Ayrshare Social Media Automation Service"
+    - "Klaviyo Email Marketing System"
+    - "Complete Customer Journey Automation"
+    - "System Health Monitoring & Alerts"
+    - "User Onboarding Tutorial System"
+    - "Security & Backup System Status"
   stuck_tasks:
     - "HYPERSCHWARM Claude AI TikTok Content API"
     - "HYPERSCHWARM Claude AI Email Campaign API"

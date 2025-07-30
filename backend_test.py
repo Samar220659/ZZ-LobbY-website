@@ -602,6 +602,13 @@ class BackendTester:
         self.test_analytics_api()           # Medium priority
         self.test_saas_status_api()         # Low priority
         
+        # HYPERSCHWARM System V3.0 Tests
+        self.test_hyperschwarm_status()     # High priority
+        self.test_hyperschwarm_agents()     # High priority
+        self.test_hyperschwarm_strategy_execution()  # High priority
+        self.test_hyperschwarm_performance_metrics() # Medium priority
+        self.test_hyperschwarm_agent_optimization()  # Medium priority
+        
         return self.results
 
     def print_summary(self):

@@ -321,6 +321,7 @@ class BaseAgent(ABC):
         self.active = True
         self.learning_rate = 0.1
         self.created_at = datetime.now()
+        self.logger = logging.getLogger(f"Agent_{agent_id}")
         
     @abstractmethod
     async def execute_task(self, task: Dict[str, Any]) -> Dict[str, Any]:

@@ -435,6 +435,39 @@ class MarketingAgent(BaseAgent):
             projected_revenue = content.expected_reach * content.conversion_potential * target_product.price
             self.update_performance(projected_revenue, content.conversion_potential)
             
+            # Erstelle zusätzlich Google Opal Landing Page
+            try:
+                campaign_config = {
+                    "hook": content.title,
+                    "target_audience": target_audience,
+                    "urgency": "Limitierte Zeit",
+                    "social_proof": "5000+ erfolgreiche Nutzer"
+                }
+                
+                opal_app = await google_opal_service.create_campaign_landing_page(
+                    product_data={
+                        "id": target_product.id,
+                        "name": target_product.name,
+                        "price": target_product.price
+                    },
+                    campaign_config=campaign_config
+                )
+                
+                # Füge Opal App-URL zu Ergebnis hinzu
+                opal_integration = {
+                    "opal_app_created": True,
+                    "opal_app_id": opal_app.app_id,
+                    "opal_app_url": opal_app.app_url,
+                    "opal_app_type": opal_app.app_type
+                }
+                
+            except Exception as opal_error:
+                self.logger.warning(f"Google Opal Integration Fehler: {str(opal_error)}")
+                opal_integration = {
+                    "opal_app_created": False,
+                    "error": str(opal_error)
+                }
+            
             # Sende Telegram-Benachrichtigung
             from services.telegram_service import telegram_service
             await telegram_service.send_content_notification(
@@ -460,6 +493,8 @@ class MarketingAgent(BaseAgent):
                     "name": target_product.name,
                     "price": target_product.price
                 },
+                "google_opal_integration": opal_integration,
+                "ai_integrations": ["Claude AI", "Google Opal", "DigiStore24"],
                 "execution_time": time.time(),
                 "status": "success"
             }

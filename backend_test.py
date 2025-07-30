@@ -295,6 +295,257 @@ class BackendTester:
         except Exception as e:
             self.log_result("analytics_api", False, f"Analytics API error: {str(e)}")
 
+    def test_hyperschwarm_status(self):
+        """Test HYPERSCHWARM System Status API"""
+        print("\n=== Testing HYPERSCHWARM System Status ===")
+        
+        try:
+            response = self.session.get(f"{API_BASE}/hyperschwarm/status")
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ['success', 'system_status', 'message']
+                
+                if all(field in data for field in required_fields):
+                    system_status = data['system_status']
+                    status_fields = ['system_health', 'total_agents', 'active_agents', 'avg_performance_score']
+                    
+                    if all(field in system_status for field in status_fields):
+                        # Check if system health is close to 99.99%
+                        health = system_status['system_health']
+                        if health >= 99.0:
+                            self.log_result("hyperschwarm_status", True, 
+                                          f"HYPERSCHWARM status OK - Health: {health}%, Agents: {system_status['total_agents']}", 
+                                          data)
+                        else:
+                            self.log_result("hyperschwarm_status", False, 
+                                          f"System health too low: {health}%")
+                    else:
+                        missing = [f for f in status_fields if f not in system_status]
+                        self.log_result("hyperschwarm_status", False, f"Missing system status fields: {missing}")
+                else:
+                    missing = [f for f in required_fields if f not in data]
+                    self.log_result("hyperschwarm_status", False, f"Missing required fields: {missing}")
+            else:
+                self.log_result("hyperschwarm_status", False, 
+                              f"HYPERSCHWARM status API failed: {response.status_code} - {response.text}")
+                
+        except Exception as e:
+            self.log_result("hyperschwarm_status", False, f"HYPERSCHWARM status error: {str(e)}")
+
+    def test_hyperschwarm_agents(self):
+        """Test HYPERSCHWARM Agents Details API"""
+        print("\n=== Testing HYPERSCHWARM Agents Details ===")
+        
+        try:
+            response = self.session.get(f"{API_BASE}/hyperschwarm/agents")
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ['success', 'agents', 'total_agents', 'message']
+                
+                if all(field in data for field in required_fields):
+                    agents = data['agents']
+                    total_agents = data['total_agents']
+                    
+                    # Check if we have 20+ agents as expected
+                    if total_agents >= 20:
+                        # Verify agent structure
+                        if len(agents) > 0:
+                            agent = agents[0]
+                            agent_fields = ['agent_id', 'specialization', 'performance_score', 'tasks_completed', 'revenue_generated', 'active']
+                            
+                            if all(field in agent for field in agent_fields):
+                                # Check for expected agent types
+                                specializations = [agent['specialization'] for agent in agents]
+                                expected_types = ['Marketing', 'Sales', 'Traffic Generation', 'Automation', 'Data Analytics', 'Compliance & Legal']
+                                found_types = [spec for spec in expected_types if spec in specializations]
+                                
+                                if len(found_types) >= 5:  # At least 5 different types
+                                    self.log_result("hyperschwarm_agents", True, 
+                                                  f"All {total_agents} agents retrieved successfully with {len(found_types)} specializations", 
+                                                  {"total_agents": total_agents, "specializations": found_types})
+                                else:
+                                    self.log_result("hyperschwarm_agents", False, 
+                                                  f"Insufficient agent specializations: {found_types}")
+                            else:
+                                missing = [f for f in agent_fields if f not in agent]
+                                self.log_result("hyperschwarm_agents", False, f"Missing agent fields: {missing}")
+                        else:
+                            self.log_result("hyperschwarm_agents", False, "No agent details found")
+                    else:
+                        self.log_result("hyperschwarm_agents", False, 
+                                      f"Insufficient agents: {total_agents} (expected 20+)")
+                else:
+                    missing = [f for f in required_fields if f not in data]
+                    self.log_result("hyperschwarm_agents", False, f"Missing required fields: {missing}")
+            else:
+                self.log_result("hyperschwarm_agents", False, 
+                              f"HYPERSCHWARM agents API failed: {response.status_code} - {response.text}")
+                
+        except Exception as e:
+            self.log_result("hyperschwarm_agents", False, f"HYPERSCHWARM agents error: {str(e)}")
+
+    def test_hyperschwarm_strategy_execution(self):
+        """Test HYPERSCHWARM Strategy Execution API"""
+        print("\n=== Testing HYPERSCHWARM Strategy Execution ===")
+        
+        try:
+            # Test different strategy objectives
+            test_strategies = [
+                {
+                    "objective": "Increase revenue through automated marketing campaigns",
+                    "priority": "high",
+                    "target_revenue": 5000.0,
+                    "timeframe": "24h"
+                },
+                {
+                    "objective": "Optimize conversion rates across all funnels",
+                    "priority": "medium",
+                    "target_revenue": 3000.0,
+                    "timeframe": "48h"
+                }
+            ]
+            
+            successful_executions = 0
+            
+            for i, strategy_data in enumerate(test_strategies):
+                response = self.session.post(f"{API_BASE}/hyperschwarm/execute-strategy", json=strategy_data)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    required_fields = ['success', 'strategy_execution', 'message']
+                    
+                    if all(field in data for field in required_fields):
+                        execution = data['strategy_execution']
+                        execution_fields = ['strategy_id', 'objective', 'execution_time', 'participating_agents']
+                        
+                        if all(field in execution for field in execution_fields):
+                            successful_executions += 1
+                            self.log_result("hyperschwarm_strategy", True, 
+                                          f"Strategy {i+1} executed successfully - ID: {execution['strategy_id']}, Agents: {execution['participating_agents']}")
+                        else:
+                            missing = [f for f in execution_fields if f not in execution]
+                            self.log_result("hyperschwarm_strategy", False, 
+                                          f"Strategy {i+1} missing execution fields: {missing}")
+                    else:
+                        missing = [f for f in required_fields if f not in data]
+                        self.log_result("hyperschwarm_strategy", False, 
+                                      f"Strategy {i+1} missing required fields: {missing}")
+                else:
+                    self.log_result("hyperschwarm_strategy", False, 
+                                  f"Strategy {i+1} execution failed: {response.status_code} - {response.text}")
+            
+            # Overall assessment
+            if successful_executions == len(test_strategies):
+                self.log_result("hyperschwarm_strategy", True, 
+                              f"All {successful_executions} strategy executions successful")
+            elif successful_executions > 0:
+                self.log_result("hyperschwarm_strategy", True, 
+                              f"Partial success: {successful_executions}/{len(test_strategies)} strategies executed")
+            else:
+                self.log_result("hyperschwarm_strategy", False, "No strategies executed successfully")
+                
+        except Exception as e:
+            self.log_result("hyperschwarm_strategy", False, f"HYPERSCHWARM strategy execution error: {str(e)}")
+
+    def test_hyperschwarm_performance_metrics(self):
+        """Test HYPERSCHWARM Performance Metrics API"""
+        print("\n=== Testing HYPERSCHWARM Performance Metrics ===")
+        
+        try:
+            response = self.session.get(f"{API_BASE}/hyperschwarm/performance-metrics")
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ['success', 'performance_metrics', 'message']
+                
+                if all(field in data for field in required_fields):
+                    metrics = data['performance_metrics']
+                    metrics_fields = [
+                        'total_revenue_generated', 'average_performance_score', 
+                        'total_tasks_completed', 'active_agents', 'performance_by_category',
+                        'system_efficiency', 'daily_revenue_projection', 'monthly_revenue_projection'
+                    ]
+                    
+                    if all(field in metrics for field in metrics_fields):
+                        # Validate revenue projections format
+                        daily_proj = metrics['daily_revenue_projection']
+                        monthly_proj = metrics['monthly_revenue_projection']
+                        
+                        if daily_proj.startswith('€') and monthly_proj.startswith('€'):
+                            # Check performance by category
+                            perf_by_cat = metrics['performance_by_category']
+                            if isinstance(perf_by_cat, dict) and len(perf_by_cat) > 0:
+                                self.log_result("hyperschwarm_performance", True, 
+                                              f"Performance metrics retrieved - Revenue: €{metrics['total_revenue_generated']}, Efficiency: {metrics['system_efficiency']}", 
+                                              metrics)
+                            else:
+                                self.log_result("hyperschwarm_performance", False, 
+                                              "Performance by category data missing or invalid")
+                        else:
+                            self.log_result("hyperschwarm_performance", False, 
+                                          "Revenue projections format invalid")
+                    else:
+                        missing = [f for f in metrics_fields if f not in metrics]
+                        self.log_result("hyperschwarm_performance", False, f"Missing metrics fields: {missing}")
+                else:
+                    missing = [f for f in required_fields if f not in data]
+                    self.log_result("hyperschwarm_performance", False, f"Missing required fields: {missing}")
+            else:
+                self.log_result("hyperschwarm_performance", False, 
+                              f"HYPERSCHWARM performance API failed: {response.status_code} - {response.text}")
+                
+        except Exception as e:
+            self.log_result("hyperschwarm_performance", False, f"HYPERSCHWARM performance error: {str(e)}")
+
+    def test_hyperschwarm_agent_optimization(self):
+        """Test HYPERSCHWARM Agent Optimization API"""
+        print("\n=== Testing HYPERSCHWARM Agent Optimization ===")
+        
+        try:
+            response = self.session.post(f"{API_BASE}/hyperschwarm/optimize-agents")
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ['success', 'optimization_results', 'optimized_agents', 'message']
+                
+                if all(field in data for field in required_fields):
+                    optimization_results = data['optimization_results']
+                    optimized_agents = data['optimized_agents']
+                    
+                    # Check if optimization was performed
+                    if isinstance(optimization_results, list):
+                        if len(optimization_results) > 0:
+                            # Verify optimization result structure
+                            result = optimization_results[0]
+                            result_fields = ['agent_id', 'action', 'improvement']
+                            
+                            if all(field in result for field in result_fields):
+                                self.log_result("hyperschwarm_optimization", True, 
+                                              f"Agent optimization successful - {optimized_agents} agents optimized", 
+                                              {"optimized_count": optimized_agents, "sample_result": result})
+                            else:
+                                missing = [f for f in result_fields if f not in result]
+                                self.log_result("hyperschwarm_optimization", False, 
+                                              f"Missing optimization result fields: {missing}")
+                        else:
+                            # No agents needed optimization - still success
+                            self.log_result("hyperschwarm_optimization", True, 
+                                          "Agent optimization completed - no agents required optimization")
+                    else:
+                        self.log_result("hyperschwarm_optimization", False, 
+                                      "Optimization results not in expected format")
+                else:
+                    missing = [f for f in required_fields if f not in data]
+                    self.log_result("hyperschwarm_optimization", False, f"Missing required fields: {missing}")
+            else:
+                self.log_result("hyperschwarm_optimization", False, 
+                              f"HYPERSCHWARM optimization API failed: {response.status_code} - {response.text}")
+                
+        except Exception as e:
+            self.log_result("hyperschwarm_optimization", False, f"HYPERSCHWARM optimization error: {str(e)}")
+
     def test_saas_status_api(self):
         """Test SaaS Status API"""
         print("\n=== Testing SaaS Status API ===")

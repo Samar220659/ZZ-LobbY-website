@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Progress } from "./ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { 
   ArrowLeft, 
   Brain, 
@@ -20,7 +21,15 @@ import {
   Play,
   BarChart3,
   Bot,
-  Award
+  Award,
+  Sparkles,
+  Layout,
+  Calculator,
+  Calendar,
+  Trophy,
+  ExternalLink,
+  Settings,
+  Download
 } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
@@ -39,12 +48,35 @@ export default function AIMarketingHub() {
   const [sellerResults, setSellerResults] = useState(null);
   const [marketingMessages, setMarketingMessages] = useState([]);
   const [salesScripts, setSalesScripts] = useState([]);
+  
+  // Google Opal States
+  const [opalTemplates, setOpalTemplates] = useState([]);
+  const [creatingOpalApp, setCreatingOpalApp] = useState(false);
+  const [opalApps, setOpalApps] = useState([]);
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [opalFormData, setOpalFormData] = useState({
+    product_name: '',
+    product_price: 497,
+    target_audience: 'digital_entrepreneurs'
+  });
 
   useEffect(() => {
     fetchAIStatus();
     fetchLeads();
     fetchMarketingContent();
+    fetchOpalTemplates();
   }, []);
+
+  const fetchOpalTemplates = async () => {
+    try {
+      const response = await axios.get(`${API_BASE}/hyperschwarm/opal/templates`);
+      if (response.data.success) {
+        setOpalTemplates(response.data.templates);
+      }
+    } catch (error) {
+      console.error('Error fetching Opal templates:', error);
+    }
+  };
 
   const fetchAIStatus = async () => {
     try {

@@ -24,6 +24,7 @@ from pymongo import MongoClient
 # Import echter Services
 from services.digistore24_service import digistore24_service
 from services.content_generation_service import content_generation_service
+from services.claude_ai_service import claude_ai_service
 
 # Elite Performance Configuration
 @dataclass

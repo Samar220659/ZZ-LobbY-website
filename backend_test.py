@@ -552,6 +552,334 @@ class BackendTester:
         except Exception as e:
             self.log_result("hyperschwarm_optimization", False, f"HYPERSCHWARM optimization error: {str(e)}")
 
+    def test_hyperschwarm_opal_templates(self):
+        """Test HYPERSCHWARM Google Opal Templates API"""
+        print("\n=== Testing HYPERSCHWARM Google Opal Templates ===")
+        
+        try:
+            response = self.session.get(f"{API_BASE}/hyperschwarm/opal/templates")
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ['success', 'templates', 'total_templates', 'message']
+                
+                if all(field in data for field in required_fields):
+                    templates = data['templates']
+                    total_templates = data['total_templates']
+                    
+                    if isinstance(templates, list) and len(templates) > 0:
+                        # Verify template structure
+                        template = templates[0]
+                        template_fields = ['template_id', 'name', 'description', 'features', 'use_cases']
+                        
+                        if all(field in template for field in template_fields):
+                            # Check for expected template types
+                            template_ids = [t['template_id'] for t in templates]
+                            expected_types = ['landing_page', 'quiz_funnel', 'calculator', 'webinar_registration', 'viral_contest']
+                            found_types = [t_id for t_id in expected_types if t_id in template_ids]
+                            
+                            if len(found_types) >= 3:  # At least 3 template types
+                                self.log_result("hyperschwarm_opal_templates", True, 
+                                              f"Google Opal templates retrieved successfully - {total_templates} templates with {len(found_types)} types", 
+                                              {"total_templates": total_templates, "template_types": found_types})
+                            else:
+                                self.log_result("hyperschwarm_opal_templates", False, 
+                                              f"Insufficient template types: {found_types}")
+                        else:
+                            missing = [f for f in template_fields if f not in template]
+                            self.log_result("hyperschwarm_opal_templates", False, f"Missing template fields: {missing}")
+                    else:
+                        self.log_result("hyperschwarm_opal_templates", False, "No templates found or invalid format")
+                else:
+                    missing = [f for f in required_fields if f not in data]
+                    self.log_result("hyperschwarm_opal_templates", False, f"Missing required fields: {missing}")
+            else:
+                self.log_result("hyperschwarm_opal_templates", False, 
+                              f"Opal templates API failed: {response.status_code} - {response.text}")
+                
+        except Exception as e:
+            self.log_result("hyperschwarm_opal_templates", False, f"Opal templates error: {str(e)}")
+
+    def test_hyperschwarm_opal_create_app(self):
+        """Test HYPERSCHWARM Google Opal Create App API"""
+        print("\n=== Testing HYPERSCHWARM Google Opal Create App ===")
+        
+        try:
+            # Test app creation with Elite Trading System parameters
+            app_data = {
+                "app_type": "landing_page",
+                "product_name": "Elite Trading System",
+                "product_price": 997.0,
+                "target_audience": "digital_entrepreneurs",
+                "campaign_config": {
+                    "hook": "Entdecke das Elite Trading System - Das System das alles verändert",
+                    "urgency": "Limitiertes Angebot - Nur 48 Stunden",
+                    "social_proof": "5000+ erfolgreiche Trader"
+                }
+            }
+            
+            response = self.session.post(f"{API_BASE}/hyperschwarm/opal/create-app", json=app_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ['success', 'opal_app', 'message']
+                
+                if all(field in data for field in required_fields):
+                    opal_app = data['opal_app']
+                    app_fields = ['app_id', 'app_name', 'app_url', 'app_type', 'created_at', 'performance_metrics']
+                    
+                    if all(field in opal_app for field in app_fields):
+                        # Verify app URL format
+                        app_url = opal_app['app_url']
+                        if app_url.startswith('https://') and 'opal' in app_url.lower():
+                            self.log_result("hyperschwarm_opal_create_app", True, 
+                                          f"Google Opal app created successfully - ID: {opal_app['app_id']}, URL: {app_url}", 
+                                          opal_app)
+                        else:
+                            self.log_result("hyperschwarm_opal_create_app", False, 
+                                          f"Invalid app URL format: {app_url}")
+                    else:
+                        missing = [f for f in app_fields if f not in opal_app]
+                        self.log_result("hyperschwarm_opal_create_app", False, f"Missing opal app fields: {missing}")
+                else:
+                    missing = [f for f in required_fields if f not in data]
+                    self.log_result("hyperschwarm_opal_create_app", False, f"Missing required fields: {missing}")
+            else:
+                self.log_result("hyperschwarm_opal_create_app", False, 
+                              f"Opal create app API failed: {response.status_code} - {response.text}")
+                
+        except Exception as e:
+            self.log_result("hyperschwarm_opal_create_app", False, f"Opal create app error: {str(e)}")
+
+    def test_hyperschwarm_opal_landing_page(self):
+        """Test HYPERSCHWARM Google Opal Landing Page API"""
+        print("\n=== Testing HYPERSCHWARM Google Opal Landing Page ===")
+        
+        try:
+            # Test landing page creation
+            landing_data = {
+                "product_data": {
+                    "name": "Elite Trading System",
+                    "price": 997.0
+                },
+                "campaign_config": {
+                    "hook": "Entdecke das Elite Trading System",
+                    "target_audience": "digital_entrepreneurs",
+                    "urgency": "Limitierte Zeit",
+                    "social_proof": "5000+ erfolgreiche Nutzer"
+                }
+            }
+            
+            response = self.session.post(f"{API_BASE}/hyperschwarm/opal/create-landing-page", json=landing_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ['success', 'landing_page', 'message']
+                
+                if all(field in data for field in required_fields):
+                    landing_page = data['landing_page']
+                    page_fields = ['app_id', 'app_name', 'app_url', 'created_at', 'features']
+                    
+                    if all(field in landing_page for field in page_fields):
+                        # Verify features
+                        features = landing_page['features']
+                        expected_features = ['countdown_timer', 'social_proof', 'payment_integration', 'mobile_responsive']
+                        
+                        if all(feature in features for feature in expected_features):
+                            self.log_result("hyperschwarm_opal_landing_page", True, 
+                                          f"Google Opal landing page created successfully - ID: {landing_page['app_id']}", 
+                                          landing_page)
+                        else:
+                            missing_features = [f for f in expected_features if f not in features]
+                            self.log_result("hyperschwarm_opal_landing_page", False, 
+                                          f"Missing landing page features: {missing_features}")
+                    else:
+                        missing = [f for f in page_fields if f not in landing_page]
+                        self.log_result("hyperschwarm_opal_landing_page", False, f"Missing landing page fields: {missing}")
+                else:
+                    missing = [f for f in required_fields if f not in data]
+                    self.log_result("hyperschwarm_opal_landing_page", False, f"Missing required fields: {missing}")
+            else:
+                self.log_result("hyperschwarm_opal_landing_page", False, 
+                              f"Opal landing page API failed: {response.status_code} - {response.text}")
+                
+        except Exception as e:
+            self.log_result("hyperschwarm_opal_landing_page", False, f"Opal landing page error: {str(e)}")
+
+    def test_hyperschwarm_claude_tiktok(self):
+        """Test HYPERSCHWARM Claude AI TikTok Content API"""
+        print("\n=== Testing HYPERSCHWARM Claude AI TikTok Content ===")
+        
+        try:
+            # Test TikTok content generation with Elite Trading System parameters
+            tiktok_params = {
+                "product_name": "Elite Trading System",
+                "product_price": 997.0,
+                "target_audience": "digital_entrepreneurs"
+            }
+            
+            response = self.session.post(f"{API_BASE}/hyperschwarm/ai-content/tiktok", params=tiktok_params)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ['success', 'ai_content', 'message']
+                
+                if all(field in data for field in required_fields):
+                    ai_content = data['ai_content']
+                    content_fields = ['content_id', 'title', 'content', 'target_audience', 'predicted_performance', 'ai_confidence']
+                    
+                    if all(field in ai_content for field in content_fields):
+                        # Verify content quality
+                        content = ai_content['content']
+                        predicted_performance = ai_content['predicted_performance']
+                        ai_confidence = ai_content['ai_confidence']
+                        
+                        if len(content) > 100 and predicted_performance > 0 and ai_confidence > 0.8:
+                            self.log_result("hyperschwarm_claude_tiktok", True, 
+                                          f"Claude AI TikTok content generated successfully - Confidence: {ai_confidence:.2f}, Performance: {predicted_performance:.2f}", 
+                                          {"content_id": ai_content['content_id'], "content_length": len(content)})
+                        else:
+                            self.log_result("hyperschwarm_claude_tiktok", False, 
+                                          f"Content quality insufficient - Length: {len(content)}, Confidence: {ai_confidence}")
+                    else:
+                        missing = [f for f in content_fields if f not in ai_content]
+                        self.log_result("hyperschwarm_claude_tiktok", False, f"Missing AI content fields: {missing}")
+                else:
+                    missing = [f for f in required_fields if f not in data]
+                    self.log_result("hyperschwarm_claude_tiktok", False, f"Missing required fields: {missing}")
+            else:
+                self.log_result("hyperschwarm_claude_tiktok", False, 
+                              f"Claude TikTok API failed: {response.status_code} - {response.text}")
+                
+        except Exception as e:
+            self.log_result("hyperschwarm_claude_tiktok", False, f"Claude TikTok error: {str(e)}")
+
+    def test_hyperschwarm_claude_email(self):
+        """Test HYPERSCHWARM Claude AI Email Campaign API"""
+        print("\n=== Testing HYPERSCHWARM Claude AI Email Campaign ===")
+        
+        try:
+            # Test email campaign generation
+            email_params = {
+                "product_name": "Elite Trading System",
+                "product_price": 997.0,
+                "campaign_type": "launch"
+            }
+            
+            response = self.session.post(f"{API_BASE}/hyperschwarm/ai-content/email", params=email_params)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ['success', 'email_campaign', 'message']
+                
+                if all(field in data for field in required_fields):
+                    email_campaign = data['email_campaign']
+                    campaign_fields = ['content_id', 'title', 'content', 'predicted_performance', 'ai_confidence']
+                    
+                    if all(field in email_campaign for field in campaign_fields):
+                        # Verify email content quality
+                        content = email_campaign['content']
+                        predicted_performance = email_campaign['predicted_performance']
+                        ai_confidence = email_campaign['ai_confidence']
+                        
+                        if len(content) > 200 and predicted_performance > 0 and ai_confidence > 0.8:
+                            self.log_result("hyperschwarm_claude_email", True, 
+                                          f"Claude AI email campaign generated successfully - Confidence: {ai_confidence:.2f}, Performance: {predicted_performance:.2f}", 
+                                          {"content_id": email_campaign['content_id'], "content_length": len(content)})
+                        else:
+                            self.log_result("hyperschwarm_claude_email", False, 
+                                          f"Email content quality insufficient - Length: {len(content)}, Confidence: {ai_confidence}")
+                    else:
+                        missing = [f for f in campaign_fields if f not in email_campaign]
+                        self.log_result("hyperschwarm_claude_email", False, f"Missing email campaign fields: {missing}")
+                else:
+                    missing = [f for f in required_fields if f not in data]
+                    self.log_result("hyperschwarm_claude_email", False, f"Missing required fields: {missing}")
+            else:
+                self.log_result("hyperschwarm_claude_email", False, 
+                              f"Claude email API failed: {response.status_code} - {response.text}")
+                
+        except Exception as e:
+            self.log_result("hyperschwarm_claude_email", False, f"Claude email error: {str(e)}")
+
+    def test_hyperschwarm_integrated_campaign(self):
+        """Test HYPERSCHWARM Integrated Campaign API (VOLLAUTOMATISIERTE KAMPAGNE)"""
+        print("\n=== Testing HYPERSCHWARM Integrated Campaign (VOLLAUTOMATISIERT) ===")
+        
+        try:
+            # Test integrated campaign with Elite Trading System parameters
+            campaign_params = {
+                "product_name": "Elite Trading System",
+                "product_price": 997.0,
+                "target_audience": "digital_entrepreneurs"
+            }
+            
+            response = self.session.post(f"{API_BASE}/hyperschwarm/integrated-campaign", params=campaign_params)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ['success', 'integrated_campaign', 'message']
+                
+                if all(field in data for field in required_fields):
+                    campaign = data['integrated_campaign']
+                    campaign_fields = ['tiktok_content', 'email_campaign', 'landing_page', 'campaign_summary']
+                    
+                    if all(field in campaign for field in campaign_fields):
+                        # Verify each component
+                        tiktok_content = campaign['tiktok_content']
+                        email_campaign = campaign['email_campaign']
+                        landing_page = campaign['landing_page']
+                        campaign_summary = campaign['campaign_summary']
+                        
+                        # Check if all components were generated
+                        components_generated = [
+                            tiktok_content.get('generated', False),
+                            email_campaign.get('generated', False),
+                            'app_id' in landing_page
+                        ]
+                        
+                        if all(components_generated):
+                            # Verify AI integrations
+                            ai_integrations = campaign_summary.get('ai_integrations', [])
+                            expected_integrations = ['Claude AI', 'Google Opal', 'Telegram Bot']
+                            
+                            if all(integration in ai_integrations for integration in expected_integrations):
+                                self.log_result("hyperschwarm_integrated_campaign", True, 
+                                              f"Integrated campaign created successfully - All AI services coordinated", 
+                                              {
+                                                  "tiktok_generated": tiktok_content.get('generated'),
+                                                  "email_generated": email_campaign.get('generated'),
+                                                  "landing_page_id": landing_page.get('app_id'),
+                                                  "ai_integrations": ai_integrations
+                                              })
+                            else:
+                                missing_integrations = [i for i in expected_integrations if i not in ai_integrations]
+                                self.log_result("hyperschwarm_integrated_campaign", False, 
+                                              f"Missing AI integrations: {missing_integrations}")
+                        else:
+                            failed_components = []
+                            if not tiktok_content.get('generated', False):
+                                failed_components.append('TikTok Content')
+                            if not email_campaign.get('generated', False):
+                                failed_components.append('Email Campaign')
+                            if 'app_id' not in landing_page:
+                                failed_components.append('Landing Page')
+                            
+                            self.log_result("hyperschwarm_integrated_campaign", False, 
+                                          f"Failed to generate components: {failed_components}")
+                    else:
+                        missing = [f for f in campaign_fields if f not in campaign]
+                        self.log_result("hyperschwarm_integrated_campaign", False, f"Missing campaign fields: {missing}")
+                else:
+                    missing = [f for f in required_fields if f not in data]
+                    self.log_result("hyperschwarm_integrated_campaign", False, f"Missing required fields: {missing}")
+            else:
+                self.log_result("hyperschwarm_integrated_campaign", False, 
+                              f"Integrated campaign API failed: {response.status_code} - {response.text}")
+                
+        except Exception as e:
+            self.log_result("hyperschwarm_integrated_campaign", False, f"Integrated campaign error: {str(e)}")
+
     def test_saas_status_api(self):
         """Test SaaS Status API"""
         print("\n=== Testing SaaS Status API ===")

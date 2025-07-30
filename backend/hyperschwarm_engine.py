@@ -43,18 +43,22 @@ class EliteConfig:
     SWARM_INTELLIGENCE_FACTOR: float = 2.5
     
     # Monetization Sources
-    REVENUE_SOURCES: List[str] = [
-        "digistore24_affiliate",
-        "high_ticket_products", 
-        "recurring_subscriptions",
-        "upsells_downsells",
-        "email_marketing",
-        "social_media_organic",
-        "paid_advertising",
-        "webinar_funnels",
-        "membership_sites",
-        "digital_products"
-    ]
+    REVENUE_SOURCES: List[str] = None
+    
+    def __post_init__(self):
+        if self.REVENUE_SOURCES is None:
+            self.REVENUE_SOURCES = [
+                "digistore24_affiliate",
+                "high_ticket_products", 
+                "recurring_subscriptions",
+                "upsells_downsells",
+                "email_marketing",
+                "social_media_organic",
+                "paid_advertising",
+                "webinar_funnels",
+                "membership_sites",
+                "digital_products"
+            ]
 
 # HYPERSCHWARM ORCHESTRATOR - Zentrale Steuerungseinheit
 class HyperschwarmOrchestrator:

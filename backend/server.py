@@ -766,8 +766,14 @@ async def get_email_marketing_stats():
         raise HTTPException(status_code=500, detail=f"Failed to get email stats: {str(e)}")
 
 # COMPREHENSIVE AUTOMATION ENDPOINT
+class CustomerJourneyRequest(BaseModel):
+    email: str
+    product_name: str
+    price: float
+    customer_name: str = None
+
 @api_router.post("/automation/complete-customer-journey")
-async def complete_customer_journey(email: str, product_name: str, price: float, customer_name: str = None):
+async def complete_customer_journey(request: CustomerJourneyRequest):
     """Complete automated customer journey: Email + Social + Revenue Priority"""
     try:
         results = {
@@ -778,27 +784,27 @@ async def complete_customer_journey(email: str, product_name: str, price: float,
         }
         
         # 1. Create email profile and send welcome
-        email_result = await klaviyo_service.send_welcome_sequence(email, customer_name)
+        email_result = await klaviyo_service.send_welcome_sequence(request.email, request.customer_name)
         results["email_marketing"] = email_result
         
         # 2. Create viral social media content
-        social_result = await ayrshare_service.create_viral_content_campaign(product_name, price, "new_customers")
+        social_result = await ayrshare_service.create_viral_content_campaign(request.product_name, request.price, "new_customers")
         results["social_media"] = social_result
         
         # 3. Process revenue with priority system
-        revenue_result = await revenue_priority_service.process_revenue_priority(price, "new_customer")
+        revenue_result = await revenue_priority_service.process_revenue_priority(request.price, "new_customer")
         results["revenue_processing"] = revenue_result
         
         # 4. Create upsell campaign
-        if price < 500:
-            upsell_result = await klaviyo_service.create_upsell_campaign(email, price)
+        if request.price < 500:
+            upsell_result = await klaviyo_service.create_upsell_campaign(request.email, request.price)
             results["upsell_campaign"] = upsell_result
         
         results["journey_success"] = True
         results["automation_summary"] = {
-            "customer": email,
-            "product": product_name,
-            "price": price,
+            "customer": request.email,
+            "product": request.product_name,
+            "price": request.price,
             "systems_activated": ["Email Marketing", "Social Media", "Revenue Priority", "Upsell System"],
             "estimated_automation_time": "< 30 seconds"
         }
@@ -806,7 +812,7 @@ async def complete_customer_journey(email: str, product_name: str, price: float,
         return {
             "success": True,
             "complete_journey": results,
-            "message": f"Complete customer journey automated for {email}"
+            "message": f"Complete customer journey automated for {request.email}"
         }
         
     except Exception as e:

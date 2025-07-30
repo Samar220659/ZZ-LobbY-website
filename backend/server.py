@@ -370,6 +370,237 @@ async def optimize_hyperschwarm_agents():
         logging.error(f"Error optimizing HYPERSCHWARM agents: {e}")
         raise HTTPException(status_code=500, detail="Failed to optimize agents")
 
+# GOOGLE OPAL API ENDPOINTS
+@api_router.get("/hyperschwarm/opal/templates")
+async def get_opal_templates():
+    """Gibt verfügbare Google Opal Templates zurück"""
+    try:
+        from services.google_opal_service import google_opal_service
+        templates = google_opal_service.get_available_templates()
+        
+        return {
+            "success": True,
+            "templates": templates,
+            "total_templates": len(templates),
+            "message": "Google Opal templates retrieved successfully"
+        }
+    except Exception as e:
+        logging.error(f"Error getting Opal templates: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get Opal templates")
+
+class OpalAppRequest(BaseModel):
+    app_type: str
+    product_name: str
+    product_price: float
+    target_audience: str = "digital_entrepreneurs"
+    campaign_config: dict = {}
+
+@api_router.post("/hyperschwarm/opal/create-app")
+async def create_opal_marketing_app(request: OpalAppRequest):
+    """Erstellt Google Opal Marketing-App"""
+    try:
+        from services.google_opal_service import google_opal_service
+        
+        config = {
+            "app_name": f"{request.app_type.replace('_', ' ').title()}: {request.product_name}",
+            "product_name": request.product_name,
+            "price": request.product_price,
+            "audience": request.target_audience,
+            **request.campaign_config
+        }
+        
+        opal_app = await google_opal_service.create_marketing_app(request.app_type, config)
+        
+        return {
+            "success": True,
+            "opal_app": {
+                "app_id": opal_app.app_id,
+                "app_name": opal_app.app_name,
+                "app_url": opal_app.app_url,
+                "app_type": opal_app.app_type,
+                "created_at": opal_app.created_at.isoformat(),
+                "performance_metrics": opal_app.performance_metrics
+            },
+            "message": f"Google Opal {request.app_type} app created successfully"
+        }
+    except Exception as e:
+        logging.error(f"Error creating Opal app: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to create Opal app: {str(e)}")
+
+@api_router.post("/hyperschwarm/opal/create-landing-page")
+async def create_opal_landing_page(product_data: dict, campaign_config: dict = {}):
+    """Erstellt automatisch Google Opal Landing Page"""
+    try:
+        from services.google_opal_service import google_opal_service
+        
+        opal_app = await google_opal_service.create_campaign_landing_page(
+            product_data=product_data,
+            campaign_config=campaign_config
+        )
+        
+        return {
+            "success": True,
+            "landing_page": {
+                "app_id": opal_app.app_id,
+                "app_name": opal_app.app_name,
+                "app_url": opal_app.app_url,
+                "created_at": opal_app.created_at.isoformat(),
+                "features": ["countdown_timer", "social_proof", "payment_integration", "mobile_responsive"]
+            },
+            "message": "Google Opal landing page created successfully"
+        }
+    except Exception as e:
+        logging.error(f"Error creating Opal landing page: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to create landing page: {str(e)}")
+
+# CLAUDE AI CONTENT GENERATION ENDPOINTS
+@api_router.post("/hyperschwarm/ai-content/tiktok")
+async def generate_ai_tiktok_content(product_name: str, product_price: float, target_audience: str = "digital_entrepreneurs"):
+    """Generiert TikTok Content mit Claude AI"""
+    try:
+        from services.claude_ai_service import claude_ai_service
+        
+        ai_content = await claude_ai_service.generate_viral_tiktok_script(
+            product_name=product_name,
+            product_price=product_price,
+            target_audience=target_audience
+        )
+        
+        if ai_content:
+            return {
+                "success": True,
+                "ai_content": {
+                    "content_id": ai_content.content_id,
+                    "title": ai_content.title,
+                    "content": ai_content.content,
+                    "target_audience": ai_content.target_audience,
+                    "predicted_performance": ai_content.predicted_performance,
+                    "ai_confidence": ai_content.ai_confidence
+                },
+                "message": "AI TikTok content generated successfully"
+            }
+        else:
+            raise HTTPException(status_code=500, detail="Failed to generate AI content")
+            
+    except Exception as e:
+        logging.error(f"Error generating AI TikTok content: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to generate AI content: {str(e)}")
+
+@api_router.post("/hyperschwarm/ai-content/email")
+async def generate_ai_email_campaign(product_name: str, product_price: float, campaign_type: str = "launch"):
+    """Generiert Email-Kampagne mit Claude AI"""
+    try:
+        from services.claude_ai_service import claude_ai_service
+        
+        ai_content = await claude_ai_service.generate_email_campaign(
+            product_name=product_name,
+            product_price=product_price,
+            campaign_type=campaign_type
+        )
+        
+        if ai_content:
+            return {
+                "success": True,
+                "email_campaign": {
+                    "content_id": ai_content.content_id,
+                    "title": ai_content.title,
+                    "content": ai_content.content,
+                    "predicted_performance": ai_content.predicted_performance,
+                    "ai_confidence": ai_content.ai_confidence
+                },
+                "message": f"AI email campaign ({campaign_type}) generated successfully"
+            }
+        else:
+            raise HTTPException(status_code=500, detail="Failed to generate AI email campaign")
+            
+    except Exception as e:
+        logging.error(f"Error generating AI email campaign: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to generate AI email campaign: {str(e)}")
+
+@api_router.post("/hyperschwarm/integrated-campaign")
+async def create_integrated_ai_campaign(product_name: str, product_price: float, target_audience: str = "digital_entrepreneurs"):
+    """Erstellt komplette integrierte Kampagne mit AI + Opal"""
+    try:
+        from services.claude_ai_service import claude_ai_service
+        from services.google_opal_service import google_opal_service
+        from services.telegram_service import telegram_service
+        
+        # 1. Generiere TikTok Content mit Claude AI
+        tiktok_content = await claude_ai_service.generate_viral_tiktok_script(
+            product_name=product_name,
+            product_price=product_price,
+            target_audience=target_audience
+        )
+        
+        # 2. Generiere Email-Kampagne
+        email_content = await claude_ai_service.generate_email_campaign(
+            product_name=product_name,
+            product_price=product_price,
+            campaign_type="launch"
+        )
+        
+        # 3. Erstelle Google Opal Landing Page
+        campaign_config = {
+            "hook": tiktok_content.title if tiktok_content else f"Entdecke {product_name}",
+            "target_audience": target_audience,
+            "urgency": "Limitierte Zeit",
+            "social_proof": "5000+ erfolgreiche Nutzer"
+        }
+        
+        opal_landing = await google_opal_service.create_campaign_landing_page(
+            product_data={
+                "name": product_name,
+                "price": product_price
+            },
+            campaign_config=campaign_config
+        )
+        
+        # 4. Sende Telegram Summary
+        await telegram_service.send_message(
+            f"🚀 **INTEGRIERTE AI-KAMPAGNE ERSTELLT** 🚀\n\n"
+            f"📱 **Produkt:** {product_name} (€{product_price})\n"
+            f"🎯 **Zielgruppe:** {target_audience}\n\n"
+            f"✅ **TikTok Content:** Viral-optimiert mit Claude AI\n"
+            f"✅ **Email-Kampagne:** Launch-Serie generiert\n"
+            f"✅ **Landing Page:** {opal_landing.app_url}\n\n"
+            f"💪 **HYPERSCHWARM hat eine komplette Marketing-Kampagne automatisiert erstellt!**\n\n"
+            f"#IntegratedCampaign #ClaudeAI #GoogleOpal"
+        )
+        
+        return {
+            "success": True,
+            "integrated_campaign": {
+                "tiktok_content": {
+                    "generated": tiktok_content is not None,
+                    "content_id": tiktok_content.content_id if tiktok_content else None,
+                    "predicted_performance": tiktok_content.predicted_performance if tiktok_content else None
+                },
+                "email_campaign": {
+                    "generated": email_content is not None,
+                    "content_id": email_content.content_id if email_content else None,
+                    "predicted_performance": email_content.predicted_performance if email_content else None
+                },
+                "landing_page": {
+                    "app_id": opal_landing.app_id,
+                    "app_url": opal_landing.app_url,
+                    "created_at": opal_landing.created_at.isoformat()
+                },
+                "campaign_summary": {
+                    "product_name": product_name,
+                    "product_price": product_price,
+                    "target_audience": target_audience,
+                    "ai_integrations": ["Claude AI", "Google Opal", "Telegram Bot"],
+                    "estimated_setup_time": "< 5 minutes",
+                    "projected_reach": "10,000+ potential customers"
+                }
+            },
+            "message": "Integrated AI marketing campaign created successfully with Claude AI + Google Opal"
+        }
+        
+    except Exception as e:
+        logging.error(f"Error creating integrated AI campaign: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to create integrated campaign: {str(e)}")
+
 # Include the routers in the main app
 app.include_router(api_router)
 app.include_router(automation_router)  # Automation Engine

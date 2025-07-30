@@ -61,6 +61,12 @@ async def startup_event():
     await db_service.initialize_default_data()
     logging.info("Database initialized successfully")
     logging.info("Automation Engine initialized successfully")
+    
+    # Initialize HYPERSCHWARM
+    global hyperschwarm
+    hyperschwarm = get_hyperschwarm_orchestrator(client)
+    logging.info("🚀 HYPERSCHWARM Multi-Agent System initialized successfully")
+    logging.info(f"✅ {len(hyperschwarm.agents)} Elite Agents online and ready for deployment!")
 
 # Dashboard API
 @api_router.get("/dashboard/stats", response_model=DashboardStatsResponse)

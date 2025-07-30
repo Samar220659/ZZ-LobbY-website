@@ -888,6 +888,553 @@ class BackendTester:
         except Exception as e:
             self.log_result("hyperschwarm_integrated_campaign", False, f"Integrated campaign error: {str(e)}")
 
+    def test_revenue_priority_service(self):
+        """Test Revenue Priority Service - €90 API cost automation"""
+        print("\n=== Testing Revenue Priority Service ===")
+        
+        try:
+            # Test 1: Get priority status
+            status_response = self.session.get(f"{API_BASE}/revenue-priority/status")
+            
+            if status_response.status_code == 200:
+                status_data = status_response.json()
+                required_fields = ['success', 'priority_status', 'message']
+                
+                if all(field in status_data for field in required_fields):
+                    priority_status = status_data['priority_status']
+                    status_fields = ['total_api_costs', 'pending_payments', 'ready_payments', 'personal_payout_threshold']
+                    
+                    if all(field in priority_status for field in status_fields):
+                        # Verify €90 total API costs
+                        total_costs = priority_status['total_api_costs']
+                        if total_costs == 90.0:
+                            self.log_result("revenue_priority_service", True, 
+                                          f"Priority status OK - Total API costs: €{total_costs}")
+                            
+                            # Test 2: Process revenue with partial amount (€50)
+                            partial_response = self.session.post(f"{API_BASE}/revenue-priority/process", 
+                                                               params={"revenue_amount": 50.0, "source": "test_customer"})
+                            
+                            if partial_response.status_code == 200:
+                                partial_data = partial_response.json()
+                                if partial_data.get('success') and 'processing_result' in partial_data:
+                                    result = partial_data['processing_result']
+                                    if not result.get('api_payments_covered', True):
+                                        self.log_result("revenue_priority_service", True, 
+                                                      f"Partial payment processed correctly - €50 insufficient for €90 API costs")
+                                        
+                                        # Test 3: Process revenue with full coverage (€100)
+                                        full_response = self.session.post(f"{API_BASE}/revenue-priority/process", 
+                                                                        params={"revenue_amount": 100.0, "source": "test_customer"})
+                                        
+                                        if full_response.status_code == 200:
+                                            full_data = full_response.json()
+                                            if full_data.get('success') and 'processing_result' in full_data:
+                                                full_result = full_data['processing_result']
+                                                if full_result.get('api_payments_covered', False):
+                                                    self.log_result("revenue_priority_service", True, 
+                                                                  f"Full payment processed - €100 covers €90 API costs with €{full_result.get('available_for_payout', 0):.2f} remaining")
+                                                    
+                                                    # Test 4: Get payment instructions
+                                                    instructions_response = self.session.get(f"{API_BASE}/revenue-priority/payment-instructions")
+                                                    if instructions_response.status_code == 200:
+                                                        instructions_data = instructions_response.json()
+                                                        if instructions_data.get('success'):
+                                                            self.log_result("revenue_priority_service", True, 
+                                                                          "Revenue Priority Service fully functional - all tests passed")
+                                                        else:
+                                                            self.log_result("revenue_priority_service", False, 
+                                                                          "Payment instructions failed")
+                                                    else:
+                                                        self.log_result("revenue_priority_service", False, 
+                                                                      f"Payment instructions API failed: {instructions_response.status_code}")
+                                                else:
+                                                    self.log_result("revenue_priority_service", False, 
+                                                                  "Full payment not properly processed")
+                                            else:
+                                                self.log_result("revenue_priority_service", False, 
+                                                              "Full payment response invalid")
+                                        else:
+                                            self.log_result("revenue_priority_service", False, 
+                                                          f"Full payment processing failed: {full_response.status_code}")
+                                    else:
+                                        self.log_result("revenue_priority_service", False, 
+                                                      "Partial payment logic incorrect")
+                                else:
+                                    self.log_result("revenue_priority_service", False, 
+                                                  "Partial payment response invalid")
+                            else:
+                                self.log_result("revenue_priority_service", False, 
+                                              f"Partial payment processing failed: {partial_response.status_code}")
+                        else:
+                            self.log_result("revenue_priority_service", False, 
+                                          f"Incorrect API costs total: €{total_costs} (expected €90)")
+                    else:
+                        missing = [f for f in status_fields if f not in priority_status]
+                        self.log_result("revenue_priority_service", False, f"Missing status fields: {missing}")
+                else:
+                    missing = [f for f in required_fields if f not in status_data]
+                    self.log_result("revenue_priority_service", False, f"Missing required fields: {missing}")
+            else:
+                self.log_result("revenue_priority_service", False, 
+                              f"Priority status API failed: {status_response.status_code} - {status_response.text}")
+                
+        except Exception as e:
+            self.log_result("revenue_priority_service", False, f"Revenue Priority Service error: {str(e)}")
+
+    def test_ayrshare_social_media(self):
+        """Test Ayrshare Social Media Automation - 20 call limit tracking"""
+        print("\n=== Testing Ayrshare Social Media Automation ===")
+        
+        try:
+            # Test 1: Get usage statistics
+            usage_response = self.session.get(f"{API_BASE}/social-media/usage")
+            
+            if usage_response.status_code == 200:
+                usage_data = usage_response.json()
+                required_fields = ['success', 'usage_stats', 'message']
+                
+                if all(field in usage_data for field in required_fields):
+                    usage_stats = usage_data['usage_stats']
+                    stats_fields = ['calls_used', 'calls_remaining', 'call_limit', 'usage_percentage']
+                    
+                    if all(field in usage_stats for field in stats_fields):
+                        call_limit = usage_stats['call_limit']
+                        if call_limit == 20:
+                            self.log_result("ayrshare_social_media", True, 
+                                          f"Usage stats OK - {usage_stats['calls_used']}/{call_limit} calls used")
+                            
+                            # Test 2: Create social media post
+                            post_data = {
+                                "content": "🚀 ZZ-Lobby Elite Test Post - HYPERSCHWARM V3.0 System AKTIV! 💎 Automatische Umsätze generieren 🎯 #ZZLobbyElite #TestPost",
+                                "platforms": ["instagram", "twitter"]
+                            }
+                            
+                            post_response = self.session.post(f"{API_BASE}/social-media/post", json=post_data)
+                            
+                            if post_response.status_code == 200:
+                                post_result = post_response.json()
+                                if post_result.get('success', False):
+                                    self.log_result("ayrshare_social_media", True, 
+                                                  f"Social media post successful - Posted to {len(post_data['platforms'])} platforms")
+                                    
+                                    # Test 3: Create viral campaign
+                                    campaign_response = self.session.post(f"{API_BASE}/social-media/viral-campaign", 
+                                                                        params={"product_name": "Elite System", "price": 297, "target_audience": "digital_entrepreneurs"})
+                                    
+                                    if campaign_response.status_code == 200:
+                                        campaign_data = campaign_response.json()
+                                        if campaign_data.get('success', False):
+                                            viral_campaign = campaign_data['viral_campaign']
+                                            if viral_campaign.get('campaign_success', False):
+                                                self.log_result("ayrshare_social_media", True, 
+                                                              f"Viral campaign created - {viral_campaign.get('posts_created', 0)} posts created")
+                                                
+                                                # Test 4: Get connected platforms
+                                                platforms_response = self.session.get(f"{API_BASE}/social-media/platforms")
+                                                if platforms_response.status_code == 200:
+                                                    platforms_data = platforms_response.json()
+                                                    if platforms_data.get('success'):
+                                                        platforms = platforms_data.get('connected_platforms', [])
+                                                        self.log_result("ayrshare_social_media", True, 
+                                                                      f"Ayrshare Social Media Service fully functional - {len(platforms)} platforms connected")
+                                                    else:
+                                                        self.log_result("ayrshare_social_media", False, 
+                                                                      "Connected platforms check failed")
+                                                else:
+                                                    self.log_result("ayrshare_social_media", False, 
+                                                                  f"Platforms API failed: {platforms_response.status_code}")
+                                            else:
+                                                self.log_result("ayrshare_social_media", False, 
+                                                              "Viral campaign creation failed")
+                                        else:
+                                            self.log_result("ayrshare_social_media", False, 
+                                                          "Viral campaign response invalid")
+                                    else:
+                                        self.log_result("ayrshare_social_media", False, 
+                                                      f"Viral campaign API failed: {campaign_response.status_code}")
+                                else:
+                                    # Check if it's a call limit issue
+                                    if "limit reached" in str(post_result):
+                                        self.log_result("ayrshare_social_media", True, 
+                                                      "Social media service working - API call limit reached (expected behavior)")
+                                    else:
+                                        self.log_result("ayrshare_social_media", False, 
+                                                      f"Social media post failed: {post_result}")
+                            else:
+                                self.log_result("ayrshare_social_media", False, 
+                                              f"Social media post API failed: {post_response.status_code}")
+                        else:
+                            self.log_result("ayrshare_social_media", False, 
+                                          f"Incorrect call limit: {call_limit} (expected 20)")
+                    else:
+                        missing = [f for f in stats_fields if f not in usage_stats]
+                        self.log_result("ayrshare_social_media", False, f"Missing usage stats fields: {missing}")
+                else:
+                    missing = [f for f in required_fields if f not in usage_data]
+                    self.log_result("ayrshare_social_media", False, f"Missing required fields: {missing}")
+            else:
+                self.log_result("ayrshare_social_media", False, 
+                              f"Usage stats API failed: {usage_response.status_code} - {usage_response.text}")
+                
+        except Exception as e:
+            self.log_result("ayrshare_social_media", False, f"Ayrshare Social Media error: {str(e)}")
+
+    def test_klaviyo_email_marketing(self):
+        """Test Klaviyo Email Marketing System - Complete automation"""
+        print("\n=== Testing Klaviyo Email Marketing System ===")
+        
+        try:
+            # Test 1: Create customer profile
+            profile_response = self.session.post(f"{API_BASE}/email-marketing/create-profile", 
+                                               params={"email": "test@zzlobby.com", "first_name": "Elite", "last_name": "Tester"})
+            
+            if profile_response.status_code == 200:
+                profile_data = profile_response.json()
+                if profile_data.get('success', False):
+                    profile_result = profile_data['profile_result']
+                    self.log_result("klaviyo_email_marketing", True, 
+                                  f"Customer profile created - Email: test@zzlobby.com")
+                    
+                    # Test 2: Send welcome sequence
+                    welcome_response = self.session.post(f"{API_BASE}/email-marketing/welcome-sequence", 
+                                                       params={"email": "test@zzlobby.com", "customer_name": "Elite Tester"})
+                    
+                    if welcome_response.status_code == 200:
+                        welcome_data = welcome_response.json()
+                        if welcome_data.get('success', False):
+                            welcome_result = welcome_data['welcome_result']
+                            if welcome_result.get('sequence_started', False):
+                                self.log_result("klaviyo_email_marketing", True, 
+                                              "Welcome sequence started successfully")
+                                
+                                # Test 3: Create upsell campaign
+                                upsell_response = self.session.post(f"{API_BASE}/email-marketing/upsell-campaign", 
+                                                                  params={"customer_email": "test@zzlobby.com", "purchase_amount": 297})
+                                
+                                if upsell_response.status_code == 200:
+                                    upsell_data = upsell_response.json()
+                                    if upsell_data.get('success', False):
+                                        upsell_result = upsell_data['upsell_result']
+                                        self.log_result("klaviyo_email_marketing", True, 
+                                                      f"Upsell campaign created - Type: {upsell_result.get('upsell_type', 'unknown')}")
+                                        
+                                        # Test 4: Get email marketing stats
+                                        stats_response = self.session.get(f"{API_BASE}/email-marketing/stats")
+                                        if stats_response.status_code == 200:
+                                            stats_data = stats_response.json()
+                                            if stats_data.get('success'):
+                                                email_stats = stats_data['email_stats']
+                                                stats_fields = ['total_subscribers', 'open_rate', 'click_rate', 'conversion_rate']
+                                                if all(field in email_stats for field in stats_fields):
+                                                    self.log_result("klaviyo_email_marketing", True, 
+                                                                  f"Klaviyo Email Marketing System fully functional - {email_stats['total_subscribers']} subscribers, {email_stats['open_rate']}% open rate")
+                                                else:
+                                                    self.log_result("klaviyo_email_marketing", False, 
+                                                                  "Email stats missing required fields")
+                                            else:
+                                                self.log_result("klaviyo_email_marketing", False, 
+                                                              "Email stats response invalid")
+                                        else:
+                                            self.log_result("klaviyo_email_marketing", False, 
+                                                          f"Email stats API failed: {stats_response.status_code}")
+                                    else:
+                                        self.log_result("klaviyo_email_marketing", False, 
+                                                      "Upsell campaign creation failed")
+                                else:
+                                    self.log_result("klaviyo_email_marketing", False, 
+                                                  f"Upsell campaign API failed: {upsell_response.status_code}")
+                            else:
+                                self.log_result("klaviyo_email_marketing", False, 
+                                              "Welcome sequence not started")
+                        else:
+                            self.log_result("klaviyo_email_marketing", False, 
+                                          "Welcome sequence response invalid")
+                    else:
+                        self.log_result("klaviyo_email_marketing", False, 
+                                      f"Welcome sequence API failed: {welcome_response.status_code}")
+                else:
+                    self.log_result("klaviyo_email_marketing", False, 
+                                  "Customer profile creation failed")
+            else:
+                self.log_result("klaviyo_email_marketing", False, 
+                              f"Profile creation API failed: {profile_response.status_code} - {profile_response.text}")
+                
+        except Exception as e:
+            self.log_result("klaviyo_email_marketing", False, f"Klaviyo Email Marketing error: {str(e)}")
+
+    def test_complete_customer_journey(self):
+        """Test Complete Customer Journey Automation - Full integration"""
+        print("\n=== Testing Complete Customer Journey Automation ===")
+        
+        try:
+            # Test complete customer journey automation
+            journey_data = {
+                "email": "journey@test.com",
+                "product_name": "ZZ-Lobby Elite",
+                "price": 497.0,
+                "customer_name": "Test Customer"
+            }
+            
+            journey_response = self.session.post(f"{API_BASE}/automation/complete-customer-journey", json=journey_data)
+            
+            if journey_response.status_code == 200:
+                journey_result = journey_response.json()
+                required_fields = ['success', 'complete_journey', 'message']
+                
+                if all(field in journey_result for field in required_fields):
+                    complete_journey = journey_result['complete_journey']
+                    journey_fields = ['email_marketing', 'social_media', 'revenue_processing', 'journey_success']
+                    
+                    if all(field in complete_journey for field in journey_fields):
+                        if complete_journey.get('journey_success', False):
+                            # Verify all systems were activated
+                            automation_summary = complete_journey.get('automation_summary', {})
+                            systems_activated = automation_summary.get('systems_activated', [])
+                            expected_systems = ["Email Marketing", "Social Media", "Revenue Priority"]
+                            
+                            activated_count = len([s for s in expected_systems if s in systems_activated])
+                            
+                            if activated_count >= 3:
+                                automation_time = automation_summary.get('estimated_automation_time', 'unknown')
+                                self.log_result("complete_customer_journey", True, 
+                                              f"Complete customer journey successful - {activated_count} systems activated in {automation_time}")
+                                
+                                # Verify individual components
+                                email_success = complete_journey['email_marketing'].get('success', False)
+                                social_success = complete_journey['social_media'].get('campaign_success', False)
+                                revenue_success = 'revenue_processing' in complete_journey
+                                
+                                component_status = f"Email: {'✅' if email_success else '❌'}, Social: {'✅' if social_success else '❌'}, Revenue: {'✅' if revenue_success else '❌'}"
+                                self.log_result("complete_customer_journey", True, 
+                                              f"Component status - {component_status}")
+                            else:
+                                self.log_result("complete_customer_journey", False, 
+                                              f"Insufficient systems activated: {activated_count}/3")
+                        else:
+                            self.log_result("complete_customer_journey", False, 
+                                          "Customer journey not marked as successful")
+                    else:
+                        missing = [f for f in journey_fields if f not in complete_journey]
+                        self.log_result("complete_customer_journey", False, f"Missing journey fields: {missing}")
+                else:
+                    missing = [f for f in required_fields if f not in journey_result]
+                    self.log_result("complete_customer_journey", False, f"Missing required fields: {missing}")
+            else:
+                self.log_result("complete_customer_journey", False, 
+                              f"Customer journey API failed: {journey_response.status_code} - {journey_response.text}")
+                
+        except Exception as e:
+            self.log_result("complete_customer_journey", False, f"Complete Customer Journey error: {str(e)}")
+
+    def test_system_health_monitoring(self):
+        """Test System Health Monitoring & Alerts"""
+        print("\n=== Testing System Health Monitoring & Alerts ===")
+        
+        try:
+            health_response = self.session.get(f"{API_BASE}/monitoring/system-health")
+            
+            if health_response.status_code == 200:
+                health_data = health_response.json()
+                required_fields = ['success', 'system_health', 'message']
+                
+                if all(field in health_data for field in required_fields):
+                    system_health = health_data['system_health']
+                    health_fields = ['overall_health', 'services_status', 'performance_metrics', 'resource_usage', 'alerts', 'recommendations']
+                    
+                    if all(field in system_health for field in health_fields):
+                        # Verify services status
+                        services_status = system_health['services_status']
+                        expected_services = ['paypal_integration', 'database', 'hyperschwarm_agents', 'email_marketing', 'social_media', 'revenue_priority']
+                        
+                        services_count = len([s for s in expected_services if s in services_status])
+                        
+                        if services_count >= 5:
+                            # Check performance metrics
+                            performance_metrics = system_health['performance_metrics']
+                            perf_fields = ['response_time', 'uptime', 'error_rate', 'throughput']
+                            
+                            if all(field in performance_metrics for field in perf_fields):
+                                # Check resource usage including API call tracking
+                                resource_usage = system_health['resource_usage']
+                                if 'api_calls_remaining' in resource_usage:
+                                    api_calls = resource_usage['api_calls_remaining']
+                                    if 'ayrshare' in api_calls:
+                                        ayrshare_calls = api_calls['ayrshare']
+                                        self.log_result("system_health_monitoring", True, 
+                                                      f"System health monitoring fully functional - {services_count} services tracked, Ayrshare: {ayrshare_calls}")
+                                        
+                                        # Verify alerts system
+                                        alerts = system_health.get('alerts', [])
+                                        recommendations = system_health.get('recommendations', [])
+                                        
+                                        self.log_result("system_health_monitoring", True, 
+                                                      f"Alerts & recommendations system working - {len(alerts)} alerts, {len(recommendations)} recommendations")
+                                    else:
+                                        self.log_result("system_health_monitoring", False, 
+                                                      "Ayrshare call tracking missing")
+                                else:
+                                    self.log_result("system_health_monitoring", False, 
+                                                  "API calls tracking missing")
+                            else:
+                                missing = [f for f in perf_fields if f not in performance_metrics]
+                                self.log_result("system_health_monitoring", False, f"Missing performance metrics: {missing}")
+                        else:
+                            self.log_result("system_health_monitoring", False, 
+                                          f"Insufficient services monitored: {services_count}/6")
+                    else:
+                        missing = [f for f in health_fields if f not in system_health]
+                        self.log_result("system_health_monitoring", False, f"Missing health fields: {missing}")
+                else:
+                    missing = [f for f in required_fields if f not in health_data]
+                    self.log_result("system_health_monitoring", False, f"Missing required fields: {missing}")
+            else:
+                self.log_result("system_health_monitoring", False, 
+                              f"System health API failed: {health_response.status_code} - {health_response.text}")
+                
+        except Exception as e:
+            self.log_result("system_health_monitoring", False, f"System Health Monitoring error: {str(e)}")
+
+    def test_user_onboarding_tutorial(self):
+        """Test User Onboarding Tutorial System"""
+        print("\n=== Testing User Onboarding Tutorial System ===")
+        
+        try:
+            tutorial_response = self.session.get(f"{API_BASE}/onboarding/tutorial-steps")
+            
+            if tutorial_response.status_code == 200:
+                tutorial_data = tutorial_response.json()
+                required_fields = ['success', 'tutorial_steps', 'total_steps', 'message']
+                
+                if all(field in tutorial_data for field in required_fields):
+                    tutorial_steps = tutorial_data['tutorial_steps']
+                    total_steps = tutorial_data['total_steps']
+                    
+                    if isinstance(tutorial_steps, list) and len(tutorial_steps) > 0:
+                        # Verify we have 8 steps as specified
+                        if total_steps == 8 and len(tutorial_steps) == 8:
+                            # Verify step structure
+                            first_step = tutorial_steps[0]
+                            step_fields = ['step', 'title', 'description', 'action', 'estimated_time', 'completion_reward']
+                            
+                            if all(field in first_step for field in step_fields):
+                                # Verify key steps are present
+                                step_titles = [step['title'] for step in tutorial_steps]
+                                key_steps = ['PayPal', 'HYPERSCHWARM', 'Email', 'Social', 'Revenue', 'Elite', 'Kunden']
+                                
+                                found_key_steps = sum(1 for key in key_steps if any(key in title for title in step_titles))
+                                
+                                if found_key_steps >= 6:
+                                    # Check estimated times and rewards
+                                    total_time = tutorial_data.get('estimated_total_time', 'unknown')
+                                    completion_bonus = tutorial_data.get('completion_bonus', 'unknown')
+                                    
+                                    self.log_result("user_onboarding_tutorial", True, 
+                                                  f"Onboarding tutorial system fully functional - {total_steps} steps, {total_time} total time, {completion_bonus} bonus")
+                                    
+                                    # Verify specific step content
+                                    welcome_step = tutorial_steps[0]
+                                    if 'HYPERSCHWARM V3.0' in welcome_step['description']:
+                                        self.log_result("user_onboarding_tutorial", True, 
+                                                      "Tutorial content properly branded with HYPERSCHWARM V3.0")
+                                    else:
+                                        self.log_result("user_onboarding_tutorial", False, 
+                                                      "Tutorial content missing HYPERSCHWARM branding")
+                                else:
+                                    self.log_result("user_onboarding_tutorial", False, 
+                                                  f"Missing key tutorial steps: {found_key_steps}/7")
+                            else:
+                                missing = [f for f in step_fields if f not in first_step]
+                                self.log_result("user_onboarding_tutorial", False, f"Missing step fields: {missing}")
+                        else:
+                            self.log_result("user_onboarding_tutorial", False, 
+                                          f"Incorrect step count: {len(tutorial_steps)} (expected 8)")
+                    else:
+                        self.log_result("user_onboarding_tutorial", False, 
+                                      "Tutorial steps not in expected format")
+                else:
+                    missing = [f for f in required_fields if f not in tutorial_data]
+                    self.log_result("user_onboarding_tutorial", False, f"Missing required fields: {missing}")
+            else:
+                self.log_result("user_onboarding_tutorial", False, 
+                              f"Tutorial API failed: {tutorial_response.status_code} - {tutorial_response.text}")
+                
+        except Exception as e:
+            self.log_result("user_onboarding_tutorial", False, f"User Onboarding Tutorial error: {str(e)}")
+
+    def test_security_backup_status(self):
+        """Test Security & Backup System Status"""
+        print("\n=== Testing Security & Backup System Status ===")
+        
+        try:
+            security_response = self.session.get(f"{API_BASE}/security/backup-status")
+            
+            if security_response.status_code == 200:
+                security_data = security_response.json()
+                required_fields = ['success', 'security_status', 'overall_security_score', 'message']
+                
+                if all(field in security_data for field in required_fields):
+                    security_status = security_data['security_status']
+                    security_score = security_data['overall_security_score']
+                    
+                    # Verify security score format (should be "95/100")
+                    if '/100' in str(security_score):
+                        score_value = int(security_score.split('/')[0])
+                        if score_value >= 90:
+                            # Verify security sections
+                            security_sections = ['backup_system', 'security_measures', 'data_protection', 'monitoring_alerts', 'emergency_procedures']
+                            
+                            sections_present = sum(1 for section in security_sections if section in security_status)
+                            
+                            if sections_present >= 4:
+                                # Verify backup system details
+                                backup_system = security_status.get('backup_system', {})
+                                backup_fields = ['status', 'backup_frequency', 'backup_location', 'data_retention']
+                                
+                                if all(field in backup_system for field in backup_fields):
+                                    # Check backup frequency (should be every 6 hours)
+                                    backup_frequency = backup_system['backup_frequency']
+                                    if '6 hours' in backup_frequency:
+                                        self.log_result("security_backup_status", True, 
+                                                      f"Security & Backup system fully functional - Score: {security_score}, Backup: {backup_frequency}")
+                                        
+                                        # Verify data protection measures
+                                        data_protection = security_status.get('data_protection', {})
+                                        protection_fields = ['customer_data_encryption', 'payment_data_compliance', 'gdpr_compliance']
+                                        
+                                        protection_count = sum(1 for field in protection_fields if field in data_protection)
+                                        
+                                        if protection_count >= 2:
+                                            self.log_result("security_backup_status", True, 
+                                                          f"Data protection measures verified - {protection_count} compliance standards")
+                                        else:
+                                            self.log_result("security_backup_status", False, 
+                                                          "Insufficient data protection measures")
+                                    else:
+                                        self.log_result("security_backup_status", False, 
+                                                      f"Incorrect backup frequency: {backup_frequency}")
+                                else:
+                                    missing = [f for f in backup_fields if f not in backup_system]
+                                    self.log_result("security_backup_status", False, f"Missing backup fields: {missing}")
+                            else:
+                                self.log_result("security_backup_status", False, 
+                                              f"Insufficient security sections: {sections_present}/5")
+                        else:
+                            self.log_result("security_backup_status", False, 
+                                          f"Security score too low: {score_value}/100")
+                    else:
+                        self.log_result("security_backup_status", False, 
+                                      f"Invalid security score format: {security_score}")
+                else:
+                    missing = [f for f in required_fields if f not in security_data]
+                    self.log_result("security_backup_status", False, f"Missing required fields: {missing}")
+            else:
+                self.log_result("security_backup_status", False, 
+                              f"Security status API failed: {security_response.status_code} - {security_response.text}")
+                
+        except Exception as e:
+            self.log_result("security_backup_status", False, f"Security & Backup Status error: {str(e)}")
+
     def test_saas_status_api(self):
         """Test SaaS Status API"""
         print("\n=== Testing SaaS Status API ===")

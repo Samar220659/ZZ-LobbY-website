@@ -401,14 +401,11 @@ metadata:
   run_ui: true
 
 test_plan:
-  current_focus:
-    - "HYPERSCHWARM Google Opal Templates API"
-    - "HYPERSCHWARM Google Opal Create App API"
-    - "HYPERSCHWARM Google Opal Landing Page API"
+  current_focus: []
+  stuck_tasks:
     - "HYPERSCHWARM Claude AI TikTok Content API"
     - "HYPERSCHWARM Claude AI Email Campaign API"
     - "HYPERSCHWARM Integrated Campaign API"
-  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 

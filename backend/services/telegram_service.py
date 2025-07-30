@@ -23,8 +23,12 @@ class TelegramService:
     """Echter Telegram Service für ZzLobby Bot"""
     
     def __init__(self):
-        self.bot_token = os.getenv("TELEGRAM_BOT_TOKEN", "7548705938:AAFdhQ6rCMv8er43YqRqn4EEQ-gpIPvPRU")
-        self.chat_id = os.getenv("TELEGRAM_CHAT_ID", "7548705938")
+        self.bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
+        self.chat_id = os.getenv("TELEGRAM_CHAT_ID") 
+        
+        if not self.bot_token:
+            self.logger.warning("TELEGRAM_BOT_TOKEN not found in environment variables")
+            
         self.base_url = f"https://api.telegram.org/bot{self.bot_token}"
         self.logger = logging.getLogger("TelegramService")
         

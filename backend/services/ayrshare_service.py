@@ -37,20 +37,26 @@ class AyrshareService:
                 }
             
             if not platforms:
-                platforms = ["instagram", "twitter", "tiktok"]
+                # Use correct Ayrshare platform names
+                platforms = ["instagram", "twitter"]  # TikTok might need special setup
             
             headers = {
-                "Content-Type": "application/json",
+                "Content-Type": "application/json", 
                 "Authorization": f"Bearer {self.api_key}"
             }
             
+            # Correct Ayrshare API payload structure
             payload = {
                 "post": content,
                 "platforms": platforms
             }
             
+            # Add media URLs if provided
             if media_urls:
                 payload["mediaUrls"] = media_urls
+            
+            # Add unique identifier to prevent duplicates
+            payload["idempotencyKey"] = f"zzlobby-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
             
             async with aiohttp.ClientSession() as session:
                 async with session.post(
@@ -72,7 +78,8 @@ class AyrshareService:
                             "content": content,
                             "calls_used": self.calls_used,
                             "calls_remaining": self.call_limit - self.calls_used,
-                            "timestamp": datetime.now().isoformat()
+                            "timestamp": datetime.now().isoformat(),
+                            "ayrshare_response": result
                         }
                         
                         logger.info(f"Social media post successful: {self.calls_used}/{self.call_limit} calls used")
@@ -85,11 +92,13 @@ class AyrshareService:
                         return success_result
                     else:
                         error_text = await response.text()
+                        logger.error(f"Ayrshare API error: {response.status} - {error_text}")
                         return {
                             "success": False,
                             "error": f"Ayrshare API error: {response.status} - {error_text}",
                             "calls_used": self.calls_used,
-                            "calls_remaining": self.call_limit - self.calls_used
+                            "calls_remaining": self.call_limit - self.calls_used,
+                            "payload_sent": payload  # For debugging
                         }
         
         except Exception as e:

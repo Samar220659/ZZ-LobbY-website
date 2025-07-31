@@ -171,7 +171,7 @@ export default function StripeExplosion() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-900/20 to-slate-900 text-white flex items-center justify-center">
         <div className="text-center">
-          <Fire className="h-12 w-12 animate-pulse text-red-400 mx-auto mb-4" />
+          <Flame className="h-12 w-12 animate-pulse text-red-400 mx-auto mb-4" />
           <p className="text-red-200 font-serif text-xl">Stripe Explosion wird geladen...</p>
         </div>
       </div>

@@ -320,6 +320,7 @@ async def get_checkout_status(session_id: str, request: Request):
 async def stripe_webhook(request: Request):
     """Handle Stripe webhooks"""
     try:
+        from services.payment_service import payment_service
         # Get request body and headers
         body = await request.body()
         signature = request.headers.get("Stripe-Signature")

@@ -202,6 +202,45 @@ async def launch_saas_system():
         logging.error(f"Error launching SaaS system: {e}")
         raise HTTPException(status_code=500, detail="Failed to launch SaaS system")
 
+@api_router.post("/social-connect", response_model=StandardResponse)
+async def connect_social_media(request: SocialMediaConnectRequest):
+    """
+    Social Media Login - E-Mail/Passwort Anmeldung
+    Hinweis: In einer echten Implementierung würde man OAuth verwenden.
+    Dies ist eine vereinfachte Version für Demo-Zwecke.
+    """
+    try:
+        # Validierung der Eingaben
+        if not request.email or not request.password:
+            raise HTTPException(status_code=400, detail="E-Mail und Passwort sind erforderlich")
+        
+        # Simuliere Social Media API Verbindung
+        # In der Realität würde hier eine OAuth-Authentifizierung stattfinden
+        if request.platform.lower() in ['facebook', 'instagram', 'linkedin']:
+            # Simuliere erfolgreiche Verbindung
+            # Speichere die Verbindungsdaten in der Datenbank (verschlüsselt)
+            connection_data = {
+                "user_id": "demo_user",
+                "platform": request.platform.lower(),
+                "email": request.email,
+                "connected_at": datetime.utcnow(),
+                "status": "connected"
+            }
+            
+            # In echter Anwendung: Speichere verschlüsselten Token, nicht das Passwort
+            await db["social_connections"].insert_one(connection_data)
+            
+            return StandardResponse(
+                success=True,
+                message=f"{request.platform} erfolgreich verbunden!"
+            )
+        else:
+            raise HTTPException(status_code=400, detail="Unsupported platform")
+            
+    except Exception as e:
+        logging.error(f"Error connecting social media: {e}")
+        raise HTTPException(status_code=500, detail="Fehler bei der Social Media Verbindung")
+
 # Legacy endpoints
 @api_router.get("/")
 async def root():

@@ -42,10 +42,13 @@ export default function EasyAutomation() {
   const [socialConfig, setSocialConfig] = useState({
     facebook_email: '',
     facebook_password: '',
+    facebook_connected: false,
     instagram_email: '',
     instagram_password: '',
+    instagram_connected: false,
     linkedin_email: '',
     linkedin_password: '',
+    linkedin_connected: false,
     auto_posting_enabled: false
   });
   

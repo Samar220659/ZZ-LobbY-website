@@ -18,7 +18,7 @@ import {
   Gift,
   Percent,
   Star,
-  Fire
+  Flame
 } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";

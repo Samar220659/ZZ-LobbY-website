@@ -360,6 +360,14 @@ export default function ControlCenter() {
               </Button>
 
               <Button 
+                onClick={() => navigate('/profit-center')}
+                className="h-24 bg-gradient-to-br from-yellow-500 to-amber-600 hover:from-yellow-600 hover:to-amber-700 text-white font-serif font-bold flex flex-col items-center justify-center border-2 border-yellow-400/30"
+              >
+                <DollarSign className="h-6 w-6 mb-2" />
+                <span>💰 Profit Center</span>
+              </Button>
+
+              <Button 
                 onClick={() => navigate('/ai-marketing')}
                 className="h-24 bg-gradient-to-br from-green-500 to-green-700 hover:from-green-600 hover:to-green-800 text-white font-serif font-bold flex flex-col items-center justify-center"
               >

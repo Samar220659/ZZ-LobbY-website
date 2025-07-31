@@ -10,6 +10,7 @@ import ControlCenter from "./components/ControlCenter";
 import AutomationControl from "./components/AutomationControl";
 import EasyAutomation from "./components/EasyAutomation";
 import AIMarketingHub from "./components/AIMarketingHub";
+import StripeExplosion from "./components/StripeExplosion";
 import LiveProfitDashboard from "./components/LiveProfitDashboard";
 import ProfitCenter from "./components/ProfitCenter";
 import PaymentSuccess from "./components/PaymentSuccess";

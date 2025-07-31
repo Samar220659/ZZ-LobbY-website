@@ -29,6 +29,9 @@ function App() {
           <Route path="/automation-control" element={<AutomationControl />} />
           <Route path="/easy-automation" element={<EasyAutomation />} />
           <Route path="/ai-marketing" element={<AIMarketingHub />} />
+          <Route path="/profit-center" element={<ProfitCenter />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/payment-cancel" element={<PaymentCancel />} />
         </Routes>
         <Toaster />
       </BrowserRouter>

@@ -22,6 +22,8 @@ import {
   Briefcase,
   Clock,
   Globe,
+  Fire,
+  Sparkles,
   Loader2,
   ChevronRight,
   ArrowLeft,

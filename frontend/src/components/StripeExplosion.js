@@ -159,7 +159,7 @@ export default function StripeExplosion() {
   const getPackageExplosionLevel = (packageId) => {
     switch (packageId) {
       case 'zzlobby_boost':
-        return { level: 'MEGA', color: 'from-yellow-500 to-orange-600', icon: <Fire className="h-6 w-6" /> };
+        return { level: 'MEGA', color: 'from-yellow-500 to-orange-600', icon: <Flame className="h-6 w-6" /> };
       case 'pro_plan':
         return { level: 'ULTRA', color: 'from-purple-500 to-pink-600', icon: <Crown className="h-6 w-6" /> };
       default:

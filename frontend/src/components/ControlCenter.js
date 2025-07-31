@@ -22,7 +22,7 @@ import {
   Briefcase,
   Clock,
   Globe,
-  Fire,
+  Flame,
   Sparkles,
   Loader2,
   ChevronRight,

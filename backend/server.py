@@ -53,6 +53,8 @@ class SocialMediaConnectRequest(BaseModel):
 class PaymentPackageRequest(BaseModel):
     package_id: str
     origin_url: str
+    coupon_code: Optional[str] = None
+    metadata: Optional[Dict[str, Any]] = None
 
 class StatusCheck(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))

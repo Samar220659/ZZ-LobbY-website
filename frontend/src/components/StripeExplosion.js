@@ -186,7 +186,7 @@ export default function StripeExplosion() {
           <div className="text-center">
             <div className="flex items-center justify-center space-x-3 mb-4">
               <div className="relative">
-                <Fire className="h-12 w-12 text-red-400 animate-pulse" />
+                <Flame className="h-12 w-12 text-red-400 animate-pulse" />
                 <Sparkles className="h-6 w-6 text-yellow-400 absolute -top-1 -right-1 animate-spin" />
               </div>
               <div>

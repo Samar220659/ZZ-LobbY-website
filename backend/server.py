@@ -273,6 +273,9 @@ async def create_checkout_session(package_request: PaymentPackageRequest, reques
             "transaction_id": transaction_id
         }
         
+    except HTTPException:
+        # Re-raise HTTPExceptions as-is
+        raise
     except Exception as e:
         logging.error(f"Error creating checkout session: {e}")
         raise HTTPException(status_code=500, detail="Failed to create checkout session")

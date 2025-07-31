@@ -18,6 +18,7 @@ from models import (
 )
 from services.paypal_service import paypal_service
 from services.database_service import db_service
+from services.payment_service import init_payment_service, payment_service
 
 # Import automation engine
 from automation_engine import automation_router

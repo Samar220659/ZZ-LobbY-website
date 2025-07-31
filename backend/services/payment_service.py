@@ -176,6 +176,14 @@ class PaymentService:
         """Get payment transaction by session ID"""
         try:
             transaction = await self.db["payment_transactions"].find_one({"session_id": session_id})
+            if transaction:
+                # Convert ObjectId to string for JSON serialization
+                if '_id' in transaction:
+                    transaction['_id'] = str(transaction['_id'])
+                # Convert datetime objects to ISO strings
+                for key, value in transaction.items():
+                    if hasattr(value, 'isoformat'):
+                        transaction[key] = value.isoformat()
             return transaction
         except Exception as e:
             logging.error(f"Error getting payment transaction: {e}")

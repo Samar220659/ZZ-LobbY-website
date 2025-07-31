@@ -44,6 +44,11 @@ api_router = APIRouter(prefix="/api")
 
 
 # Define Models
+class SocialMediaConnectRequest(BaseModel):
+    platform: str
+    email: str
+    password: str
+
 class StatusCheck(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     client_name: str

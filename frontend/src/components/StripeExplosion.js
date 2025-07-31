@@ -405,7 +405,7 @@ export default function StripeExplosion() {
         {/* Explosion Footer */}
         <div className="mt-12 text-center">
           <div className="flex items-center justify-center gap-4 text-red-400/60 flex-wrap">
-            <Fire className="h-5 w-5 animate-pulse" />
+            <Flame className="h-5 w-5 animate-pulse" />
             <span className="font-serif">Stripe Explosion Engine läuft</span>
             <Rocket className="h-5 w-5 animate-bounce" />
             <span className="font-serif">Payment Processing maximiert</span>

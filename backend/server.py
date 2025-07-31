@@ -233,7 +233,16 @@ async def create_checkout_session(package_request: PaymentPackageRequest, reques
         if package_request.package_id not in packages:
             raise HTTPException(status_code=400, detail="Invalid package ID")
         
+        # Add coupon handling to payment service
+        coupon_discount = 0
+        if package_request.coupon_code:
+            coupon_discount = await payment_service.validate_and_apply_coupon(
+                package_request.coupon_code, 
+                package_request.package_id
+            )
+        
         package = packages[package_request.package_id]
+        final_amount = package["amount"] * (1 - coupon_discount / 100) if coupon_discount else package["amount"]
         
         # Create webhook URL from request
         host_url = str(request.base_url)
@@ -246,17 +255,31 @@ async def create_checkout_session(package_request: PaymentPackageRequest, reques
         success_url = f"{package_request.origin_url}/payment-success?session_id={{CHECKOUT_SESSION_ID}}"
         cancel_url = f"{package_request.origin_url}/payment-cancel"
         
+        # Prepare metadata with coupon info
+        checkout_metadata = {
+            "package_id": package_request.package_id,
+            "package_name": package["name"],
+            "source": "zzlobby_app"
+        }
+        
+        if package_request.coupon_code and coupon_discount > 0:
+            checkout_metadata.update({
+                "coupon_code": package_request.coupon_code,
+                "discount_percent": coupon_discount,
+                "original_amount": package["amount"],
+                "discounted_amount": final_amount
+            })
+        
+        if package_request.metadata:
+            checkout_metadata.update(package_request.metadata)
+        
         # Create checkout session
         checkout_request = CheckoutSessionRequest(
-            amount=package["amount"],
+            amount=final_amount,
             currency=package["currency"],
             success_url=success_url,
             cancel_url=cancel_url,
-            metadata={
-                "package_id": package_request.package_id,
-                "package_name": package["name"],
-                "source": "zzlobby_app"
-            }
+            metadata=checkout_metadata
         )
         
         session: CheckoutSessionResponse = await stripe_checkout.create_checkout_session(checkout_request)

@@ -182,6 +182,32 @@ P.S.: Das Angebot gilt nur diese Woche!`,
     }, 3000);
   };
 
+  const handleConnectSocialMedia = async (platform) => {
+    if (!socialConfig[`${platform}_email`] || !socialConfig[`${platform}_password`]) {
+      toast.error(`Bitte ${platform} E-Mail und Passwort eingeben!`);
+      return;
+    }
+
+    try {
+      // Backend-Aufruf für Social Media Login
+      const response = await axios.post(`${API_BASE}/social-connect`, {
+        platform: platform,
+        email: socialConfig[`${platform}_email`],
+        password: socialConfig[`${platform}_password`]
+      });
+
+      if (response.data.success) {
+        toast.success(`✅ ${platform} erfolgreich verbunden!`);
+        setSocialConfig({...socialConfig, [`${platform}_connected`]: true});
+      } else {
+        toast.error(`❌ ${platform} Verbindung fehlgeschlagen`);
+      }
+    } catch (error) {
+      console.error('Social Media Connection Error:', error);
+      toast.error(`❌ Fehler bei ${platform} Verbindung`);
+    }
+  };
+
   const openSocialMediaGuide = (platform) => {
     const guides = {
       facebook: 'https://www.facebook.com/business/help/200000840043554',

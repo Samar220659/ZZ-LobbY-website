@@ -207,6 +207,147 @@ async def launch_saas_system():
         logging.error(f"Error launching SaaS system: {e}")
         raise HTTPException(status_code=500, detail="Failed to launch SaaS system")
 
+from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
+from fastapi import Request
+
+@api_router.get("/payments/packages")
+async def get_payment_packages():
+    """Get all available payment packages"""
+    try:
+        packages = payment_service.get_available_packages()
+        return {"success": True, "packages": packages}
+    except Exception as e:
+        logging.error(f"Error getting payment packages: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get payment packages")
+
+@api_router.post("/payments/checkout/session")
+async def create_checkout_session(package_request: PaymentPackageRequest, request: Request):
+    """Create Stripe checkout session for payment"""
+    try:
+        # Validate package exists
+        packages = payment_service.get_available_packages()
+        if package_request.package_id not in packages:
+            raise HTTPException(status_code=400, detail="Invalid package ID")
+        
+        package = packages[package_request.package_id]
+        
+        # Create webhook URL from request
+        host_url = str(request.base_url)
+        webhook_url = f"{host_url}api/webhook/stripe"
+        
+        # Initialize Stripe checkout
+        stripe_checkout = payment_service.get_stripe_checkout(webhook_url)
+        
+        # Build success and cancel URLs
+        success_url = f"{package_request.origin_url}/payment-success?session_id={{CHECKOUT_SESSION_ID}}"
+        cancel_url = f"{package_request.origin_url}/payment-cancel"
+        
+        # Create checkout session
+        checkout_request = CheckoutSessionRequest(
+            amount=package["amount"],
+            currency=package["currency"],
+            success_url=success_url,
+            cancel_url=cancel_url,
+            metadata={
+                "package_id": package_request.package_id,
+                "package_name": package["name"],
+                "source": "zzlobby_app"
+            }
+        )
+        
+        session: CheckoutSessionResponse = await stripe_checkout.create_checkout_session(checkout_request)
+        
+        # Create payment transaction record
+        transaction_id = await payment_service.create_payment_transaction(
+            package_request.package_id,
+            session.session_id,
+            checkout_request.metadata
+        )
+        
+        return {
+            "success": True,
+            "url": session.url,
+            "session_id": session.session_id,
+            "transaction_id": transaction_id
+        }
+        
+    except Exception as e:
+        logging.error(f"Error creating checkout session: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create checkout session")
+
+@api_router.get("/payments/checkout/status/{session_id}")
+async def get_checkout_status(session_id: str, request: Request):
+    """Get payment status by session ID"""
+    try:
+        # Create webhook URL from request
+        host_url = str(request.base_url)
+        webhook_url = f"{host_url}api/webhook/stripe"
+        
+        # Initialize Stripe checkout
+        stripe_checkout = payment_service.get_stripe_checkout(webhook_url)
+        
+        # Get checkout status from Stripe
+        checkout_status: CheckoutStatusResponse = await stripe_checkout.get_checkout_status(session_id)
+        
+        # Update local database status
+        await payment_service.update_payment_status(
+            session_id,
+            checkout_status.payment_status,
+            checkout_status.status
+        )
+        
+        # Get transaction details
+        transaction = await payment_service.get_payment_transaction(session_id)
+        
+        return {
+            "success": True,
+            "status": checkout_status.status,
+            "payment_status": checkout_status.payment_status,
+            "amount_total": checkout_status.amount_total,
+            "currency": checkout_status.currency,
+            "metadata": checkout_status.metadata,
+            "transaction": transaction
+        }
+        
+    except Exception as e:
+        logging.error(f"Error getting checkout status: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get checkout status")
+
+@api_router.post("/webhook/stripe")
+async def stripe_webhook(request: Request):
+    """Handle Stripe webhooks"""
+    try:
+        # Get request body and headers
+        body = await request.body()
+        signature = request.headers.get("Stripe-Signature")
+        
+        if not signature:
+            raise HTTPException(status_code=400, detail="Missing Stripe signature")
+        
+        # Create webhook URL from request
+        host_url = str(request.base_url)
+        webhook_url = f"{host_url}api/webhook/stripe"
+        
+        # Initialize Stripe checkout
+        stripe_checkout = payment_service.get_stripe_checkout(webhook_url)
+        
+        # Handle webhook
+        webhook_response = await stripe_checkout.handle_webhook(body, signature)
+        
+        # Update payment status based on webhook
+        if webhook_response.session_id:
+            await payment_service.update_payment_status(
+                webhook_response.session_id,
+                webhook_response.payment_status,
+                "completed" if webhook_response.payment_status == "paid" else "failed"
+            )
+        
+        return {"success": True, "received": True}
+        
+    except Exception as e:
+        logging.error(f"Error handling Stripe webhook: {e}")
+        raise HTTPException(status_code=500, detail="Webhook processing failed")
+
 @api_router.post("/social-connect", response_model=StandardResponse)
 async def connect_social_media(request: SocialMediaConnectRequest):
     """

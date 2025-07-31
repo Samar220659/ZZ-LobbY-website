@@ -267,6 +267,10 @@ async def get_status_checks():
 app.include_router(api_router)
 app.include_router(automation_router)  # Automation Engine
 app.include_router(ai_router)  # AI Marketing Engine
+app.include_router(monitoring_router)  # System Monitoring
+
+# Initialize payment service
+init_payment_service(db)
 
 app.add_middleware(
     CORSMiddleware,

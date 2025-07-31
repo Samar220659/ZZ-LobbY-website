@@ -255,7 +255,7 @@ async def create_checkout_session(package_request: PaymentPackageRequest, reques
         success_url = f"{package_request.origin_url}/payment-success?session_id={{CHECKOUT_SESSION_ID}}"
         cancel_url = f"{package_request.origin_url}/payment-cancel"
         
-        # Prepare metadata with coupon info
+        # Prepare metadata with coupon info - ALL VALUES MUST BE STRINGS
         checkout_metadata = {
             "package_id": package_request.package_id,
             "package_name": package["name"],
@@ -265,13 +265,15 @@ async def create_checkout_session(package_request: PaymentPackageRequest, reques
         if package_request.coupon_code and coupon_discount > 0:
             checkout_metadata.update({
                 "coupon_code": package_request.coupon_code,
-                "discount_percent": coupon_discount,
-                "original_amount": package["amount"],
-                "discounted_amount": final_amount
+                "discount_percent": str(coupon_discount),
+                "original_amount": str(package["amount"]),
+                "discounted_amount": str(final_amount)
             })
         
         if package_request.metadata:
-            checkout_metadata.update(package_request.metadata)
+            # Convert all metadata values to strings
+            for key, value in package_request.metadata.items():
+                checkout_metadata[key] = str(value)
         
         # Create checkout session
         checkout_request = CheckoutSessionRequest(

@@ -281,6 +281,7 @@ async def create_checkout_session(package_request: PaymentPackageRequest, reques
 async def get_checkout_status(session_id: str, request: Request):
     """Get payment status by session ID"""
     try:
+        from services.payment_service import payment_service
         # Create webhook URL from request
         host_url = str(request.base_url)
         webhook_url = f"{host_url}api/webhook/stripe"

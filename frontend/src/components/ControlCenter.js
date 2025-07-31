@@ -360,6 +360,17 @@ export default function ControlCenter() {
               </Button>
 
               <Button 
+                onClick={() => navigate('/stripe-explosion')}
+                className="h-24 bg-gradient-to-br from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 text-white font-serif font-bold flex flex-col items-center justify-center border-2 border-red-400/40 shadow-lg shadow-red-500/25 transform hover:scale-105"
+              >
+                <div className="flex items-center mb-2">
+                  <Fire className="h-6 w-6 mr-1" />
+                  <Sparkles className="h-4 w-4 animate-spin" />
+                </div>
+                <span>🔥 STRIPE EXPLOSION</span>
+              </Button>
+
+              <Button 
                 onClick={() => navigate('/profit-center')}
                 className="h-24 bg-gradient-to-br from-yellow-500 to-amber-600 hover:from-yellow-600 hover:to-amber-700 text-white font-serif font-bold flex flex-col items-center justify-center border-2 border-yellow-400/30"
               >

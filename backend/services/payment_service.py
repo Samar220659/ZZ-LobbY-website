@@ -172,6 +172,43 @@ class PaymentService:
         """Get all available payment packages"""
         return self.PAYMENT_PACKAGES
     
+    async def validate_and_apply_coupon(self, coupon_code: str, package_id: str) -> float:
+        """Validate coupon code and return discount percentage"""
+        try:
+            # Explosive coupon codes with discounts
+            explosive_coupons = {
+                'BOOST50': 50.0,
+                'ROCKET30': 30.0, 
+                'PROFIT25': 25.0,
+                'FIRE20': 20.0,
+                'MEGA15': 15.0,
+                'STRIPE10': 10.0,
+                'EXPLOSION5': 5.0
+            }
+            
+            coupon_code = coupon_code.upper().strip()
+            
+            if coupon_code in explosive_coupons:
+                # Log coupon usage
+                coupon_usage = {
+                    "coupon_code": coupon_code,
+                    "package_id": package_id,
+                    "discount_percent": explosive_coupons[coupon_code],
+                    "used_at": datetime.utcnow(),
+                    "status": "applied"
+                }
+                await self.db["coupon_usage"].insert_one(coupon_usage)
+                
+                logging.info(f"Coupon {coupon_code} applied: {explosive_coupons[coupon_code]}% discount")
+                return explosive_coupons[coupon_code]
+            else:
+                logging.warning(f"Invalid coupon code: {coupon_code}")
+                return 0.0
+                
+        except Exception as e:
+            logging.error(f"Error validating coupon {coupon_code}: {e}")
+            return 0.0
+    
     async def get_payment_transaction(self, session_id: str) -> Optional[Dict[str, Any]]:
         """Get payment transaction by session ID"""
         try:

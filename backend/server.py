@@ -225,6 +225,7 @@ async def get_payment_packages():
 async def create_checkout_session(package_request: PaymentPackageRequest, request: Request):
     """Create Stripe checkout session for payment"""
     try:
+        from services.payment_service import payment_service
         # Validate package exists
         packages = payment_service.get_available_packages()
         if package_request.package_id not in packages:

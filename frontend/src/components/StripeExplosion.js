@@ -381,7 +381,7 @@ export default function StripeExplosion() {
                       </>
                     ) : (
                       <>
-                        <Fire className="mr-2 h-5 w-5" />
+                        <Flame className="mr-2 h-5 w-5" />
                         STRIPE EXPLOSION - {hasDiscount ? discountedPrice.toFixed(2) : originalPrice}€
                       </>
                     )}

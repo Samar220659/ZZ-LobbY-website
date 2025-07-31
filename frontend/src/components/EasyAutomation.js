@@ -412,6 +412,139 @@ P.S.: Das Angebot gilt nur diese Woche!`,
           </CardContent>
         </Card>
 
+        {/* Social Media Login Section */}
+        <Card className="bg-black/40 border-blue-400/20 backdrop-blur-sm mb-8">
+          <CardHeader>
+            <CardTitle className="text-blue-200 font-serif flex items-center gap-2">
+              <Share2 className="h-5 w-5 text-blue-400" />
+              Social Media Login (E-Mail/Passwort)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Facebook Login */}
+              <div className="p-4 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                <h3 className="text-blue-200 font-serif mb-3 flex items-center gap-2">
+                  📘 Facebook 
+                  {socialConfig.facebook_connected && <CheckCircle className="h-4 w-4 text-green-400" />}
+                </h3>
+                <div className="space-y-3">
+                  <Input
+                    type="email"
+                    placeholder="facebook@email.com"
+                    value={socialConfig.facebook_email}
+                    onChange={(e) => setSocialConfig({...socialConfig, facebook_email: e.target.value})}
+                    className="bg-black/40 border-blue-400/20 text-white text-sm"
+                    disabled={socialConfig.facebook_connected}
+                  />
+                  <Input
+                    type="password"
+                    placeholder="Passwort"
+                    value={socialConfig.facebook_password}
+                    onChange={(e) => setSocialConfig({...socialConfig, facebook_password: e.target.value})}
+                    className="bg-black/40 border-blue-400/20 text-white text-sm"
+                    disabled={socialConfig.facebook_connected}
+                  />
+                  <Button 
+                    onClick={() => handleConnectSocialMedia('facebook')}
+                    disabled={socialConfig.facebook_connected}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-serif text-sm"
+                  >
+                    {socialConfig.facebook_connected ? (
+                      <>
+                        <CheckCircle className="mr-2 h-4 w-4" />
+                        Verbunden
+                      </>
+                    ) : (
+                      'Facebook Verbinden'
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Instagram Login */}
+              <div className="p-4 bg-purple-500/10 rounded-lg border border-purple-500/20">
+                <h3 className="text-purple-200 font-serif mb-3 flex items-center gap-2">
+                  📸 Instagram
+                  {socialConfig.instagram_connected && <CheckCircle className="h-4 w-4 text-green-400" />}
+                </h3>
+                <div className="space-y-3">
+                  <Input
+                    type="email"
+                    placeholder="instagram@email.com"
+                    value={socialConfig.instagram_email}
+                    onChange={(e) => setSocialConfig({...socialConfig, instagram_email: e.target.value})}
+                    className="bg-black/40 border-purple-400/20 text-white text-sm"
+                    disabled={socialConfig.instagram_connected}
+                  />
+                  <Input
+                    type="password"
+                    placeholder="Passwort"
+                    value={socialConfig.instagram_password}
+                    onChange={(e) => setSocialConfig({...socialConfig, instagram_password: e.target.value})}
+                    className="bg-black/40 border-purple-400/20 text-white text-sm"
+                    disabled={socialConfig.instagram_connected}
+                  />
+                  <Button 
+                    onClick={() => handleConnectSocialMedia('instagram')}
+                    disabled={socialConfig.instagram_connected}
+                    className="w-full bg-purple-600 hover:bg-purple-700 text-white font-serif text-sm"
+                  >
+                    {socialConfig.instagram_connected ? (
+                      <>
+                        <CheckCircle className="mr-2 h-4 w-4" />
+                        Verbunden
+                      </>
+                    ) : (
+                      'Instagram Verbinden'
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              {/* LinkedIn Login */}
+              <div className="p-4 bg-blue-700/10 rounded-lg border border-blue-700/20">
+                <h3 className="text-blue-300 font-serif mb-3 flex items-center gap-2">
+                  💼 LinkedIn
+                  {socialConfig.linkedin_connected && <CheckCircle className="h-4 w-4 text-green-400" />}
+                </h3>
+                <div className="space-y-3">
+                  <Input
+                    type="email"
+                    placeholder="linkedin@email.com"
+                    value={socialConfig.linkedin_email}
+                    onChange={(e) => setSocialConfig({...socialConfig, linkedin_email: e.target.value})}
+                    className="bg-black/40 border-blue-400/20 text-white text-sm"
+                    disabled={socialConfig.linkedin_connected}
+                  />
+                  <Input
+                    type="password"
+                    placeholder="Passwort"
+                    value={socialConfig.linkedin_password}
+                    onChange={(e) => setSocialConfig({...socialConfig, linkedin_password: e.target.value})}
+                    className="bg-black/40 border-blue-400/20 text-white text-sm"
+                    disabled={socialConfig.linkedin_connected}
+                  />
+                  <Button 
+                    onClick={() => handleConnectSocialMedia('linkedin')}
+                    disabled={socialConfig.linkedin_connected}
+                    className="w-full bg-blue-800 hover:bg-blue-900 text-white font-serif text-sm"
+                  >
+                    {socialConfig.linkedin_connected ? (
+                      <>
+                        <CheckCircle className="mr-2 h-4 w-4" />
+                        Verbunden
+                      </>
+                    ) : (
+                      'LinkedIn Verbinden'
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Social Media Instructions */}
         <Card className="bg-black/40 border-blue-400/20 backdrop-blur-sm">
           <CardHeader>

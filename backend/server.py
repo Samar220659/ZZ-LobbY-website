@@ -214,6 +214,7 @@ from fastapi import Request
 async def get_payment_packages():
     """Get all available payment packages"""
     try:
+        from services.payment_service import payment_service
         packages = payment_service.get_available_packages()
         return {"success": True, "packages": packages}
     except Exception as e:

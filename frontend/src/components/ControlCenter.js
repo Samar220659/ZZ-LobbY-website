@@ -31,7 +31,8 @@ import {
   Brain,
   Rocket,
   ArrowRightLeft,
-  Link
+  Link,
+  Trophy
 } from "lucide-react";
 import { toast } from "sonner";
 import { dashboardApi, paypalApi, automationApi, analyticsApi, saasApi } from "../services/api";

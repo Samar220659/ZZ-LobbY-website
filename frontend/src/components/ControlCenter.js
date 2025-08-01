@@ -29,7 +29,9 @@ import {
   ChevronRight,
   ArrowLeft,
   Brain,
-  Rocket
+  Rocket,
+  ArrowRightLeft,
+  Link
 } from "lucide-react";
 import { toast } from "sonner";
 import { dashboardApi, paypalApi, automationApi, analyticsApi, saasApi } from "../services/api";

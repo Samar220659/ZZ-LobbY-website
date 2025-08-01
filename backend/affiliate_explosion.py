@@ -349,6 +349,65 @@ class AffiliateExplosionSystem:
         except Exception as e:
             logging.error(f"Affiliate Link Generation Fehler: {e}")
             return ""
+
+# Globale Digistore24 Affiliate System Instanz
+digistore24_affiliate_system = None
+
+def init_digistore24_system(db: AsyncIOMotorDatabase):
+    """Initialisiert das Digistore24 Affiliate System"""
+    global digistore24_affiliate_system
+    digistore24_affiliate_system = Digistore24AffiliateSystem(db)
+    return digistore24_affiliate_system
+
+class AffiliateExplosionSystem:
+    def __init__(self):
+        # Affiliate Platforms
+        self.platforms = {
+            'digistore24': {
+                'commission_rate': 0.50,  # 50% Provision
+                'active_affiliates': 0,
+                'total_sales': 0,
+                'api_endpoint': 'https://www.digistore24.com/api/'
+            },
+            'copecart': {
+                'commission_rate': 0.50,
+                'active_affiliates': 0, 
+                'total_sales': 0,
+                'api_endpoint': 'https://www.copecart.com/api/'
+            },
+            'partnernet': {
+                'commission_rate': 0.45,  # 45% für größere Netzwerke
+                'active_affiliates': 0,
+                'total_sales': 0,
+                'api_endpoint': 'https://www.partnernet.de/api/'
+            }
+        }
+        
+        # Produkt Info
+        self.product = {
+            'name': 'ZZ-Lobby Elite Marketing System',
+            'price': 49.0,
+            'currency': 'EUR',
+            'description': '1-Klick Video Marketing Automation mit AI',
+            'commission_structure': 'Sofort-Auszahlung + Bonus-System'
+        }
+        
+        # Affiliate Stats
+        self.affiliate_stats = {
+            'total_affiliates': 0,
+            'active_promoters': 0,
+            'total_commissions_paid': 0,
+            'viral_coefficient': 0,
+            'content_pieces_generated': 0
+        }
+        
+        # Content Generation Queue
+        self.content_queue = []
+        self.viral_content = []
+        
+        self.explosion_active = False
+    
+    async def start_affiliate_explosion(self):
         """Startet die komplette Affiliate Explosion"""
         self.explosion_active = True
         logging.info("🚀 Affiliate Explosion System gestartet!")

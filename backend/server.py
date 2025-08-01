@@ -427,6 +427,9 @@ async def connect_social_media(request: SocialMediaConnectRequest):
         else:
             raise HTTPException(status_code=400, detail="Unsupported platform")
             
+    except HTTPException:
+        # Re-raise HTTPExceptions as-is
+        raise
     except Exception as e:
         logging.error(f"Error connecting social media: {e}")
         raise HTTPException(status_code=500, detail="Fehler bei der Social Media Verbindung")

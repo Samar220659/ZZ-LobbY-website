@@ -130,8 +130,225 @@ class AffiliateExplosionSystem:
         self.viral_content = []
         
         self.explosion_active = False
+    async def validate_ipn_signature(self, raw_data: str, signature: str) -> bool:
+        """Validiert Digistore24 IPN Signature"""
+        try:
+            passphrase = self.digistore24_config['ipn_passphrase']
+            if not passphrase:
+                logging.error("IPN Passphrase nicht konfiguriert")
+                return False
+                
+            # Berechne HMAC Signature
+            expected_signature = hmac.new(
+                passphrase.encode('utf-8'),
+                raw_data.encode('utf-8'),
+                hashlib.sha256
+            ).hexdigest()
+            
+            return hmac.compare_digest(signature, expected_signature)
+            
+        except Exception as e:
+            logging.error(f"IPN Signature Validation Fehler: {e}")
+            return False
     
-    async def start_affiliate_explosion(self):
+    async def process_digistore24_ipn(self, ipn_data: Digistore24IPNData) -> Dict[str, Any]:
+        """Verarbeitet Digistore24 IPN für Affiliate Sales"""
+        try:
+            # Prüfe ob es ein Affiliate Sale ist
+            if not ipn_data.affiliate_name:
+                logging.info(f"Direct Sale (kein Affiliate): {ipn_data.order_id}")
+                return {"status": "direct_sale", "processed": True}
+            
+            # Berechne Commission
+            commission = ipn_data.amount * self.digistore24_config['commission_rate']
+            your_profit = ipn_data.amount - commission
+            
+            # Erstelle Affiliate Sale Record
+            affiliate_sale = {
+                "sale_id": f"ds24_{ipn_data.order_id}",
+                "order_id": ipn_data.order_id,
+                "product_id": ipn_data.product_id,
+                "affiliate_name": ipn_data.affiliate_name,
+                "affiliate_link": ipn_data.affiliate_link,
+                "campaign_key": ipn_data.campaignkey,
+                "buyer_email": ipn_data.buyer_email,
+                "amount": ipn_data.amount,
+                "commission": commission,
+                "your_profit": your_profit,
+                "currency": ipn_data.currency,
+                "transaction_id": ipn_data.transaction_id,
+                "order_date": ipn_data.order_date,
+                "processed_at": datetime.now().isoformat(),
+                "status": "completed",
+                "platform": "digistore24"
+            }
+            
+            # Speichere in MongoDB
+            await self.db.affiliate_sales.insert_one(affiliate_sale)
+            
+            # Update Affiliate Statistics
+            await self.update_affiliate_stats(ipn_data.affiliate_name, commission, ipn_data.order_date)
+            
+            # Trigger Commission Payment
+            await self.create_commission_payment(ipn_data.affiliate_name, commission, ipn_data.order_id)
+            
+            # Trigger AI Content Generation (falls gewünscht)
+            if ipn_data.product_id == self.digistore24_config['product_id']:
+                await self.trigger_ai_workflow(affiliate_sale)
+            
+            logging.info(f"💰 Digistore24 Affiliate Sale verarbeitet: {your_profit:.2f}€ Profit, {commission:.2f}€ Commission für {ipn_data.affiliate_name}")
+            
+            return {
+                "status": "success",
+                "sale_id": affiliate_sale["sale_id"],
+                "commission": commission,
+                "your_profit": your_profit,
+                "affiliate": ipn_data.affiliate_name
+            }
+            
+        except Exception as e:
+            logging.error(f"Digistore24 IPN Processing Fehler: {e}")
+            return {"status": "error", "message": str(e)}
+    
+    async def update_affiliate_stats(self, affiliate_name: str, commission: float, sale_date: str):
+        """Update Affiliate Statistics"""
+        try:
+            # Update oder Insert Affiliate Stats
+            filter_query = {"affiliate_name": affiliate_name}
+            update_data = {
+                "$inc": {
+                    "total_sales": 1,
+                    "total_commission": commission
+                },
+                "$set": {
+                    "last_sale_date": sale_date,
+                    "updated_at": datetime.now().isoformat()
+                },
+                "$setOnInsert": {
+                    "affiliate_id": f"aff_{affiliate_name.lower().replace(' ', '_')}",
+                    "affiliate_name": affiliate_name,
+                    "created_at": datetime.now().isoformat(),
+                    "active_campaigns": 1,
+                    "conversion_rate": 0.0
+                }
+            }
+            
+            await self.db.affiliate_stats.update_one(
+                filter_query,
+                update_data,
+                upsert=True
+            )
+            
+            logging.info(f"📊 Affiliate Stats updated für {affiliate_name}")
+            
+        except Exception as e:
+            logging.error(f"Affiliate Stats Update Fehler: {e}")
+    
+    async def create_commission_payment(self, affiliate_name: str, commission: float, order_id: str):
+        """Erstellt Commission Payment Record"""
+        try:
+            payment_id = f"pay_{affiliate_name.lower().replace(' ', '_')}_{order_id}"
+            
+            commission_payment = {
+                "payment_id": payment_id,
+                "affiliate_name": affiliate_name,
+                "amount": commission,
+                "currency": "EUR",
+                "order_id": order_id,
+                "status": "pending",  # pending -> approved -> paid
+                "created_at": datetime.now().isoformat(),
+                "payment_method": "bank_transfer",  # Standard für Digistore24
+                "notes": f"Commission für Order #{order_id}"
+            }
+            
+            await self.db.affiliate_payments.insert_one(commission_payment)
+            
+            logging.info(f"💳 Commission Payment erstellt: {commission:.2f}€ für {affiliate_name}")
+            
+        except Exception as e:
+            logging.error(f"Commission Payment Creation Fehler: {e}")
+    
+    async def trigger_ai_workflow(self, sale_data: Dict[str, Any]):
+        """Trigger AI Video Generation für Affiliate Sale"""
+        try:
+            # Nur für ZZ-Lobby Boost Produkt
+            if sale_data.get("product_id") == self.digistore24_config['product_id']:
+                workflow = {
+                    "workflow_id": f"ai_workflow_{sale_data['sale_id']}",
+                    "sale_id": sale_data["sale_id"],
+                    "affiliate_name": sale_data["affiliate_name"],
+                    "buyer_email": sale_data["buyer_email"],
+                    "trigger": "affiliate_sale",
+                    "status": "queued",
+                    "created_at": datetime.now().isoformat(),
+                    "workflow_type": "ai_video_generation"
+                }
+                
+                await self.db.ai_workflows.insert_one(workflow)
+                
+                logging.info(f"🎬 AI Workflow triggered für Affiliate Sale: {sale_data['sale_id']}")
+                
+        except Exception as e:
+            logging.error(f"AI Workflow Trigger Fehler: {e}")
+    
+    async def get_affiliate_dashboard_stats(self) -> Dict[str, Any]:
+        """Hole Affiliate Dashboard Statistiken"""
+        try:
+            # Total Affiliate Sales
+            total_sales = await self.db.affiliate_sales.count_documents({})
+            
+            # Total Commission Paid
+            commission_pipeline = [
+                {"$group": {"_id": None, "total": {"$sum": "$commission"}}}
+            ]
+            commission_result = await self.db.affiliate_sales.aggregate(commission_pipeline).to_list(1)
+            total_commission = commission_result[0]["total"] if commission_result else 0
+            
+            # Total Profit
+            profit_pipeline = [
+                {"$group": {"_id": None, "total": {"$sum": "$your_profit"}}}
+            ]
+            profit_result = await self.db.affiliate_sales.aggregate(profit_pipeline).to_list(1)
+            total_profit = profit_result[0]["total"] if profit_result else 0
+            
+            # Active Affiliates
+            active_affiliates = await self.db.affiliate_stats.count_documents({})
+            
+            # Top Affiliates
+            top_affiliates = await self.db.affiliate_stats.find().sort("total_commission", -1).limit(10).to_list(10)
+            
+            # Recent Sales
+            recent_sales = await self.db.affiliate_sales.find().sort("processed_at", -1).limit(20).to_list(20)
+            
+            return {
+                "total_sales": total_sales,
+                "total_commission": round(total_commission, 2),
+                "total_profit": round(total_profit, 2),
+                "active_affiliates": active_affiliates,
+                "top_affiliates": top_affiliates,
+                "recent_sales": recent_sales,
+                "commission_rate": self.digistore24_config['commission_rate'] * 100,
+                "platform": "Digistore24"
+            }
+            
+        except Exception as e:
+            logging.error(f"Dashboard Stats Fehler: {e}")
+            return {"error": str(e)}
+    
+    async def generate_affiliate_link(self, affiliate_name: str, campaign_key: str = None) -> str:
+        """Generiert Digistore24 Affiliate Link"""
+        try:
+            product_id = self.digistore24_config['product_id']
+            base_url = f"https://www.digistore24.com/redir/{product_id}/{affiliate_name}"
+            
+            if campaign_key:
+                base_url += f"?campaignkey={campaign_key}"
+            
+            return base_url
+            
+        except Exception as e:
+            logging.error(f"Affiliate Link Generation Fehler: {e}")
+            return ""
         """Startet die komplette Affiliate Explosion"""
         self.explosion_active = True
         logging.info("🚀 Affiliate Explosion System gestartet!")

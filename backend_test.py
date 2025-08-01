@@ -31,6 +31,340 @@ if not BACKEND_URL:
 API_BASE = f"{BACKEND_URL}/api"
 print(f"Testing backend at: {API_BASE}")
 
+class Digistore24AffiliateTester:
+    def __init__(self, api_base):
+        self.api_base = api_base
+        self.test_results = []
+        self.failed_tests = []
+        
+    def log_test(self, test_name, success, details=""):
+        """Log test result"""
+        status = "✅ PASS" if success else "❌ FAIL"
+        print(f"{status}: {test_name}")
+        if details:
+            print(f"   Details: {details}")
+        
+        self.test_results.append({
+            'test': test_name,
+            'success': success,
+            'details': details,
+            'timestamp': datetime.now().isoformat()
+        })
+        
+        if not success:
+            self.failed_tests.append(test_name)
+    
+    def test_affiliate_stats_endpoint(self):
+        """Test GET /api/affiliate/stats endpoint"""
+        try:
+            response = requests.get(f"{self.api_base}/affiliate/stats", timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('success') and 'stats' in data:
+                    stats = data['stats']
+                    required_fields = ['total_sales', 'total_commission', 'total_profit', 'active_affiliates', 'commission_rate', 'platform']
+                    
+                    missing_fields = [field for field in required_fields if field not in stats]
+                    if not missing_fields:
+                        self.log_test("Affiliate Stats Endpoint", True, f"Stats structure correct: {stats}")
+                        return True
+                    else:
+                        self.log_test("Affiliate Stats Endpoint", False, f"Missing fields: {missing_fields}")
+                        return False
+                else:
+                    self.log_test("Affiliate Stats Endpoint", False, f"Invalid response structure: {data}")
+                    return False
+            else:
+                self.log_test("Affiliate Stats Endpoint", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Affiliate Stats Endpoint", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_affiliate_link_generation(self):
+        """Test POST /api/affiliate/generate-link endpoint"""
+        payload = {
+            "affiliate_name": "MaxMustermann",
+            "campaign_key": "zzlobby_boost_2025"
+        }
+        
+        try:
+            response = requests.post(f"{self.api_base}/affiliate/generate-link", json=payload, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if (data.get('success') and 
+                    'affiliate_link' in data and 
+                    'affiliate_name' in data and
+                    data['affiliate_name'] == payload['affiliate_name']):
+                    
+                    # Validate link format
+                    link = data['affiliate_link']
+                    if 'digistore24.com/redir' in link and payload['affiliate_name'] in link:
+                        self.log_test("Affiliate Link Generation", True, f"Generated link: {link}")
+                        return True
+                    else:
+                        self.log_test("Affiliate Link Generation", False, f"Invalid link format: {link}")
+                        return False
+                else:
+                    self.log_test("Affiliate Link Generation", False, f"Invalid response: {data}")
+                    return False
+            else:
+                self.log_test("Affiliate Link Generation", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Affiliate Link Generation", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_affiliate_link_generation_missing_name(self):
+        """Test affiliate link generation with missing affiliate name"""
+        payload = {
+            "campaign_key": "test_campaign"
+            # affiliate_name missing
+        }
+        
+        try:
+            response = requests.post(f"{self.api_base}/affiliate/generate-link", json=payload, timeout=10)
+            
+            if response.status_code == 400:
+                data = response.json()
+                if "Affiliate name required" in data.get('detail', ''):
+                    self.log_test("Affiliate Link Generation - Missing Name", True, f"Correctly rejected: {data}")
+                    return True
+                else:
+                    self.log_test("Affiliate Link Generation - Missing Name", False, f"Wrong error message: {data}")
+                    return False
+            else:
+                self.log_test("Affiliate Link Generation - Missing Name", False, f"Expected 400, got {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Affiliate Link Generation - Missing Name", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_affiliate_sales_endpoint(self):
+        """Test GET /api/affiliate/sales endpoint"""
+        try:
+            response = requests.get(f"{self.api_base}/affiliate/sales?limit=10", timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('success') and 'sales' in data and 'count' in data:
+                    sales = data['sales']
+                    count = data['count']
+                    
+                    # Should return list (even if empty)
+                    if isinstance(sales, list) and isinstance(count, int):
+                        self.log_test("Affiliate Sales Endpoint", True, f"Sales count: {count}, Structure correct")
+                        return True
+                    else:
+                        self.log_test("Affiliate Sales Endpoint", False, f"Invalid data types: sales={type(sales)}, count={type(count)}")
+                        return False
+                else:
+                    self.log_test("Affiliate Sales Endpoint", False, f"Invalid response structure: {data}")
+                    return False
+            else:
+                self.log_test("Affiliate Sales Endpoint", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Affiliate Sales Endpoint", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_affiliate_payments_endpoint(self):
+        """Test GET /api/affiliate/payments endpoint"""
+        try:
+            response = requests.get(f"{self.api_base}/affiliate/payments", timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('success') and 'payments' in data and 'count' in data:
+                    payments = data['payments']
+                    count = data['count']
+                    
+                    # Should return list (even if empty)
+                    if isinstance(payments, list) and isinstance(count, int):
+                        self.log_test("Affiliate Payments Endpoint", True, f"Payments count: {count}, Structure correct")
+                        return True
+                    else:
+                        self.log_test("Affiliate Payments Endpoint", False, f"Invalid data types: payments={type(payments)}, count={type(count)}")
+                        return False
+                else:
+                    self.log_test("Affiliate Payments Endpoint", False, f"Invalid response structure: {data}")
+                    return False
+            else:
+                self.log_test("Affiliate Payments Endpoint", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Affiliate Payments Endpoint", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_affiliate_payments_with_status_filter(self):
+        """Test GET /api/affiliate/payments with status filter"""
+        try:
+            response = requests.get(f"{self.api_base}/affiliate/payments?status=pending", timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('success') and 'payments' in data and 'count' in data:
+                    self.log_test("Affiliate Payments - Status Filter", True, f"Filtered payments: {data['count']}")
+                    return True
+                else:
+                    self.log_test("Affiliate Payments - Status Filter", False, f"Invalid response structure: {data}")
+                    return False
+            else:
+                self.log_test("Affiliate Payments - Status Filter", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Affiliate Payments - Status Filter", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_digistore24_webhook_endpoint_structure(self):
+        """Test POST /api/affiliate/digistore24/webhook endpoint structure (without valid signature)"""
+        # Mock IPN data
+        form_data = {
+            'buyer_email': 'kunde@example.com',
+            'order_id': 'DS24_TEST_12345',
+            'product_id': '12345',
+            'vendor_id': 'test_vendor',
+            'affiliate_name': 'TestAffiliate',
+            'amount': '49.00',
+            'currency': 'EUR',
+            'payment_method': 'paypal',
+            'transaction_id': 'TXN_TEST_67890',
+            'order_date': '2025-01-27 10:30:00',
+            'affiliate_link': 'https://www.digistore24.com/redir/12345/TestAffiliate',
+            'campaignkey': 'test_campaign'
+        }
+        
+        try:
+            # Send as form data (not JSON) as Digistore24 sends form data
+            response = requests.post(f"{self.api_base}/affiliate/digistore24/webhook", 
+                                   data=form_data, 
+                                   headers={'X-Digistore24-Signature': 'invalid_signature'},
+                                   timeout=10)
+            
+            # Should return 400 for invalid signature (which is expected behavior)
+            if response.status_code == 400:
+                data = response.json()
+                if "Invalid signature" in data.get('detail', ''):
+                    self.log_test("Digistore24 Webhook - Signature Validation", True, f"Correctly validates signature: {data}")
+                    return True
+                else:
+                    self.log_test("Digistore24 Webhook - Signature Validation", False, f"Wrong error message: {data}")
+                    return False
+            else:
+                self.log_test("Digistore24 Webhook - Signature Validation", False, f"Expected 400, got {response.status_code}: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Digistore24 Webhook - Signature Validation", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_environment_configuration(self):
+        """Test that environment variables are properly configured"""
+        try:
+            # Read backend .env file
+            env_file = '/app/backend/.env'
+            if not os.path.exists(env_file):
+                self.log_test("Environment Configuration", False, "Backend .env file not found")
+                return False
+            
+            required_vars = [
+                'DIGISTORE24_VENDOR_ID',
+                'DIGISTORE24_API_KEY', 
+                'DIGISTORE24_IPN_PASSPHRASE',
+                'DIGISTORE24_PRODUCT_ID',
+                'AFFILIATE_COMMISSION_RATE',
+                'DIGISTORE24_WEBHOOK_URL'
+            ]
+            
+            found_vars = []
+            with open(env_file, 'r') as f:
+                content = f.read()
+                for var in required_vars:
+                    if f"{var}=" in content:
+                        found_vars.append(var)
+            
+            missing_vars = [var for var in required_vars if var not in found_vars]
+            
+            if not missing_vars:
+                self.log_test("Environment Configuration", True, f"All required Digistore24 variables present: {found_vars}")
+                return True
+            else:
+                self.log_test("Environment Configuration", False, f"Missing variables: {missing_vars}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Environment Configuration", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_commission_rate_configuration(self):
+        """Test that commission rate is properly set to 50%"""
+        try:
+            # Check if commission rate is set correctly in environment
+            env_file = '/app/backend/.env'
+            with open(env_file, 'r') as f:
+                content = f.read()
+                if 'AFFILIATE_COMMISSION_RATE=0.50' in content or 'AFFILIATE_COMMISSION_RATE=0.5' in content:
+                    self.log_test("Commission Rate Configuration", True, "Commission rate set to 50% (0.50)")
+                    return True
+                else:
+                    self.log_test("Commission Rate Configuration", False, "Commission rate not set to 50%")
+                    return False
+                    
+        except Exception as e:
+            self.log_test("Commission Rate Configuration", False, f"Exception: {str(e)}")
+            return False
+    
+    def run_all_affiliate_tests(self):
+        """Run all affiliate system tests"""
+        print("\n" + "=" * 80)
+        print("🚀 DIGISTORE24 AFFILIATE SYSTEM COMPREHENSIVE TESTING")
+        print("=" * 80)
+        
+        print("\n--- Environment & Configuration Tests ---")
+        self.test_environment_configuration()
+        self.test_commission_rate_configuration()
+        
+        print("\n--- Affiliate API Endpoints Tests ---")
+        self.test_affiliate_stats_endpoint()
+        self.test_affiliate_link_generation()
+        self.test_affiliate_link_generation_missing_name()
+        self.test_affiliate_sales_endpoint()
+        self.test_affiliate_payments_endpoint()
+        self.test_affiliate_payments_with_status_filter()
+        self.test_digistore24_webhook_endpoint_structure()
+        
+        # Summary
+        print("\n" + "=" * 80)
+        print("🎯 AFFILIATE SYSTEM TEST SUMMARY")
+        print("=" * 80)
+        
+        total_tests = len(self.test_results)
+        passed_tests = len([t for t in self.test_results if t['success']])
+        failed_tests = len(self.failed_tests)
+        
+        print(f"Total Affiliate Tests: {total_tests}")
+        print(f"Passed: {passed_tests}")
+        print(f"Failed: {failed_tests}")
+        print(f"Success Rate: {(passed_tests/total_tests)*100:.1f}%")
+        
+        if self.failed_tests:
+            print(f"\n❌ Failed Affiliate Tests:")
+            for test in self.failed_tests:
+                print(f"  - {test}")
+        else:
+            print("\n✅ ALL AFFILIATE SYSTEM TESTS PASSED!")
+        
+        return failed_tests == 0
+
+
 class SocialMediaConnectTester:
     def __init__(self):
         self.test_results = []

@@ -690,12 +690,51 @@ class SocialMediaConnectTester:
         return failed_tests == 0
 
 if __name__ == "__main__":
-    tester = SocialMediaConnectTester()
-    success = tester.run_all_tests()
+    print("🚀 ZZ-LOBBY ELITE BACKEND COMPREHENSIVE TESTING")
+    print("=" * 80)
     
-    if success:
-        print("\n🎉 All tests passed!")
+    # Test Affiliate System
+    affiliate_tester = Digistore24AffiliateTester(API_BASE)
+    affiliate_success = affiliate_tester.run_all_affiliate_tests()
+    
+    # Test Social Media Connect (existing tests)
+    print("\n" + "=" * 80)
+    print("📱 SOCIAL MEDIA CONNECT SYSTEM TESTING")
+    print("=" * 80)
+    
+    social_tester = SocialMediaConnectTester()
+    social_success = social_tester.run_all_tests()
+    
+    # Overall Summary
+    print("\n" + "=" * 80)
+    print("🎯 OVERALL BACKEND TESTING SUMMARY")
+    print("=" * 80)
+    
+    total_affiliate_tests = len(affiliate_tester.test_results)
+    total_social_tests = len(social_tester.test_results)
+    total_tests = total_affiliate_tests + total_social_tests
+    
+    passed_affiliate = len([t for t in affiliate_tester.test_results if t['success']])
+    passed_social = len([t for t in social_tester.test_results if t['success']])
+    total_passed = passed_affiliate + passed_social
+    
+    failed_affiliate = len(affiliate_tester.failed_tests)
+    failed_social = len(social_tester.failed_tests)
+    total_failed = failed_affiliate + failed_social
+    
+    print(f"📊 AFFILIATE SYSTEM: {passed_affiliate}/{total_affiliate_tests} passed")
+    print(f"📱 SOCIAL CONNECT: {passed_social}/{total_social_tests} passed")
+    print(f"🎯 OVERALL: {total_passed}/{total_tests} passed ({(total_passed/total_tests)*100:.1f}%)")
+    
+    if affiliate_success and social_success:
+        print("\n🎉 ALL BACKEND SYSTEMS FULLY FUNCTIONAL!")
+        print("✅ Digistore24 Affiliate System: READY FOR PRODUCTION")
+        print("✅ Social Media Connect: READY FOR PRODUCTION")
         sys.exit(0)
     else:
-        print(f"\n❌ {len(tester.failed_tests)} test(s) failed!")
+        print(f"\n❌ {total_failed} test(s) failed across systems!")
+        if not affiliate_success:
+            print("🚨 AFFILIATE SYSTEM ISSUES DETECTED")
+        if not social_success:
+            print("🚨 SOCIAL CONNECT SYSTEM ISSUES DETECTED")
         sys.exit(1)

@@ -32,6 +32,7 @@ function App() {
           <Route path="/automation-control" element={<AutomationControl />} />
           <Route path="/easy-automation" element={<EasyAutomation />} />
           <Route path="/ai-marketing" element={<AIMarketingHub />} />
+          <Route path="/system-optimizer" element={<SystemOptimizer />} />
           <Route path="/stripe-explosion" element={<StripeExplosion />} />
           <Route path="/profit-center" element={<ProfitCenter />} />
           <Route path="/live-profit" element={<LiveProfitDashboard />} />

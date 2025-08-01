@@ -362,6 +362,17 @@ export default function ControlCenter() {
               </Button>
 
               <Button 
+                onClick={() => navigate('/system-optimizer')}
+                className="h-24 bg-gradient-to-br from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-serif font-bold flex flex-col items-center justify-center border-2 border-emerald-400/40 shadow-lg shadow-emerald-500/25 transform hover:scale-105"
+              >
+                <div className="flex items-center mb-2">
+                  <Rocket className="h-6 w-6 mr-1" />
+                  <Settings className="h-4 w-4 animate-spin" />
+                </div>
+                <span>🎯 SYSTEM OPTIMIZER</span>
+              </Button>
+
+              <Button 
                 onClick={() => navigate('/stripe-explosion')}
                 className="h-24 bg-gradient-to-br from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 text-white font-serif font-bold flex flex-col items-center justify-center border-2 border-red-400/40 shadow-lg shadow-red-500/25 transform hover:scale-105"
               >

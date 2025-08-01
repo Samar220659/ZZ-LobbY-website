@@ -291,8 +291,9 @@ class Digistore24AffiliateSystem:
     async def generate_affiliate_link(self, affiliate_name: str, campaign_key: str = None) -> str:
         """Generiert Digistore24 Affiliate Link"""
         try:
-            product_id = self.digistore24_config['product_id']
-            base_url = f"https://www.digistore24.com/redir/{product_id}/{affiliate_name}"
+            # Use vendor_id for affiliate links, not product_id
+            vendor_id = self.digistore24_config['vendor_id']
+            base_url = f"https://www.digistore24.com/redir/{vendor_id}/{affiliate_name}"
             
             if campaign_key:
                 base_url += f"?campaignkey={campaign_key}"

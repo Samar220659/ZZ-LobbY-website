@@ -11,6 +11,7 @@ import {
   Users, 
   TrendingUp, 
   Bot, 
+  Activity,
   Settings,
   Shield,
   Zap,

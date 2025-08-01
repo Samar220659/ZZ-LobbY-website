@@ -17,6 +17,72 @@ from fastapi import HTTPException
 from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
+# Digistore24 Models
+class Digistore24IPNData(BaseModel):
+    """Digistore24 IPN Data Model"""
+    buyer_email: str
+    order_id: str
+    product_id: str
+    vendor_id: str
+    affiliate_name: Optional[str] = None
+    amount: float
+    currency: str = "EUR"
+    payment_method: str
+    transaction_id: str
+    order_date: str
+    affiliate_link: Optional[str] = None
+    campaignkey: Optional[str] = None
+    custom1: Optional[str] = None
+    custom2: Optional[str] = None
+    
+class AffiliateStats(BaseModel):
+    """Affiliate Statistics Model"""
+    affiliate_id: str
+    affiliate_name: str
+    total_sales: int = 0
+    total_commission: float = 0.0
+    conversion_rate: float = 0.0
+    active_campaigns: int = 0
+    last_sale_date: Optional[str] = None
+    
+class AffiliatePayment(BaseModel):
+    """Affiliate Payment Model"""
+    payment_id: str
+    affiliate_id: str
+    amount: float
+    currency: str = "EUR"
+    status: str = "pending"  # pending, paid, failed
+    created_at: str
+    paid_at: Optional[str] = None
+
+class Digistore24AffiliateSystem:
+    def __init__(self, db: AsyncIOMotorDatabase):
+        self.db = db
+        self.digistore24_config = {
+            'vendor_id': os.getenv('DIGISTORE24_VENDOR_ID'),
+            'api_key': os.getenv('DIGISTORE24_API_KEY'),
+            'ipn_passphrase': os.getenv('DIGISTORE24_IPN_PASSPHRASE'),
+            'product_id': os.getenv('DIGISTORE24_PRODUCT_ID', '12345'),  # ZZ-Lobby Boost Product ID
+            'commission_rate': float(os.getenv('AFFILIATE_COMMISSION_RATE', '0.50')),  # 50% standard
+            'base_url': 'https://www.digistore24.com/api/',
+            'webhook_url': os.getenv('DIGISTORE24_WEBHOOK_URL', 'https://your-domain.com/api/affiliate/digistore24/webhook')
+        }
+        
+        # Product Configuration
+        self.products = {
+            'zzlobby_boost': {
+                'name': 'ZZ-Lobby Elite Marketing System',
+                'price': 49.0,
+                'currency': 'EUR',
+                'digistore24_product_id': self.digistore24_config['product_id'],
+                'commission_rate': self.digistore24_config['commission_rate'],
+                'description': '1-Klick Video Marketing Automation mit AI'
+            }
+        }
+        
+        self.explosion_active = False
+        logging.info("🚀 Digistore24 Affiliate System initialisiert")
+
 class AffiliateExplosionSystem:
     def __init__(self):
         # Affiliate Platforms

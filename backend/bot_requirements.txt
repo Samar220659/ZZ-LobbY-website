@@ -1,0 +1,4 @@
+# Sales Explosion Bot - Requirements
+aiohttp==3.9.3
+asyncio-mqtt==0.16.1
+schedule==1.2.0

@@ -26,8 +26,8 @@ from automation_engine import automation_router
 # Import AI marketing engine
 from ai_marketing_engine import ai_router
 
-# Import system monitoring
-from system_monitoring import monitoring_router
+# Import affiliate system
+from affiliate_explosion import init_digistore24_system, digistore24_affiliate_system, Digistore24IPNData
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -445,7 +445,6 @@ async def get_status_checks():
 app.include_router(api_router)
 app.include_router(automation_router)  # Automation Engine
 app.include_router(ai_router)  # AI Marketing Engine
-app.include_router(monitoring_router)  # System Monitoring
 
 # Initialize payment service
 init_payment_service(db)

@@ -520,6 +520,9 @@ async def generate_affiliate_link(data: dict):
             "campaign_key": campaign_key
         }
         
+    except HTTPException:
+        # Re-raise HTTPExceptions as-is
+        raise
     except Exception as e:
         logging.error(f"Affiliate Link Generation Fehler: {e}")
         raise HTTPException(status_code=500, detail="Failed to generate affiliate link")

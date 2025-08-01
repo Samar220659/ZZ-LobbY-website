@@ -426,6 +426,113 @@ async def connect_social_media(request: SocialMediaConnectRequest):
         logging.error(f"Error connecting social media: {e}")
         raise HTTPException(status_code=500, detail="Fehler bei der Social Media Verbindung")
 
+# Digistore24 Affiliate API Endpoints
+@api_router.post("/affiliate/digistore24/webhook")
+async def digistore24_webhook(request: Request):
+    """Digistore24 IPN Webhook Handler"""
+    try:
+        # Get raw body and signature
+        raw_body = await request.body()
+        signature = request.headers.get("X-Digistore24-Signature", "")
+        
+        # Parse form data
+        form_data = await request.form()
+        
+        # Validate signature
+        if not await digistore24_affiliate_system.validate_ipn_signature(raw_body.decode(), signature):
+            raise HTTPException(status_code=400, detail="Invalid signature")
+        
+        # Extract IPN data
+        ipn_data = Digistore24IPNData(
+            buyer_email=form_data.get("buyer_email", ""),
+            order_id=form_data.get("order_id", ""),
+            product_id=form_data.get("product_id", ""),
+            vendor_id=form_data.get("vendor_id", ""),
+            affiliate_name=form_data.get("affiliate_name"),
+            amount=float(form_data.get("amount", 0)),
+            currency=form_data.get("currency", "EUR"),
+            payment_method=form_data.get("payment_method", ""),
+            transaction_id=form_data.get("transaction_id", ""),
+            order_date=form_data.get("order_date", ""),
+            affiliate_link=form_data.get("affiliate_link"),
+            campaignkey=form_data.get("campaignkey"),
+            custom1=form_data.get("custom1"),
+            custom2=form_data.get("custom2")
+        )
+        
+        # Process IPN
+        result = await digistore24_affiliate_system.process_digistore24_ipn(ipn_data)
+        
+        logging.info(f"🚀 Digistore24 IPN verarbeitet: {result}")
+        
+        return {"status": "success", "message": "IPN processed", "data": result}
+        
+    except Exception as e:
+        logging.error(f"Digistore24 Webhook Fehler: {e}")
+        raise HTTPException(status_code=500, detail="Webhook processing failed")
+
+@api_router.get("/affiliate/stats")
+async def get_affiliate_stats():
+    """Hole Affiliate Dashboard Statistiken"""
+    try:
+        stats = await digistore24_affiliate_system.get_affiliate_dashboard_stats()
+        return {"success": True, "stats": stats}
+    except Exception as e:
+        logging.error(f"Affiliate Stats Fehler: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get affiliate stats")
+
+@api_router.post("/affiliate/generate-link")
+async def generate_affiliate_link(data: dict):
+    """Generiert Affiliate Link"""
+    try:
+        affiliate_name = data.get("affiliate_name", "")
+        campaign_key = data.get("campaign_key")
+        
+        if not affiliate_name:
+            raise HTTPException(status_code=400, detail="Affiliate name required")
+        
+        link = await digistore24_affiliate_system.generate_affiliate_link(affiliate_name, campaign_key)
+        
+        return {
+            "success": True,
+            "affiliate_link": link,
+            "affiliate_name": affiliate_name,
+            "campaign_key": campaign_key
+        }
+        
+    except Exception as e:
+        logging.error(f"Affiliate Link Generation Fehler: {e}")
+        raise HTTPException(status_code=500, detail="Failed to generate affiliate link")
+
+@api_router.get("/affiliate/sales")
+async def get_affiliate_sales(limit: int = 50):
+    """Hole neueste Affiliate Sales"""
+    try:
+        # Get recent affiliate sales
+        sales = await db.affiliate_sales.find().sort("processed_at", -1).limit(limit).to_list(limit)
+        
+        return {"success": True, "sales": sales, "count": len(sales)}
+        
+    except Exception as e:
+        logging.error(f"Affiliate Sales Fehler: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get affiliate sales")
+
+@api_router.get("/affiliate/payments")
+async def get_affiliate_payments(status: str = None):
+    """Hole Affiliate Commission Payments"""
+    try:
+        filter_query = {}
+        if status:
+            filter_query["status"] = status
+            
+        payments = await db.affiliate_payments.find(filter_query).sort("created_at", -1).to_list(100)
+        
+        return {"success": True, "payments": payments, "count": len(payments)}
+        
+    except Exception as e:
+        logging.error(f"Affiliate Payments Fehler: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get affiliate payments")
+
 # Legacy endpoints
 @api_router.get("/")
 async def root():

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Backend API Testing for Social Media Connect Endpoint
-Tests the /api/social-connect endpoint implementation
+Backend API Testing for ZZ-Lobby Elite System
+Tests all backend API endpoints including Digistore24 Affiliate System
 """
 
 import requests
@@ -9,6 +9,8 @@ import json
 import os
 from datetime import datetime
 import sys
+import hashlib
+import hmac
 
 # Get backend URL from frontend .env file
 def get_backend_url():

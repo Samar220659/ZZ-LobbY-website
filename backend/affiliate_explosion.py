@@ -1,6 +1,6 @@
 """
 ZZ-Lobby Affiliate Explosion System
-Automatisches Affiliate Marketing + Content Generation Engine
+ECHTE Digistore24 Integration für sofortige Monetarisierung
 """
 
 import asyncio
@@ -8,8 +8,14 @@ import aiohttp
 import json
 import logging
 from datetime import datetime
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
+import hashlib
+import hmac
+import os
 import random
+from fastapi import HTTPException
+from pydantic import BaseModel
+from motor.motor_asyncio import AsyncIOMotorDatabase
 
 class AffiliateExplosionSystem:
     def __init__(self):

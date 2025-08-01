@@ -27,7 +27,12 @@ from automation_engine import automation_router
 from ai_marketing_engine import ai_router
 
 # Import affiliate system
-from affiliate_explosion import init_digistore24_system, digistore24_affiliate_system, Digistore24IPNData
+from affiliate_explosion import init_digistore24_system, Digistore24IPNData
+import affiliate_explosion
+
+def get_affiliate_system():
+    """Get the initialized affiliate system instance"""
+    return affiliate_explosion.digistore24_affiliate_system
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -438,8 +443,13 @@ async def digistore24_webhook(request: Request):
         # Parse form data
         form_data = await request.form()
         
+        # Get affiliate system instance
+        affiliate_system = get_affiliate_system()
+        if not affiliate_system:
+            raise HTTPException(status_code=500, detail="Affiliate system not initialized")
+        
         # Validate signature
-        if not await digistore24_affiliate_system.validate_ipn_signature(raw_body.decode(), signature):
+        if not await affiliate_system.validate_ipn_signature(raw_body.decode(), signature):
             raise HTTPException(status_code=400, detail="Invalid signature")
         
         # Extract IPN data
@@ -461,7 +471,7 @@ async def digistore24_webhook(request: Request):
         )
         
         # Process IPN
-        result = await digistore24_affiliate_system.process_digistore24_ipn(ipn_data)
+        result = await affiliate_system.process_digistore24_ipn(ipn_data)
         
         logging.info(f"🚀 Digistore24 IPN verarbeitet: {result}")
         
@@ -475,7 +485,12 @@ async def digistore24_webhook(request: Request):
 async def get_affiliate_stats():
     """Hole Affiliate Dashboard Statistiken"""
     try:
-        stats = await digistore24_affiliate_system.get_affiliate_dashboard_stats()
+        # Get affiliate system instance
+        affiliate_system = get_affiliate_system()
+        if not affiliate_system:
+            raise HTTPException(status_code=500, detail="Affiliate system not initialized")
+            
+        stats = await affiliate_system.get_affiliate_dashboard_stats()
         return {"success": True, "stats": stats}
     except Exception as e:
         logging.error(f"Affiliate Stats Fehler: {e}")
@@ -491,7 +506,12 @@ async def generate_affiliate_link(data: dict):
         if not affiliate_name:
             raise HTTPException(status_code=400, detail="Affiliate name required")
         
-        link = await digistore24_affiliate_system.generate_affiliate_link(affiliate_name, campaign_key)
+        # Get affiliate system instance
+        affiliate_system = get_affiliate_system()
+        if not affiliate_system:
+            raise HTTPException(status_code=500, detail="Affiliate system not initialized")
+        
+        link = await affiliate_system.generate_affiliate_link(affiliate_name, campaign_key)
         
         return {
             "success": True,

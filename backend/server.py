@@ -477,6 +477,9 @@ async def digistore24_webhook(request: Request):
         
         return {"status": "success", "message": "IPN processed", "data": result}
         
+    except HTTPException:
+        # Re-raise HTTPExceptions as-is
+        raise
     except Exception as e:
         logging.error(f"Digistore24 Webhook Fehler: {e}")
         raise HTTPException(status_code=500, detail="Webhook processing failed")

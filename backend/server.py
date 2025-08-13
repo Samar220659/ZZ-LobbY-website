@@ -28,6 +28,9 @@ from ai_marketing_engine import ai_router
 
 # Import affiliate system
 from affiliate_explosion import init_digistore24_system, Digistore24IPNData
+
+# Import business integration system
+from business_integration import init_business_system, business_system
 import affiliate_explosion
 
 def get_affiliate_system():

@@ -20,6 +20,7 @@ import PaymentSuccess from "./components/PaymentSuccess";
 import PaymentCancel from "./components/PaymentCancel";
 import AffiliateExplosion from "./components/AffiliateExplosion";
 import BusinessDashboard from "./components/BusinessDashboard";
+import AutomationCenter from "./components/AutomationCenter";
 import "./App.css";
 
 function App() {
@@ -46,6 +47,7 @@ function App() {
           <Route path="/payment-cancel" element={<PaymentCancel />} />
           <Route path="/affiliate-explosion" element={<AffiliateExplosion />} />
           <Route path="/business-dashboard" element={<BusinessDashboard />} />
+          <Route path="/automation-center" element={<AutomationCenter />} />
         </Routes>
         <Toaster />
       </BrowserRouter>

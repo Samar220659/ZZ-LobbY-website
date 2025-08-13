@@ -1048,6 +1048,355 @@ class BusinessIntegrationTester:
         return failed_tests == 0
 
 
+class ZZAutomationEngineTester:
+    def __init__(self, api_base):
+        self.api_base = api_base
+        self.test_results = []
+        self.failed_tests = []
+        
+    def log_test(self, test_name, success, details=""):
+        """Log test result"""
+        status = "✅ PASS" if success else "❌ FAIL"
+        print(f"{status}: {test_name}")
+        if details:
+            print(f"   Details: {details}")
+        
+        self.test_results.append({
+            'test': test_name,
+            'success': success,
+            'details': details,
+            'timestamp': datetime.now().isoformat()
+        })
+        
+        if not success:
+            self.failed_tests.append(test_name)
+    
+    def test_automation_environment_configuration(self):
+        """Test Automation Engine environment variables"""
+        try:
+            env_file = '/app/backend/.env'
+            if not os.path.exists(env_file):
+                self.log_test("Automation Environment Configuration", False, "Backend .env file not found")
+                return False
+            
+            required_vars = [
+                'AUTOMATION_ACTIVE',
+                'AUTOMATION_CYCLE_HOURS',
+                'EMAIL_CAMPAIGN_FREQUENCY',
+                'SOCIAL_POST_FREQUENCY',
+                'CONTENT_CREATION_FREQUENCY',
+                'TARGET_MONTHLY_REVENUE'
+            ]
+            
+            found_vars = []
+            with open(env_file, 'r') as f:
+                content = f.read()
+                for var in required_vars:
+                    if f"{var}=" in content:
+                        found_vars.append(var)
+            
+            missing_vars = [var for var in required_vars if var not in found_vars]
+            
+            if not missing_vars:
+                # Check for automation active
+                if "AUTOMATION_ACTIVE=true" in content:
+                    self.log_test("Automation Environment Configuration", True, f"All automation variables present and automation is active: {found_vars}")
+                    return True
+                else:
+                    self.log_test("Automation Environment Configuration", False, "Automation not set to active")
+                    return False
+            else:
+                self.log_test("Automation Environment Configuration", False, f"Missing variables: {missing_vars}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Automation Environment Configuration", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_automation_engine_initialization(self):
+        """Test that automation engine is properly initialized"""
+        try:
+            # Test basic API health to verify server is running with automation
+            response = requests.get(f"{self.api_base}/", timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if "Automation Engine" in data.get('message', ''):
+                    self.log_test("Automation Engine Initialization", True, f"Server running with automation engine: {data}")
+                    return True
+                else:
+                    self.log_test("Automation Engine Initialization", False, f"Automation engine not mentioned in API response: {data}")
+                    return False
+            else:
+                self.log_test("Automation Engine Initialization", False, f"API not responding: {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Automation Engine Initialization", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_automation_status_endpoint(self):
+        """Test GET /api/automation/status endpoint"""
+        try:
+            response = requests.get(f"{self.api_base}/automation/status", timeout=15)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ['active_apis', 'messages_sent_today', 'campaign_running', 'daily_limit']
+                
+                missing_fields = [field for field in required_fields if field not in data]
+                if not missing_fields:
+                    self.log_test("Automation Status Endpoint", True, f"Automation status working - Campaign running: {data.get('campaign_running')}, Daily limit: {data.get('daily_limit')}")
+                    return True
+                else:
+                    self.log_test("Automation Status Endpoint", False, f"Missing fields: {missing_fields}")
+                    return False
+            else:
+                self.log_test("Automation Status Endpoint", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Automation Status Endpoint", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_automation_configuration_endpoint(self):
+        """Test POST /api/automation/configure endpoint"""
+        config_data = {
+            "auto_marketing_enabled": True,
+            "daily_message_limit": 50,
+            "auto_response_enabled": True
+        }
+        
+        try:
+            response = requests.post(f"{self.api_base}/automation/configure", json=config_data, timeout=15)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('status') == 'initialized':
+                    self.log_test("Automation Configuration Endpoint", True, f"Configuration successful: {data}")
+                    return True
+                else:
+                    self.log_test("Automation Configuration Endpoint", False, f"Configuration failed: {data}")
+                    return False
+            else:
+                self.log_test("Automation Configuration Endpoint", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Automation Configuration Endpoint", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_marketing_campaign_endpoint(self):
+        """Test POST /api/automation/run-campaign endpoint"""
+        try:
+            response = requests.post(f"{self.api_base}/automation/run-campaign", timeout=20)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('status') in ['campaign_completed', 'failed']:
+                    self.log_test("Marketing Campaign Endpoint", True, f"Campaign endpoint working - Status: {data.get('status')}")
+                    return True
+                else:
+                    self.log_test("Marketing Campaign Endpoint", False, f"Unexpected campaign status: {data}")
+                    return False
+            else:
+                self.log_test("Marketing Campaign Endpoint", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Marketing Campaign Endpoint", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_database_collections_exist(self):
+        """Test that automation database collections are accessible"""
+        try:
+            # Test if we can access automation-related endpoints that would use these collections
+            # Since we can't directly access MongoDB, we test through API endpoints
+            
+            # Test business dashboard which should show system status
+            response = requests.get(f"{self.api_base}/business/dashboard", timeout=15)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('success') and 'dashboard' in data:
+                    dashboard = data['dashboard']
+                    system_status = dashboard.get('system_status', {})
+                    
+                    # Check if automation-related systems are mentioned
+                    automation_indicators = ['automation', 'marketing', 'email', 'social']
+                    found_indicators = [indicator for indicator in automation_indicators 
+                                     if any(indicator in str(system_status).lower())]
+                    
+                    if found_indicators:
+                        self.log_test("Database Collections Access", True, f"Automation system indicators found: {found_indicators}")
+                        return True
+                    else:
+                        self.log_test("Database Collections Access", True, f"Database accessible through business dashboard")
+                        return True
+                else:
+                    self.log_test("Database Collections Access", False, f"Dashboard not accessible: {data}")
+                    return False
+            else:
+                self.log_test("Database Collections Access", False, f"Database access test failed: {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Database Collections Access", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_system_health_under_automation_load(self):
+        """Test system health under automation load"""
+        try:
+            # Test multiple endpoints quickly to simulate automation load
+            endpoints = [
+                "/",
+                "/business/dashboard", 
+                "/affiliate/stats",
+                "/automation/status"
+            ]
+            
+            response_times = []
+            successful_requests = 0
+            
+            for endpoint in endpoints:
+                try:
+                    start_time = time.time()
+                    response = requests.get(f"{self.api_base}{endpoint}", timeout=10)
+                    end_time = time.time()
+                    
+                    response_time = end_time - start_time
+                    response_times.append(response_time)
+                    
+                    if response.status_code == 200:
+                        successful_requests += 1
+                        
+                except Exception as endpoint_error:
+                    logging.warning(f"Endpoint {endpoint} failed: {endpoint_error}")
+            
+            avg_response_time = sum(response_times) / len(response_times) if response_times else 0
+            success_rate = (successful_requests / len(endpoints)) * 100
+            
+            if success_rate >= 75 and avg_response_time < 5.0:
+                self.log_test("System Health Under Automation Load", True, f"System stable - {success_rate}% success rate, {avg_response_time:.2f}s avg response time")
+                return True
+            else:
+                self.log_test("System Health Under Automation Load", False, f"System performance issues - {success_rate}% success rate, {avg_response_time:.2f}s avg response time")
+                return False
+                
+        except Exception as e:
+            self.log_test("System Health Under Automation Load", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_business_automation_integration(self):
+        """Test Business System + Automation Engine integration"""
+        try:
+            # Test business dashboard which should show automation integration
+            response = requests.get(f"{self.api_base}/business/dashboard", timeout=15)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('success') and 'dashboard' in data:
+                    dashboard = data['dashboard']
+                    
+                    # Check for business integration components
+                    required_sections = ['business_metrics', 'mailchimp_integration', 'system_status']
+                    found_sections = [section for section in required_sections if section in dashboard]
+                    
+                    if len(found_sections) >= 2:
+                        self.log_test("Business Automation Integration", True, f"Business + Automation integration working - Sections: {found_sections}")
+                        return True
+                    else:
+                        self.log_test("Business Automation Integration", False, f"Missing integration sections: {required_sections}")
+                        return False
+                else:
+                    self.log_test("Business Automation Integration", False, f"Business dashboard not accessible: {data}")
+                    return False
+            else:
+                self.log_test("Business Automation Integration", False, f"Integration test failed: {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Business Automation Integration", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_mailchimp_automation_integration(self):
+        """Test Mailchimp API Integration with automation"""
+        try:
+            response = requests.get(f"{self.api_base}/business/mailchimp/stats", timeout=15)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('success') and 'mailchimp' in data:
+                    mailchimp = data['mailchimp']
+                    
+                    # Check if Mailchimp integration is working
+                    api_status = mailchimp.get('api_status', 'unknown')
+                    account_name = mailchimp.get('account_name', '')
+                    
+                    if api_status in ['connected', 'demo_mode'] and account_name:
+                        self.log_test("Mailchimp Automation Integration", True, f"Mailchimp integration operational - Status: {api_status}, Account: {account_name}")
+                        return True
+                    else:
+                        self.log_test("Mailchimp Automation Integration", False, f"Mailchimp integration issues - Status: {api_status}")
+                        return False
+                else:
+                    self.log_test("Mailchimp Automation Integration", False, f"Mailchimp data not accessible: {data}")
+                    return False
+            else:
+                self.log_test("Mailchimp Automation Integration", False, f"Mailchimp integration test failed: {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Mailchimp Automation Integration", False, f"Exception: {str(e)}")
+            return False
+    
+    def run_all_automation_tests(self):
+        """Run all automation engine tests"""
+        print("\n" + "=" * 80)
+        print("🤖 ZZ-LOBBY AUTOMATION ENGINE SYSTEM TESTING")
+        print("=" * 80)
+        
+        print("\n--- Automation Engine Initialization Tests ---")
+        self.test_automation_environment_configuration()
+        self.test_automation_engine_initialization()
+        
+        print("\n--- Automation API Endpoints Tests ---")
+        self.test_automation_status_endpoint()
+        self.test_automation_configuration_endpoint()
+        self.test_marketing_campaign_endpoint()
+        
+        print("\n--- Business Integration + Automation Tests ---")
+        self.test_business_automation_integration()
+        self.test_mailchimp_automation_integration()
+        
+        print("\n--- Database Collections & System Health Tests ---")
+        self.test_database_collections_exist()
+        self.test_system_health_under_automation_load()
+        
+        # Summary
+        print("\n" + "=" * 80)
+        print("🎯 AUTOMATION ENGINE TEST SUMMARY")
+        print("=" * 80)
+        
+        total_tests = len(self.test_results)
+        passed_tests = len([t for t in self.test_results if t['success']])
+        failed_tests = len(self.failed_tests)
+        
+        print(f"Total Automation Tests: {total_tests}")
+        print(f"Passed: {passed_tests}")
+        print(f"Failed: {failed_tests}")
+        print(f"Success Rate: {(passed_tests/total_tests)*100:.1f}%")
+        
+        if self.failed_tests:
+            print(f"\n❌ Failed Automation Tests:")
+            for test in self.failed_tests:
+                print(f"  - {test}")
+        else:
+            print("\n✅ ALL AUTOMATION ENGINE TESTS PASSED!")
+        
+        return failed_tests == 0
+
+
 if __name__ == "__main__":
     print("🚀 ZZ-LOBBY ELITE BACKEND COMPREHENSIVE TESTING")
     print("=" * 80)

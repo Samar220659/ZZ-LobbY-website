@@ -32,10 +32,15 @@ from affiliate_explosion import init_digistore24_system, Digistore24IPNData
 # Import business integration system
 from business_integration import init_business_system, business_system
 import affiliate_explosion
+import business_integration
 
 def get_affiliate_system():
     """Get the initialized affiliate system instance"""
     return affiliate_explosion.digistore24_affiliate_system
+
+def get_business_system():
+    """Get the initialized business system instance"""
+    return business_integration.business_system
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')

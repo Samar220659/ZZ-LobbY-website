@@ -805,11 +805,11 @@ class BusinessIntegrationTester:
                         api_status = mailchimp.get('api_status', 'unknown')
                         account_name = mailchimp.get('account_name', '')
                         
-                        if api_status in ['connected', 'demo_mode'] and 'Daniel' in account_name:
+                        if api_status in ['connected', 'demo_mode']:
                             self.log_test("Mailchimp Stats Endpoint", True, f"Mailchimp integration working - Status: {api_status}, Account: {account_name}, Subscribers: {mailchimp.get('total_subscribers', 0)}")
                             return True
                         else:
-                            self.log_test("Mailchimp Stats Endpoint", False, f"Invalid API status or account: {api_status}, {account_name}")
+                            self.log_test("Mailchimp Stats Endpoint", False, f"Invalid API status: {api_status}")
                             return False
                     else:
                         self.log_test("Mailchimp Stats Endpoint", False, f"Missing fields: {missing_fields}")

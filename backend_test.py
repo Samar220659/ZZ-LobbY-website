@@ -1398,10 +1398,14 @@ class ZZAutomationEngineTester:
 
 
 if __name__ == "__main__":
-    print("🚀 ZZ-LOBBY ELITE BACKEND COMPREHENSIVE TESTING")
+    print("🚀 ZZ-LOBBY AUTOMATION ENGINE SYSTEM - START THE MONEY MACHINE!")
     print("=" * 80)
     
-    # Test Business Integration System (NEW - HIGH PRIORITY)
+    # Test ZZ-Lobby Automation Engine (NEW - CRITICAL PRIORITY)
+    automation_tester = ZZAutomationEngineTester(API_BASE)
+    automation_success = automation_tester.run_all_automation_tests()
+    
+    # Test Business Integration System (HIGH PRIORITY)
     business_tester = BusinessIntegrationTester(API_BASE)
     business_success = business_tester.run_all_business_tests()
     
@@ -1419,37 +1423,45 @@ if __name__ == "__main__":
     
     # Overall Summary
     print("\n" + "=" * 80)
-    print("🎯 OVERALL BACKEND TESTING SUMMARY")
+    print("🎯 DANIEL'S GELD-MASCHINE TESTING SUMMARY")
     print("=" * 80)
     
+    total_automation_tests = len(automation_tester.test_results)
     total_business_tests = len(business_tester.test_results)
     total_affiliate_tests = len(affiliate_tester.test_results)
     total_social_tests = len(social_tester.test_results)
-    total_tests = total_business_tests + total_affiliate_tests + total_social_tests
+    total_tests = total_automation_tests + total_business_tests + total_affiliate_tests + total_social_tests
     
+    passed_automation = len([t for t in automation_tester.test_results if t['success']])
     passed_business = len([t for t in business_tester.test_results if t['success']])
     passed_affiliate = len([t for t in affiliate_tester.test_results if t['success']])
     passed_social = len([t for t in social_tester.test_results if t['success']])
-    total_passed = passed_business + passed_affiliate + passed_social
+    total_passed = passed_automation + passed_business + passed_affiliate + passed_social
     
+    failed_automation = len(automation_tester.failed_tests)
     failed_business = len(business_tester.failed_tests)
     failed_affiliate = len(affiliate_tester.failed_tests)
     failed_social = len(social_tester.failed_tests)
-    total_failed = failed_business + failed_affiliate + failed_social
+    total_failed = failed_automation + failed_business + failed_affiliate + failed_social
     
+    print(f"🤖 AUTOMATION ENGINE: {passed_automation}/{total_automation_tests} passed")
     print(f"🏦 BUSINESS INTEGRATION: {passed_business}/{total_business_tests} passed")
     print(f"📊 AFFILIATE SYSTEM: {passed_affiliate}/{total_affiliate_tests} passed")
     print(f"📱 SOCIAL CONNECT: {passed_social}/{total_social_tests} passed")
     print(f"🎯 OVERALL: {total_passed}/{total_tests} passed ({(total_passed/total_tests)*100:.1f}%)")
     
-    if business_success and affiliate_success and social_success:
-        print("\n🎉 ALL BACKEND SYSTEMS FULLY FUNCTIONAL!")
+    if automation_success and business_success and affiliate_success and social_success:
+        print("\n🎉 DANIEL'S GELD-MASCHINE 100% FUNKTIONSFÄHIG!")
+        print("✅ Automation Engine: 98% AUTOMATION ACTIVE")
         print("✅ Business Integration System: READY FOR PRODUCTION")
         print("✅ Digistore24 Affiliate System: READY FOR PRODUCTION")
         print("✅ Social Media Connect: READY FOR PRODUCTION")
+        print("\n💰 SYSTEM READY FÜR 98% AUTOMATION!")
         sys.exit(0)
     else:
         print(f"\n❌ {total_failed} test(s) failed across systems!")
+        if not automation_success:
+            print("🚨 AUTOMATION ENGINE ISSUES DETECTED")
         if not business_success:
             print("🚨 BUSINESS INTEGRATION SYSTEM ISSUES DETECTED")
         if not affiliate_success:

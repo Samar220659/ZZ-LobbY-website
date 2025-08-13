@@ -1224,8 +1224,13 @@ class ZZAutomationEngineTester:
                     
                     # Check if automation-related systems are mentioned
                     automation_indicators = ['automation', 'marketing', 'email', 'social']
-                    found_indicators = [indicator for indicator in automation_indicators 
-                                     if any(indicator in str(system_status).lower())]
+                    found_indicators = []
+                    
+                    # Safely check system status
+                    if isinstance(system_status, dict):
+                        for indicator in automation_indicators:
+                            if any(indicator in str(value).lower() for value in system_status.values() if isinstance(value, str)):
+                                found_indicators.append(indicator)
                     
                     if found_indicators:
                         self.log_test("Database Collections Access", True, f"Automation system indicators found: {found_indicators}")

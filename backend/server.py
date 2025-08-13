@@ -77,9 +77,11 @@ class StatusCheckCreate(BaseModel):
 async def startup_event():
     await db_service.initialize_default_data()
     init_digistore24_system(db)  # Initialize Digistore24 affiliate system
+    init_business_system(db)     # Initialize Business Integration system
     logging.info("Database initialized successfully")
     logging.info("Automation Engine initialized successfully")
     logging.info("Digistore24 Affiliate System initialized successfully")
+    logging.info("Business Integration System initialized successfully")
 
 # Dashboard API
 @api_router.get("/dashboard/stats", response_model=DashboardStatsResponse)

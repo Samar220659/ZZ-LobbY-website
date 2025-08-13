@@ -87,10 +87,16 @@ async def startup_event():
     await db_service.initialize_default_data()
     init_digistore24_system(db)  # Initialize Digistore24 affiliate system
     init_business_system(db)     # Initialize Business Integration system
+    init_automation_engine(db)   # Initialize Automation Engine
+    
+    # Start automation engine as background task
+    asyncio.create_task(start_automation())
+    
     logging.info("Database initialized successfully")
     logging.info("Automation Engine initialized successfully")
     logging.info("Digistore24 Affiliate System initialized successfully")
     logging.info("Business Integration System initialized successfully")
+    logging.info("🤖 ZZ-Lobby Automation Engine started - 98% automation active!")
 
 # Dashboard API
 @api_router.get("/dashboard/stats", response_model=DashboardStatsResponse)

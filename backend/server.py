@@ -577,7 +577,10 @@ async def get_affiliate_payments(status: str = None):
 async def get_business_dashboard():
     """Hole komplettes Business Dashboard mit allen Metriken"""
     try:
-        dashboard_data = await business_system.get_comprehensive_business_dashboard()
+        business_sys = get_business_system()
+        if not business_sys:
+            raise HTTPException(status_code=500, detail="Business system not initialized")
+        dashboard_data = await business_sys.get_comprehensive_business_dashboard()
         return {"success": True, "dashboard": dashboard_data}
     except Exception as e:
         logging.error(f"Business Dashboard Fehler: {e}")
@@ -587,7 +590,10 @@ async def get_business_dashboard():
 async def get_mailchimp_stats():
     """Hole Mailchimp Statistiken"""
     try:
-        mailchimp_stats = await business_system.get_mailchimp_stats()
+        business_sys = get_business_system()
+        if not business_sys:
+            raise HTTPException(status_code=500, detail="Business system not initialized")
+        mailchimp_stats = await business_sys.get_mailchimp_stats()
         return {"success": True, "mailchimp": mailchimp_stats}
     except Exception as e:
         logging.error(f"Mailchimp Stats Fehler: {e}")
@@ -597,7 +603,10 @@ async def get_mailchimp_stats():
 async def get_paypal_metrics():
     """Hole PayPal Business Metriken"""
     try:
-        paypal_metrics = await business_system.get_paypal_business_metrics()
+        business_sys = get_business_system()
+        if not business_sys:
+            raise HTTPException(status_code=500, detail="Business system not initialized")
+        paypal_metrics = await business_sys.get_paypal_business_metrics()
         return {"success": True, "paypal": paypal_metrics}
     except Exception as e:
         logging.error(f"PayPal Metrics Fehler: {e}")
@@ -607,7 +616,10 @@ async def get_paypal_metrics():
 async def get_tax_compliance():
     """Hole Steuerliches Compliance Status"""
     try:
-        tax_status = await business_system.get_tax_compliance_status()
+        business_sys = get_business_system()
+        if not business_sys:
+            raise HTTPException(status_code=500, detail="Business system not initialized")
+        tax_status = await business_sys.get_tax_compliance_status()
         return {"success": True, "tax_compliance": tax_status}
     except Exception as e:
         logging.error(f"Tax Compliance Fehler: {e}")
@@ -617,7 +629,10 @@ async def get_tax_compliance():
 async def send_email_campaign(data: dict):
     """Sende automatisierte Email-Kampagne"""
     try:
-        campaign_result = await business_system.send_automated_email_campaign(data)
+        business_sys = get_business_system()
+        if not business_sys:
+            raise HTTPException(status_code=500, detail="Business system not initialized")
+        campaign_result = await business_sys.send_automated_email_campaign(data)
         return {"success": True, "campaign": campaign_result}
     except Exception as e:
         logging.error(f"Email Campaign Fehler: {e}")
@@ -627,7 +642,10 @@ async def send_email_campaign(data: dict):
 async def get_business_metrics():
     """Hole aktuelle Business Metriken"""
     try:
-        business_metrics = await business_system.calculate_business_metrics()
+        business_sys = get_business_system()
+        if not business_sys:
+            raise HTTPException(status_code=500, detail="Business system not initialized")
+        business_metrics = await business_sys.calculate_business_metrics()
         return {"success": True, "metrics": business_metrics}
     except Exception as e:
         logging.error(f"Business Metrics Fehler: {e}")

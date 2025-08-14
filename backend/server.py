@@ -46,6 +46,11 @@ def get_business_system():
     """Get the initialized business system instance"""
     return business_integration.business_system
 
+def get_automation_engine():
+    """Get the initialized automation engine instance"""
+    from zz_automation_engine import automation_engine
+    return automation_engine
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 

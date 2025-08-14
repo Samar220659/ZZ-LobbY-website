@@ -870,6 +870,230 @@ async def generate_test_activity():
         logging.error(f"Generate Activity Fehler: {e}")
         raise HTTPException(status_code=500, detail="Failed to generate activity")
 
+# Smart Akquise System API Endpoints
+@api_router.get("/akquise/prospects")
+async def get_prospects():
+    """Hole alle Prospects für Akquise"""
+    try:
+        prospects = await db.prospects.find().sort("created_at", -1).to_list(100)
+        
+        # Convert ObjectIds to strings
+        for prospect in prospects:
+            if '_id' in prospect:
+                prospect['id'] = str(prospect['_id'])
+                del prospect['_id']
+        
+        return {"success": True, "prospects": prospects}
+        
+    except Exception as e:
+        logging.error(f"Get Prospects Fehler: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get prospects")
+
+@api_router.post("/akquise/prospects")
+async def add_prospect(data: dict):
+    """Füge neuen Prospect hinzu"""
+    try:
+        prospect = {
+            "name": data.get("name", ""),
+            "company": data.get("company", ""),
+            "email": data.get("email", ""),
+            "linkedin": data.get("linkedin", ""),
+            "phone": data.get("phone", ""),
+            "industry": data.get("industry", ""),
+            "notes": data.get("notes", ""),
+            "status": "new",
+            "created_at": datetime.now().isoformat(),
+            "last_contact": None,
+            "affiliate_link": ""
+        }
+        
+        # Generate affiliate link
+        if prospect["name"]:
+            affiliate_id = prospect["name"].lower().replace(" ", "_").replace("-", "_")
+            prospect["affiliate_link"] = f"https://www.digistore24.com/redir/1417598/{affiliate_id}"
+        
+        result = await db.prospects.insert_one(prospect)
+        
+        prospect_response = {
+            "id": str(result.inserted_id),
+            **prospect
+        }
+        
+        logging.info(f"🎯 Prospect hinzugefügt: {prospect['name']} - {prospect['company']}")
+        
+        return {"success": True, "prospect": prospect_response}
+        
+    except Exception as e:
+        logging.error(f"Add Prospect Fehler: {e}")
+        raise HTTPException(status_code=500, detail="Failed to add prospect")
+
+@api_router.post("/akquise/personalize-message")
+async def personalize_message(data: dict):
+    """Personalisiere Message Template für Prospect"""
+    try:
+        template_type = data.get("template_type", "")
+        prospect = data.get("prospect", {})
+        
+        templates = {
+            "linkedin_initial": """Hallo {name},
+
+ich bin auf dein Profil bei {company} aufmerksam geworden und finde deine Expertise in {industry} sehr beeindruckend!
+
+Ich habe ein Affiliate Programm mit außergewöhnlich guten Konditionen:
+• 50% Provision (24,50€ pro Verkauf)
+• Sofortige Auszahlung über Digistore24  
+• Professionelle Marketing-Materialien inklusive
+• Persönlicher Support von mir
+
+Das Produkt ist ein Marketing Automation System für 49€, das bereits über 500 zufriedene Kunden hat.
+
+Falls du Interesse hast, können wir gerne kurz telefonieren oder ich sende dir weitere Informationen.
+
+Beste Grüße,
+Daniel Oettel
+
+P.S: Hier ist dein persönlicher Affiliate-Link: {affiliate_link}""",
+
+            "facebook_groups": """Hey zusammen! 👋
+
+ich teile hier meine Erfahrung mit Affiliate Marketing. Nach 6 Monaten mit verschiedenen Programmen habe ich endlich eines gefunden, das wirklich funktioniert:
+
+🎯 **Was anders ist:**
+• 50% Provision (nicht die üblichen 10-20%)
+• Sofort-Auszahlung über Digistore24
+• Produkt für 49€ (nicht überteuert wie oft)
+• Echte Erfolgsgeschichten von Kunden
+
+🔥 **Meine bisherigen Zahlen:**
+• 89 Partner aktiv
+• Durchschnittlich 2-3 Verkäufe pro Partner/Monat
+• Höchste Einzelverdienst eines Partners: 1.250€/Monat
+
+Falls jemand Interesse an seriösem Affiliate Marketing hat (kein MLM!), kann mich gerne anschreiben.
+
+#AffiliateMarketing #PassivesEinkommen #OnlineBusiness""",
+
+            "email_follow_up": """Hallo {name},
+
+ich hatte dir vor einer Woche unser Affiliate Programm vorgestellt und wollte kurz nachfragen, ob du Fragen dazu hast.
+
+Zur Erinnerung die wichtigsten Fakten:
+• 50% Provision = 24,50€ pro Verkauf
+• Produkt: Marketing Automation System für 49€
+• Zielgruppe: Online-Unternehmer, Freelancer, Coaches
+• Durchschnittliche Conversion Rate: 5-8%
+
+Vielleicht hilft es dir zu wissen, dass bereits 89 Partner dabei sind und der durchschnittliche Partner 2-3 Verkäufe pro Monat macht.
+
+Falls du erstmal unverbindlich testen möchtest, kann ich dir gerne ein kostenloses Testprodukt zur Verfügung stellen, damit du siehst wie gut es bei deiner Zielgruppe ankommt.
+
+Dein persönlicher Link: {affiliate_link}
+
+Lass mich wissen was du denkst!
+
+Beste Grüße,
+Daniel Oettel"""
+        }
+        
+        template = templates.get(template_type, "")
+        if not template:
+            raise HTTPException(status_code=400, detail="Invalid template type")
+        
+        # Personalize template
+        personalized = template.replace("{name}", prospect.get("name", "[NAME]"))
+        personalized = personalized.replace("{company}", prospect.get("company", "[COMPANY]"))
+        personalized = personalized.replace("{industry}", prospect.get("industry", "[INDUSTRY]"))
+        
+        # Generate affiliate link if needed
+        affiliate_id = prospect.get("name", "").lower().replace(" ", "_").replace("-", "_")
+        affiliate_link = f"https://www.digistore24.com/redir/1417598/{affiliate_id}" if affiliate_id else "[AFFILIATE_LINK]"
+        personalized = personalized.replace("{affiliate_link}", affiliate_link)
+        
+        return {
+            "success": True,
+            "personalized_message": personalized,
+            "affiliate_link": affiliate_link
+        }
+        
+    except Exception as e:
+        logging.error(f"Personalize Message Fehler: {e}")
+        raise HTTPException(status_code=500, detail="Failed to personalize message")
+
+@api_router.post("/akquise/track-outreach")
+async def track_outreach(data: dict):
+    """Tracke Outreach Activity für Prospect"""
+    try:
+        prospect_id = data.get("prospect_id", "")
+        channel = data.get("channel", "")  # linkedin, email, phone, facebook
+        message_sent = data.get("message_sent", "")
+        
+        outreach_record = {
+            "prospect_id": prospect_id,
+            "channel": channel,
+            "message_sent": message_sent,
+            "sent_at": datetime.now().isoformat(),
+            "status": "sent",
+            "response": None,
+            "follow_up_needed": True,
+            "follow_up_date": (datetime.now() + timedelta(days=7)).isoformat()
+        }
+        
+        await db.outreach_activities.insert_one(outreach_record)
+        
+        # Update prospect last_contact
+        await db.prospects.update_one(
+            {"_id": prospect_id},
+            {"$set": {"last_contact": datetime.now().isoformat()}}
+        )
+        
+        logging.info(f"📧 Outreach getrackt: {channel} an Prospect {prospect_id}")
+        
+        return {"success": True, "message": "Outreach activity tracked"}
+        
+    except Exception as e:
+        logging.error(f"Track Outreach Fehler: {e}")
+        raise HTTPException(status_code=500, detail="Failed to track outreach")
+
+@api_router.get("/akquise/stats")
+async def get_akquise_stats():
+    """Hole Akquise Statistiken"""
+    try:
+        # Total prospects
+        total_prospects = await db.prospects.count_documents({})
+        
+        # Prospects by status
+        new_prospects = await db.prospects.count_documents({"status": "new"})
+        contacted_prospects = await db.prospects.count_documents({"status": "contacted"})
+        interested_prospects = await db.prospects.count_documents({"status": "interested"})
+        converted_prospects = await db.prospects.count_documents({"status": "converted"})
+        
+        # Recent outreach activities
+        recent_outreach = await db.outreach_activities.find().sort("sent_at", -1).limit(10).to_list(10)
+        
+        # This week's activities
+        week_ago = datetime.now() - timedelta(days=7)
+        this_week_outreach = await db.outreach_activities.count_documents({
+            "sent_at": {"$gte": week_ago.isoformat()}
+        })
+        
+        return {
+            "success": True,
+            "stats": {
+                "total_prospects": total_prospects,
+                "new_prospects": new_prospects,
+                "contacted_prospects": contacted_prospects,
+                "interested_prospects": interested_prospects,
+                "converted_prospects": converted_prospects,
+                "this_week_outreach": this_week_outreach,
+                "conversion_rate": round((converted_prospects / max(total_prospects, 1)) * 100, 1)
+            },
+            "recent_outreach": recent_outreach
+        }
+        
+    except Exception as e:
+        logging.error(f"Get Akquise Stats Fehler: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get akquise stats")
+
 # Legacy endpoints
 @api_router.get("/")
 async def root():

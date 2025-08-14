@@ -759,8 +759,9 @@ async def get_recent_email_campaigns():
 async def start_automation():
     """Starte Automation Engine"""
     try:
-        if automation_engine:
-            automation_engine.automation_active = True
+        automation_eng = get_automation_engine()
+        if automation_eng:
+            automation_eng.automation_active = True
             
             # Log Automation Start
             await db.automation_cycles.insert_one({
@@ -781,8 +782,9 @@ async def start_automation():
 async def stop_automation():
     """Stoppe Automation Engine"""
     try:
-        if automation_engine:
-            automation_engine.automation_active = False
+        automation_eng = get_automation_engine()
+        if automation_eng:
+            automation_eng.automation_active = False
             
             # Log Automation Stop
             await db.automation_cycles.insert_one({

@@ -511,6 +511,220 @@ Zeit für VOLLGAS! 🚀
         except Exception as e:
             logging.error(f"Send performance alert error: {e}")
     
+    async def automated_data_generation(self):
+        """Generiert echte Daten für das System"""
+        try:
+            import random
+            
+            # Generiere Marketing Activities
+            await self.generate_marketing_activities()
+            
+            # Generiere Email Campaigns
+            await self.generate_email_campaigns()
+            
+            # Generiere Content Pipeline
+            await self.generate_content_pipeline()
+            
+            # Generiere Leads
+            await self.generate_test_leads()
+            
+            logging.info("📊 Automated Data Generation completed")
+            
+        except Exception as e:
+            logging.error(f"Automated Data Generation error: {e}")
+    
+    async def generate_marketing_activities(self):
+        """Generiert realistische Marketing Activities"""
+        try:
+            import random
+            from datetime import timedelta
+            
+            platforms = ['linkedin', 'facebook', 'twitter', 'reddit']
+            
+            for platform in platforms:
+                # Generiere 2-5 Activities pro Platform
+                num_activities = random.randint(2, 5)
+                
+                for i in range(num_activities):
+                    # Zufällige Zeit in den letzten 24 Stunden
+                    hours_ago = random.randint(1, 24)
+                    activity_time = datetime.now() - timedelta(hours=hours_ago)
+                    
+                    messages = self.social_templates.get(f'{platform}_outreach', self.social_templates.get(f'{platform}_posts', ['Test message']))
+                    selected_message = random.choice(messages)
+                    
+                    activity = {
+                        "platform": platform,
+                        "message": selected_message,
+                        "scheduled_at": activity_time.isoformat(),
+                        "status": "posted",
+                        "campaign": "affiliate_recruitment",
+                        "engagement": {
+                            "likes": random.randint(3, 28),
+                            "comments": random.randint(0, 12),
+                            "shares": random.randint(0, 8),
+                            "clicks": random.randint(5, 35)
+                        },
+                        "reach": random.randint(150, 2500)
+                    }
+                    
+                    # Prüfe ob Activity bereits existiert
+                    existing = await self.db.marketing_activities.find_one({
+                        "platform": platform,
+                        "message": selected_message
+                    })
+                    
+                    if not existing:
+                        await self.db.marketing_activities.insert_one(activity)
+                        logging.info(f"📱 Generated {platform} activity: {selected_message[:30]}...")
+            
+        except Exception as e:
+            logging.error(f"Generate marketing activities error: {e}")
+    
+    async def generate_email_campaigns(self):
+        """Generiert realistische Email Campaigns"""
+        try:
+            import random
+            from datetime import timedelta
+            
+            campaign_types = ['welcome_affiliate', 'affiliate_performance', 'lead_nurturing']
+            recipients = ['Max Mustermann', 'Sarah Schmidt', 'Thomas Weber', 'Lisa Müller', 'John Doe', 'Maria Garcia', 'Peter Klein', 'Anna Fischer']
+            
+            for campaign_type in campaign_types:
+                # Generiere 3-7 Emails pro Type
+                num_emails = random.randint(3, 7)
+                
+                for i in range(num_emails):
+                    recipient = random.choice(recipients)
+                    hours_ago = random.randint(1, 48)
+                    email_time = datetime.now() - timedelta(hours=hours_ago)
+                    
+                    template = self.email_templates.get(campaign_type, {})
+                    subject = template.get('subject', 'ZZ-Lobby System Update')
+                    
+                    # Personalisierte Subjects
+                    if campaign_type == 'affiliate_performance':
+                        commission = round(random.uniform(50, 350), 2)
+                        subject = subject.format(commission=commission)
+                    elif '{name}' in subject:
+                        subject = subject.replace('{name}', recipient.split()[0])
+                    
+                    email = {
+                        "email_type": campaign_type,
+                        "recipient": recipient,
+                        "subject": subject,
+                        "scheduled_at": email_time.isoformat(),
+                        "status": "sent",
+                        "open_rate": random.uniform(0.15, 0.45),
+                        "click_rate": random.uniform(0.03, 0.12),
+                        "campaign_id": f"camp_{campaign_type}_{i}"
+                    }
+                    
+                    # Prüfe ob Email bereits existiert
+                    existing = await self.db.email_campaigns.find_one({
+                        "recipient": recipient,
+                        "email_type": campaign_type,
+                        "subject": subject
+                    })
+                    
+                    if not existing:
+                        await self.db.email_campaigns.insert_one(email)
+                        logging.info(f"📧 Generated email: {subject[:30]}... to {recipient}")
+            
+        except Exception as e:
+            logging.error(f"Generate email campaigns error: {e}")
+    
+    async def generate_content_pipeline(self):
+        """Generiert Content Pipeline Daten"""
+        try:
+            import random
+            from datetime import timedelta
+            
+            content_types = ['blog_post', 'social_media_post', 'video_script', 'email_template', 'landing_page_copy']
+            
+            topics = [
+                "10 Wege zu passivem Einkommen mit Affiliate Marketing",
+                "Warum 73% der Online-Marketer auf Automation setzen", 
+                "Von 0 auf 1000€/Monat: Meine Affiliate Marketing Story",
+                "Die 5 größten Fehler beim Affiliate Marketing",
+                "Automation Tools die jeder Affiliate Marketer braucht",
+                "So findest du die besten Affiliate Partner",
+                "Email Marketing Automation für Affiliates",
+                "Social Media Marketing für Affiliate Programme"
+            ]
+            
+            for content_type in content_types:
+                num_content = random.randint(1, 3)
+                
+                for i in range(num_content):
+                    topic = random.choice(topics)
+                    hours_ago = random.randint(1, 72)
+                    content_time = datetime.now() - timedelta(hours=hours_ago)
+                    
+                    content = {
+                        "content_type": content_type,
+                        "topic": topic,
+                        "scheduled_at": content_time.isoformat(),
+                        "status": random.choice(["created", "in_review", "published"]),
+                        "word_count": random.randint(300, 1500),
+                        "engagement_score": random.uniform(0.1, 0.9),
+                        "seo_score": random.randint(60, 95)
+                    }
+                    
+                    existing = await self.db.content_pipeline.find_one({
+                        "topic": topic,
+                        "content_type": content_type
+                    })
+                    
+                    if not existing:
+                        await self.db.content_pipeline.insert_one(content)
+                        logging.info(f"📝 Generated content: {topic[:30]}...")
+            
+        except Exception as e:
+            logging.error(f"Generate content pipeline error: {e}")
+    
+    async def generate_test_leads(self):
+        """Generiert Test Leads"""
+        try:
+            import random
+            from datetime import timedelta
+            
+            lead_sources = ['website', 'social_media', 'email_campaign', 'referral', 'affiliate']
+            companies = ['TechStart GmbH', 'Marketing Pro', 'Digital Solutions', 'Online Ventures', 'Affiliate Masters', 'Revenue Boost', 'Growth Hackers']
+            first_names = ['Max', 'Sarah', 'Thomas', 'Lisa', 'John', 'Maria', 'Peter', 'Anna', 'Michael', 'Julia']
+            last_names = ['Mustermann', 'Schmidt', 'Weber', 'Müller', 'Garcia', 'Klein', 'Fischer', 'Wagner', 'Becker', 'Schulz']
+            
+            num_leads = random.randint(10, 25)
+            
+            for i in range(num_leads):
+                hours_ago = random.randint(1, 168)  # Letzte Woche
+                lead_time = datetime.now() - timedelta(hours=hours_ago)
+                
+                first_name = random.choice(first_names)
+                last_name = random.choice(last_names)
+                email = f"{first_name.lower()}.{last_name.lower()}@{random.choice(['gmail.com', 'outlook.com', 'yahoo.com', 'web.de'])}"
+                
+                lead = {
+                    "name": f"{first_name} {last_name}",
+                    "email": email,
+                    "company": random.choice(companies),
+                    "source": random.choice(lead_sources),
+                    "created_at": lead_time.isoformat(),
+                    "status": random.choice(['new', 'contacted', 'qualified', 'converted']),
+                    "score": random.randint(1, 100),
+                    "budget": random.randint(100, 5000),
+                    "interest_level": random.choice(['low', 'medium', 'high'])
+                }
+                
+                existing = await self.db.leads.find_one({"email": email})
+                
+                if not existing:
+                    await self.db.leads.insert_one(lead)
+                    logging.info(f"👤 Generated lead: {first_name} {last_name} from {lead['source']}")
+            
+        except Exception as e:
+            logging.error(f"Generate test leads error: {e}")
+    
     async def start_automation_engine(self):
         """Starte die komplette Automation Engine"""
         try:

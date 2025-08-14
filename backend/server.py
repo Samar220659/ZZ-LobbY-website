@@ -719,6 +719,12 @@ async def get_recent_automation_activities():
         # Hole neueste Marketing Activities
         recent_activities = await db.marketing_activities.find().sort("scheduled_at", -1).limit(10).to_list(10)
         
+        # Convert ObjectIds to strings for JSON serialization
+        for activity in recent_activities:
+            if '_id' in activity:
+                activity['id'] = str(activity['_id'])
+                del activity['_id']
+        
         return {"success": True, "activities": recent_activities}
         
     except Exception as e:

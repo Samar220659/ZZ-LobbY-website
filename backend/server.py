@@ -851,9 +851,16 @@ async def generate_test_activity():
         
         result = await db.marketing_activities.insert_one(activity)
         
-        # Remove the ObjectId for JSON serialization
-        activity_response = activity.copy()
-        activity_response["id"] = str(result.inserted_id)
+        # Create clean response without ObjectIds
+        activity_response = {
+            "id": str(result.inserted_id),
+            "platform": activity["platform"],
+            "message": activity["message"],
+            "scheduled_at": activity["scheduled_at"],
+            "status": activity["status"],
+            "campaign": activity["campaign"],
+            "engagement": activity["engagement"]
+        }
         
         logging.info(f"🎯 Generated {platform} activity: {selected_message[:50]}...")
         

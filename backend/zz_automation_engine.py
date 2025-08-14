@@ -730,6 +730,9 @@ Zeit für VOLLGAS! 🚀
         try:
             logging.info("🚀 ZZ-Lobby Automation Engine startet - 98% Automation Mode!")
             
+            # Generiere initial Daten für Demo
+            await self.automated_data_generation()
+            
             while self.automation_active:
                 try:
                     # Alle 6 Stunden: Affiliate Recruitment
@@ -758,6 +761,10 @@ Zeit für VOLLGAS! 🚀
                     
                     # Revenue Tracking
                     await self.automated_revenue_tracking()
+                    
+                    # Generiere mehr Daten für kontinuierliche Activity
+                    if random.randint(1, 4) == 1:  # 25% Chance
+                        await self.automated_data_generation()
                     
                     # Warten 2 Stunden bis nächster Cycle
                     logging.info("⏰ Automation Cycle completed - waiting 2 hours for next cycle...")

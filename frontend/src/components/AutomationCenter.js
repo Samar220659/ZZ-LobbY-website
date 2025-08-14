@@ -342,29 +342,35 @@ const AutomationCenter = () => {
             </h3>
             
             <div className="space-y-3 max-h-80 overflow-y-auto">
-              {[
-                { type: 'Welcome Sequence', recipient: 'Max Mustermann', subject: '🚀 Willkommen beim ZZ-Lobby Affiliate Programm', time: '5 min ago', status: 'sent' },
-                { type: 'Performance Report', recipient: 'Sarah Schmidt', subject: '📈 Deine Affiliate Performance - 147€ verdient!', time: '12 min ago', status: 'sent' },
-                { type: 'Lead Nurturing', recipient: 'Thomas Weber', subject: '🎯 ZZ-Lobby Marketing System - Deine Lösung', time: '23 min ago', status: 'sent' },
-                { type: 'Re-engagement', recipient: 'Lisa Müller', subject: '💰 Letzte Chance: 50% auf ZZ-Lobby System', time: '45 min ago', status: 'scheduled' },
-                { type: 'Welcome Sequence', recipient: 'John Doe', subject: '🚀 Willkommen beim ZZ-Lobby Affiliate Programm', time: '1 hr ago', status: 'sent' }
-              ].map((email, index) => (
-                <div key={index} className="p-3 bg-purple-900/20 rounded-lg border border-purple-500/20">
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <span className="font-semibold text-purple-400">{email.type}</span>
-                      <span className={`ml-2 px-2 py-1 text-xs font-semibold rounded-full ${
-                        email.status === 'sent' ? 'bg-green-600 text-white' : 'bg-yellow-600 text-white'
-                      }`}>
-                        {email.status}
+              {emailCampaigns.length > 0 ? (
+                emailCampaigns.map((email, index) => (
+                  <div key={index} className="p-3 bg-purple-900/20 rounded-lg border border-purple-500/20">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <span className="font-semibold text-purple-400">{email.email_type || email.type}</span>
+                        <span className={`ml-2 px-2 py-1 text-xs font-semibold rounded-full ${
+                          email.status === 'sent' || email.status === 'scheduled' ? 'bg-green-600 text-white' : 'bg-yellow-600 text-white'
+                        }`}>
+                          {email.status}
+                        </span>
+                      </div>
+                      <span className="text-xs text-gray-400">
+                        {email.time || new Date(email.scheduled_at).toLocaleString()}
                       </span>
                     </div>
-                    <span className="text-xs text-gray-400">{email.time}</span>
+                    <p className="text-gray-300 text-sm font-medium">To: {email.recipient}</p>
+                    <p className="text-gray-300 text-sm">
+                      {(email.subject || email.content)?.substring(0, 80) + '...'}
+                    </p>
                   </div>
-                  <p className="text-gray-300 text-sm font-medium">To: {email.recipient}</p>
-                  <p className="text-gray-300 text-sm">{email.subject}</p>
+                ))
+              ) : (
+                <div className="text-center text-gray-500 py-8">
+                  <Mail className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                  <p>Keine Email Campaigns vorhanden</p>
+                  <p className="text-sm">System generiert automatisch Campaigns</p>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>

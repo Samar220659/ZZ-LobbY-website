@@ -830,11 +830,15 @@ async def generate_test_activity():
             }
         }
         
-        await db.marketing_activities.insert_one(activity)
+        result = await db.marketing_activities.insert_one(activity)
+        
+        # Remove the ObjectId for JSON serialization
+        activity_response = activity.copy()
+        activity_response["id"] = str(result.inserted_id)
         
         logging.info(f"🎯 Generated {platform} activity: {selected_message[:50]}...")
         
-        return {"success": True, "activity": activity}
+        return {"success": True, "activity": activity_response}
         
     except Exception as e:
         logging.error(f"Generate Activity Fehler: {e}")

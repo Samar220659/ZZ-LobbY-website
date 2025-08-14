@@ -293,28 +293,44 @@ const AutomationCenter = () => {
             </h3>
             
             <div className="space-y-3 max-h-80 overflow-y-auto">
-              {[
-                { platform: 'LinkedIn', message: '🚀 Affiliate Marketing revolutioniert! Mit dem ZZ-Lobby System...', time: '2 min ago', status: 'posted' },
-                { platform: 'Facebook', message: 'Hey Leute! 👋 Ich teile hier meine Erfahrung mit Affiliate...', time: '15 min ago', status: 'posted' },
-                { platform: 'Twitter', message: '💰 Vergiss MLM und Get-Rich-Quick Schemes. Echtes Affiliate...', time: '32 min ago', status: 'posted' },
-                { platform: 'Reddit', message: '💡 TIPP: Wer nach einer seriösen Verdienstmöglichkeit sucht...', time: '1 hr ago', status: 'scheduled' },
-                { platform: 'LinkedIn', message: '🎯 Suche 10 motivierte Partner für mein Affiliate Programm...', time: '2 hr ago', status: 'posted' }
-              ].map((activity, index) => (
-                <div key={index} className="p-3 bg-blue-900/20 rounded-lg border border-blue-500/20">
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <span className="font-semibold text-blue-400">{activity.platform}</span>
-                      <span className={`ml-2 px-2 py-1 text-xs font-semibold rounded-full ${
-                        activity.status === 'posted' ? 'bg-green-600 text-white' : 'bg-yellow-600 text-white'
-                      }`}>
-                        {activity.status}
+              {marketingActivities.length > 0 ? (
+                marketingActivities.map((activity, index) => (
+                  <div key={index} className="p-3 bg-blue-900/20 rounded-lg border border-blue-500/20">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <span className="font-semibold text-blue-400">{activity.platform}</span>
+                        <span className={`ml-2 px-2 py-1 text-xs font-semibold rounded-full ${
+                          activity.status === 'posted' ? 'bg-green-600 text-white' : 'bg-yellow-600 text-white'
+                        }`}>
+                          {activity.status}
+                        </span>
+                        {activity.engagement && (
+                          <span className="ml-2 text-xs text-gray-400">
+                            👍 {activity.engagement.likes} 💬 {activity.engagement.comments}
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-xs text-gray-400">
+                        {activity.time || new Date(activity.scheduled_at).toLocaleString()}
                       </span>
                     </div>
-                    <span className="text-xs text-gray-400">{activity.time}</span>
+                    <p className="text-gray-300 text-sm">
+                      {activity.message.length > 120 ? activity.message.substring(0, 120) + '...' : activity.message}
+                    </p>
                   </div>
-                  <p className="text-gray-300 text-sm">{activity.message}</p>
+                ))
+              ) : (
+                <div className="text-center text-gray-500 py-8">
+                  <Activity className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                  <p>Keine Marketing Activities vorhanden</p>
+                  <button 
+                    onClick={generateTestActivity}
+                    className="mt-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  >
+                    Test Activity Generieren
+                  </button>
                 </div>
-              ))}
+              )}
             </div>
           </div>
 

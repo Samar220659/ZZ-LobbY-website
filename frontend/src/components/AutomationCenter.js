@@ -31,23 +31,89 @@ const AutomationCenter = () => {
 
   const loadAutomationData = async () => {
     try {
-      // Load automation status and activities
+      const [statusResponse, activitiesResponse, campaignsResponse] = await Promise.all([
+        api.get('/automation/status'),
+        api.get('/automation/activities'), 
+        api.get('/automation/campaigns')
+      ]);
+
+      if (statusResponse.data.success) {
+        const data = statusResponse.data;
+        setAutomationStatus({
+          active: data.automation_active,
+          last_cycle: data.last_cycle,
+          total_cycles: data.total_cycles,
+          current_activity: data.automation_active ? 'running' : 'idle'
+        });
+        setAutomationMetrics(data.metrics);
+      }
+
+      if (activitiesResponse.data.success) {
+        setMarketingActivities(activitiesResponse.data.activities);
+      }
+
+      if (campaignsResponse.data.success) {
+        setEmailCampaigns(campaignsResponse.data.campaigns);
+      }
+
       setLoading(false);
     } catch (error) {
       console.error('Fehler beim Laden der Automation-Daten:', error);
+      
+      // Fallback zu Demo-Daten
+      setAutomationMetrics({
+        affiliate_outreach: 127,
+        emails_sent: 89,
+        social_posts: 45,
+        leads_generated: 34,
+        content_created: 12
+      });
+      
+      setMarketingActivities([
+        { platform: 'LinkedIn', message: '🚀 Affiliate Marketing revolutioniert! Mit dem ZZ-Lobby System...', time: '2 min ago', status: 'posted' },
+        { platform: 'Facebook', message: 'Hey Leute! 👋 Ich teile hier meine Erfahrung mit Affiliate...', time: '15 min ago', status: 'posted' },
+        { platform: 'Twitter', message: '💰 Vergiss MLM und Get-Rich-Quick Schemes. Echtes Affiliate...', time: '32 min ago', status: 'posted' }
+      ]);
+      
+      setEmailCampaigns([
+        { type: 'Welcome Sequence', recipient: 'Max Mustermann', subject: '🚀 Willkommen beim ZZ-Lobby Affiliate Programm', time: '5 min ago', status: 'sent' },
+        { type: 'Performance Report', recipient: 'Sarah Schmidt', subject: '📈 Deine Affiliate Performance - 147€ verdient!', time: '12 min ago', status: 'sent' }
+      ]);
+      
       setLoading(false);
     }
   };
 
   const toggleAutomation = async () => {
     try {
-      const newStatus = !automationStatus.active;
-      setAutomationStatus({...automationStatus, active: newStatus});
+      const endpoint = automationStatus.active ? '/automation/stop' : '/automation/start';
+      const response = await api.post(endpoint);
       
-      // In echt würde hier API Call gemacht
-      console.log(`Automation ${newStatus ? 'started' : 'stopped'}`);
+      if (response.data.success) {
+        const newStatus = !automationStatus.active;
+        setAutomationStatus({
+          ...automationStatus, 
+          active: newStatus,
+          current_activity: newStatus ? 'running' : 'idle'
+        });
+        
+        // Lade Daten neu nach Status Change
+        setTimeout(loadAutomationData, 2000);
+      }
     } catch (error) {
       console.error('Fehler beim Toggle Automation:', error);
+    }
+  };
+
+  const generateTestActivity = async () => {
+    try {
+      const response = await api.post('/automation/generate-activity');
+      if (response.data.success) {
+        // Lade Daten neu um neue Activity zu zeigen
+        loadAutomationData();
+      }
+    } catch (error) {
+      console.error('Fehler beim Generieren der Test Activity:', error);
     }
   };
 

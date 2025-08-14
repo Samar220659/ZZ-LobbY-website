@@ -738,6 +738,12 @@ async def get_recent_email_campaigns():
         # Hole neueste Email Campaigns
         recent_campaigns = await db.email_campaigns.find().sort("scheduled_at", -1).limit(10).to_list(10)
         
+        # Convert ObjectIds to strings for JSON serialization
+        for campaign in recent_campaigns:
+            if '_id' in campaign:
+                campaign['id'] = str(campaign['_id'])
+                del campaign['_id']
+        
         return {"success": True, "campaigns": recent_campaigns}
         
     except Exception as e:

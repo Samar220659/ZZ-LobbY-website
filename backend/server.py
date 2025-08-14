@@ -701,7 +701,7 @@ async def get_automation_status():
         
         return {
             "success": True,
-            "automation_active": automation_engine.automation_active if automation_engine else False,
+            "automation_active": get_automation_engine().automation_active if get_automation_engine() else False,
             "last_cycle": datetime.now().isoformat(),
             "metrics": {
                 "affiliate_outreach": affiliate_outreach,

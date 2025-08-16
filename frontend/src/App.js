@@ -59,6 +59,7 @@ function App() {
           <Route path="/business-dashboard" element={<BusinessDashboard />} />
           <Route path="/automation-center" element={<AutomationCenter />} />
           <Route path="/smart-akquise" element={<SmartAkquiseCenter />} />
+          <Route path="/tax-compliance" element={<TaxCompliance />} />
           
           {/* Legal Routes */}
           <Route path="/impressum" element={<Impressum />} />

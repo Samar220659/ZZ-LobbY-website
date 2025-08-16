@@ -33,6 +33,9 @@ from affiliate_explosion import init_digistore24_system, Digistore24IPNData
 # Import business integration system
 from business_integration import init_business_system, business_system
 
+# Import tax compliance system
+from tax_compliance import init_tax_system, get_tax_system
+
 # Import automation engine
 from zz_automation_engine import init_automation_engine, automation_engine, start_automation
 import affiliate_explosion

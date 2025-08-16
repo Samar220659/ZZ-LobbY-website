@@ -412,6 +412,17 @@ export default function ControlCenter() {
               </Button>
 
               <Button 
+                onClick={() => navigate('/smart-akquise')}
+                className="h-24 bg-gradient-to-br from-pink-600 to-purple-700 hover:from-pink-700 hover:to-purple-800 text-white font-serif font-bold flex flex-col items-center justify-center border-2 border-pink-400/40 shadow-lg shadow-pink-500/25 transform hover:scale-105"
+              >
+                <div className="flex items-center mb-2">
+                  <Target className="h-6 w-6 mr-1" />
+                  <Users className="h-4 w-4 animate-pulse" />
+                </div>
+                <span>🎯 SMART AKQUISE</span>
+              </Button>
+
+              <Button 
                 onClick={() => navigate('/automation-center')}
                 className="h-24 bg-gradient-to-br from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-serif font-bold flex flex-col items-center justify-center border-2 border-blue-400/40 shadow-lg shadow-blue-500/25 transform hover:scale-105"
               >

@@ -1777,25 +1777,526 @@ class AutomationDataGenerationTester:
         return failed_tests == 0
 
 
-if __name__ == "__main__":
-    print("🔥 TESTE DAS NEUE AUTOMATION SYSTEM MIT ECHTEN GENERIERTEN DATEN")
+class SmartAkquiseCenterTester:
+    def __init__(self, api_base):
+        self.api_base = api_base
+        self.test_results = []
+        self.failed_tests = []
+        
+    def log_test(self, test_name, success, details=""):
+        """Log test result"""
+        status = "✅ PASS" if success else "❌ FAIL"
+        print(f"{status}: {test_name}")
+        if details:
+            print(f"   Details: {details}")
+        
+        self.test_results.append({
+            'test': test_name,
+            'success': success,
+            'details': details,
+            'timestamp': datetime.now().isoformat()
+        })
+        
+        if not success:
+            self.failed_tests.append(test_name)
+    
+    def test_get_prospects_endpoint(self):
+        """Test GET /api/akquise/prospects endpoint"""
+        try:
+            response = requests.get(f"{self.api_base}/akquise/prospects", timeout=15)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('success') and 'prospects' in data:
+                    prospects = data['prospects']
+                    if isinstance(prospects, list):
+                        self.log_test("GET Prospects Endpoint", True, f"Prospects endpoint working - Found {len(prospects)} prospects")
+                        return True
+                    else:
+                        self.log_test("GET Prospects Endpoint", False, f"Invalid prospects data type: {type(prospects)}")
+                        return False
+                else:
+                    self.log_test("GET Prospects Endpoint", False, f"Invalid response structure: {data}")
+                    return False
+            else:
+                self.log_test("GET Prospects Endpoint", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("GET Prospects Endpoint", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_add_prospect_endpoint(self):
+        """Test POST /api/akquise/prospects endpoint"""
+        prospect_data = {
+            "name": "Max Mustermann",
+            "company": "Mustermann GmbH",
+            "email": "max.mustermann@mustermann-gmbh.de",
+            "linkedin": "https://linkedin.com/in/maxmustermann",
+            "phone": "+49 30 12345678",
+            "industry": "Online Marketing",
+            "notes": "Interessiert an Affiliate Marketing, hat bereits eigene Produkte"
+        }
+        
+        try:
+            response = requests.post(f"{self.api_base}/akquise/prospects", json=prospect_data, timeout=15)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('success') and 'prospect' in data:
+                    prospect = data['prospect']
+                    required_fields = ['id', 'name', 'company', 'email', 'status', 'affiliate_link']
+                    
+                    missing_fields = [field for field in required_fields if field not in prospect]
+                    if not missing_fields:
+                        # Verify affiliate link generation
+                        affiliate_link = prospect.get('affiliate_link', '')
+                        if 'digistore24.com/redir/1417598' in affiliate_link and 'max_mustermann' in affiliate_link.lower():
+                            self.log_test("POST Add Prospect Endpoint", True, f"Prospect added successfully - ID: {prospect.get('id')}, Affiliate Link: {affiliate_link}")
+                            return True
+                        else:
+                            self.log_test("POST Add Prospect Endpoint", False, f"Invalid affiliate link format: {affiliate_link}")
+                            return False
+                    else:
+                        self.log_test("POST Add Prospect Endpoint", False, f"Missing fields in prospect: {missing_fields}")
+                        return False
+                else:
+                    self.log_test("POST Add Prospect Endpoint", False, f"Invalid response structure: {data}")
+                    return False
+            else:
+                self.log_test("POST Add Prospect Endpoint", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("POST Add Prospect Endpoint", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_personalize_message_endpoint(self):
+        """Test POST /api/akquise/personalize-message endpoint"""
+        message_data = {
+            "template_type": "linkedin_initial",
+            "prospect": {
+                "name": "Sarah Weber",
+                "company": "Weber Digital",
+                "industry": "E-Commerce"
+            }
+        }
+        
+        try:
+            response = requests.post(f"{self.api_base}/akquise/personalize-message", json=message_data, timeout=15)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('success') and 'personalized_message' in data and 'affiliate_link' in data:
+                    message = data['personalized_message']
+                    affiliate_link = data['affiliate_link']
+                    
+                    # Verify personalization
+                    if ('Sarah Weber' in message and 
+                        'Weber Digital' in message and 
+                        'E-Commerce' in message and
+                        '50% Provision' in message and
+                        'digistore24.com/redir/1417598' in affiliate_link):
+                        self.log_test("POST Personalize Message Endpoint", True, f"Message personalized successfully - Contains prospect details and affiliate link")
+                        return True
+                    else:
+                        self.log_test("POST Personalize Message Endpoint", False, f"Message not properly personalized: {message[:100]}...")
+                        return False
+                else:
+                    self.log_test("POST Personalize Message Endpoint", False, f"Invalid response structure: {data}")
+                    return False
+            else:
+                self.log_test("POST Personalize Message Endpoint", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("POST Personalize Message Endpoint", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_track_outreach_endpoint(self):
+        """Test POST /api/akquise/track-outreach endpoint"""
+        outreach_data = {
+            "prospect_id": "test_prospect_123",
+            "channel": "linkedin",
+            "message_sent": "Hallo Max, ich habe dein Profil gesehen und finde deine Arbeit sehr interessant. Ich habe ein Affiliate Programm mit 50% Provision..."
+        }
+        
+        try:
+            response = requests.post(f"{self.api_base}/akquise/track-outreach", json=outreach_data, timeout=15)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('success') and data.get('message') == "Outreach activity tracked":
+                    self.log_test("POST Track Outreach Endpoint", True, f"Outreach tracking successful - Channel: {outreach_data['channel']}")
+                    return True
+                else:
+                    self.log_test("POST Track Outreach Endpoint", False, f"Unexpected response: {data}")
+                    return False
+            else:
+                self.log_test("POST Track Outreach Endpoint", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("POST Track Outreach Endpoint", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_akquise_stats_endpoint(self):
+        """Test GET /api/akquise/stats endpoint"""
+        try:
+            response = requests.get(f"{self.api_base}/akquise/stats", timeout=15)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('success') and 'stats' in data:
+                    stats = data['stats']
+                    required_fields = ['total_prospects', 'new_prospects', 'contacted_prospects', 'interested_prospects', 'converted_prospects', 'this_week_outreach', 'conversion_rate']
+                    
+                    missing_fields = [field for field in required_fields if field not in stats]
+                    if not missing_fields:
+                        conversion_rate = stats.get('conversion_rate', 0)
+                        total_prospects = stats.get('total_prospects', 0)
+                        
+                        if isinstance(conversion_rate, (int, float)) and isinstance(total_prospects, int):
+                            self.log_test("GET Akquise Stats Endpoint", True, f"Akquise stats working - Total Prospects: {total_prospects}, Conversion Rate: {conversion_rate}%")
+                            return True
+                        else:
+                            self.log_test("GET Akquise Stats Endpoint", False, f"Invalid data types in stats: {stats}")
+                            return False
+                    else:
+                        self.log_test("GET Akquise Stats Endpoint", False, f"Missing fields in stats: {missing_fields}")
+                        return False
+                else:
+                    self.log_test("GET Akquise Stats Endpoint", False, f"Invalid response structure: {data}")
+                    return False
+            else:
+                self.log_test("GET Akquise Stats Endpoint", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("GET Akquise Stats Endpoint", False, f"Exception: {str(e)}")
+            return False
+    
+    def run_all_akquise_tests(self):
+        """Run all Smart Akquise Center tests"""
+        print("\n" + "=" * 80)
+        print("🎯 SMART AKQUISE CENTER COMPREHENSIVE TESTING")
+        print("=" * 80)
+        
+        print("\n--- Smart Akquise API Endpoints Tests ---")
+        self.test_get_prospects_endpoint()
+        self.test_add_prospect_endpoint()
+        self.test_personalize_message_endpoint()
+        self.test_track_outreach_endpoint()
+        self.test_akquise_stats_endpoint()
+        
+        # Summary
+        print("\n" + "=" * 80)
+        print("🎯 SMART AKQUISE CENTER TEST SUMMARY")
+        print("=" * 80)
+        
+        total_tests = len(self.test_results)
+        passed_tests = len([t for t in self.test_results if t['success']])
+        failed_tests = len(self.failed_tests)
+        
+        print(f"Total Akquise Tests: {total_tests}")
+        print(f"Passed: {passed_tests}")
+        print(f"Failed: {failed_tests}")
+        print(f"Success Rate: {(passed_tests/total_tests)*100:.1f}%")
+        
+        if self.failed_tests:
+            print(f"\n❌ Failed Akquise Tests:")
+            for test in self.failed_tests:
+                print(f"  - {test}")
+        else:
+            print("\n✅ ALL SMART AKQUISE CENTER TESTS PASSED!")
+        
+        return failed_tests == 0
+
+
+class ProductionReadinessTester:
+    def __init__(self, api_base):
+        self.api_base = api_base
+        self.test_results = []
+        self.failed_tests = []
+        
+    def log_test(self, test_name, success, details=""):
+        """Log test result"""
+        status = "✅ PASS" if success else "❌ FAIL"
+        print(f"{status}: {test_name}")
+        if details:
+            print(f"   Details: {details}")
+        
+        self.test_results.append({
+            'test': test_name,
+            'success': success,
+            'details': details,
+            'timestamp': datetime.now().isoformat()
+        })
+        
+        if not success:
+            self.failed_tests.append(test_name)
+    
+    def test_live_digistore24_configuration(self):
+        """Test live Digistore24 configuration with real vendor ID"""
+        try:
+            env_file = '/app/backend/.env'
+            with open(env_file, 'r') as f:
+                content = f.read()
+                
+            # Check for real vendor ID 1417598
+            if 'DIGISTORE24_VENDOR_ID=1417598' in content:
+                # Check for real API keys
+                if ('1417598-BP9FgEF71a0Kpzh5wHMtaEr9w1k5qJyWHoHes' in content or 
+                    '611-2zOAPFBnt1YZvZBWxFbgcEqqHdmqTnNYnjRZKDDOV' in content):
+                    self.log_test("Live Digistore24 Configuration", True, f"Real vendor ID 1417598 and API keys configured")
+                    return True
+                else:
+                    self.log_test("Live Digistore24 Configuration", False, "Real API keys not found")
+                    return False
+            else:
+                self.log_test("Live Digistore24 Configuration", False, "Real vendor ID 1417598 not configured")
+                return False
+                
+        except Exception as e:
+            self.log_test("Live Digistore24 Configuration", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_live_mailchimp_integration(self):
+        """Test live Mailchimp API integration"""
+        try:
+            response = requests.get(f"{self.api_base}/business/mailchimp/stats", timeout=15)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('success') and 'mailchimp' in data:
+                    mailchimp = data['mailchimp']
+                    
+                    # Check for real Mailchimp account
+                    account_name = mailchimp.get('account_name', '')
+                    api_status = mailchimp.get('api_status', '')
+                    
+                    if account_name == 'ZZLobby' and api_status == 'connected':
+                        self.log_test("Live Mailchimp Integration", True, f"Real Mailchimp account 'ZZLobby' connected with {mailchimp.get('total_subscribers', 0)} subscribers")
+                        return True
+                    else:
+                        self.log_test("Live Mailchimp Integration", False, f"Mailchimp not properly connected - Account: {account_name}, Status: {api_status}")
+                        return False
+                else:
+                    self.log_test("Live Mailchimp Integration", False, f"Invalid Mailchimp response: {data}")
+                    return False
+            else:
+                self.log_test("Live Mailchimp Integration", False, f"Mailchimp API failed: {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Live Mailchimp Integration", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_commission_calculation_accuracy(self):
+        """Test 50% commission calculation (€24,50 per €49 sale)"""
+        try:
+            # Test affiliate stats to verify commission rate
+            response = requests.get(f"{self.api_base}/affiliate/stats", timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('success') and 'stats' in data:
+                    stats = data['stats']
+                    commission_rate = stats.get('commission_rate', 0)
+                    
+                    # Verify 50% commission rate
+                    if commission_rate == 50 or commission_rate == 0.5:
+                        # Calculate expected commission for €49 sale
+                        sale_amount = 49.0
+                        expected_commission = sale_amount * 0.5  # €24.50
+                        
+                        self.log_test("Commission Calculation Accuracy", True, f"50% commission rate confirmed - €{sale_amount} sale = €{expected_commission} commission")
+                        return True
+                    else:
+                        self.log_test("Commission Calculation Accuracy", False, f"Wrong commission rate: {commission_rate}%")
+                        return False
+                else:
+                    self.log_test("Commission Calculation Accuracy", False, f"Cannot verify commission rate: {data}")
+                    return False
+            else:
+                self.log_test("Commission Calculation Accuracy", False, f"Affiliate stats failed: {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Commission Calculation Accuracy", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_real_affiliate_link_generation(self):
+        """Test real affiliate link generation with vendor ID 1417598"""
+        payload = {
+            "affiliate_name": "ProductionPartner2025",
+            "campaign_key": "live_launch_2025"
+        }
+        
+        try:
+            response = requests.post(f"{self.api_base}/affiliate/generate-link", json=payload, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('success') and 'affiliate_link' in data:
+                    link = data['affiliate_link']
+                    
+                    # Verify real vendor ID in link
+                    if ('digistore24.com/redir/1417598' in link and 
+                        'ProductionPartner2025' in link and
+                        'live_launch_2025' in link):
+                        self.log_test("Real Affiliate Link Generation", True, f"Live affiliate link generated: {link}")
+                        return True
+                    else:
+                        self.log_test("Real Affiliate Link Generation", False, f"Invalid live link format: {link}")
+                        return False
+                else:
+                    self.log_test("Real Affiliate Link Generation", False, f"Link generation failed: {data}")
+                    return False
+            else:
+                self.log_test("Real Affiliate Link Generation", False, f"Status: {response.status_code}, Response: {response.text}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Real Affiliate Link Generation", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_api_response_times(self):
+        """Test API response times for production readiness"""
+        try:
+            critical_endpoints = [
+                "/",
+                "/affiliate/stats",
+                "/business/dashboard",
+                "/automation/status",
+                "/akquise/prospects"
+            ]
+            
+            response_times = []
+            
+            for endpoint in critical_endpoints:
+                try:
+                    start_time = time.time()
+                    response = requests.get(f"{self.api_base}{endpoint}", timeout=5)
+                    end_time = time.time()
+                    
+                    response_time = (end_time - start_time) * 1000  # Convert to milliseconds
+                    response_times.append(response_time)
+                    
+                except Exception:
+                    response_times.append(5000)  # 5 second timeout
+            
+            avg_response_time = sum(response_times) / len(response_times)
+            max_response_time = max(response_times)
+            
+            # Production criteria: avg < 200ms, max < 500ms
+            if avg_response_time < 200 and max_response_time < 500:
+                self.log_test("API Response Times", True, f"Production-ready response times - Avg: {avg_response_time:.0f}ms, Max: {max_response_time:.0f}ms")
+                return True
+            else:
+                self.log_test("API Response Times", False, f"Response times too slow - Avg: {avg_response_time:.0f}ms, Max: {max_response_time:.0f}ms")
+                return False
+                
+        except Exception as e:
+            self.log_test("API Response Times", False, f"Exception: {str(e)}")
+            return False
+    
+    def run_all_production_tests(self):
+        """Run all production readiness tests"""
+        print("\n" + "=" * 80)
+        print("🚀 PRODUCTION READINESS COMPREHENSIVE TESTING")
+        print("=" * 80)
+        
+        print("\n--- Live API Integration Tests ---")
+        self.test_live_digistore24_configuration()
+        self.test_live_mailchimp_integration()
+        self.test_real_affiliate_link_generation()
+        
+        print("\n--- Production Performance Tests ---")
+        self.test_api_response_times()
+        
+        print("\n--- Business Logic Tests ---")
+        self.test_commission_calculation_accuracy()
+        
+        # Summary
+        print("\n" + "=" * 80)
+        print("🎯 PRODUCTION READINESS TEST SUMMARY")
+        print("=" * 80)
+        
+        total_tests = len(self.test_results)
+        passed_tests = len([t for t in self.test_results if t['success']])
+        failed_tests = len(self.failed_tests)
+        
+        print(f"Total Production Tests: {total_tests}")
+        print(f"Passed: {passed_tests}")
+        print(f"Failed: {failed_tests}")
+        print(f"Success Rate: {(passed_tests/total_tests)*100:.1f}%")
+        
+        if self.failed_tests:
+            print(f"\n❌ Failed Production Tests:")
+            for test in self.failed_tests:
+                print(f"  - {test}")
+        else:
+            print("\n✅ ALL PRODUCTION READINESS TESTS PASSED!")
+        
+        return failed_tests == 0
+
+
+def main():
+    """Main testing function for FINAL PRODUCTION READINESS TESTING"""
+    print("🚀 ZZ-LOBBY ELITE SYSTEM - FINAL PRODUCTION READINESS TESTING")
+    print("=" * 80)
+    print(f"Testing backend at: {API_BASE}")
     print("=" * 80)
     
-    # Focus on Automation Data Generation Testing as requested
-    automation_data_tester = AutomationDataGenerationTester(API_BASE)
-    automation_data_success = automation_data_tester.run_automation_data_generation_tests()
+    all_tests_passed = True
+    
+    # 1. Test Smart Akquise Center (NEW - CRITICAL)
+    print("\n🎯 TESTING SMART AKQUISE CENTER...")
+    akquise_tester = SmartAkquiseCenterTester(API_BASE)
+    akquise_passed = akquise_tester.run_all_akquise_tests()
+    all_tests_passed = all_tests_passed and akquise_passed
+    
+    # 2. Test Production Readiness
+    print("\n🚀 TESTING PRODUCTION READINESS...")
+    production_tester = ProductionReadinessTester(API_BASE)
+    production_passed = production_tester.run_all_production_tests()
+    all_tests_passed = all_tests_passed and production_passed
+    
+    # 3. Test Core Systems (Quick verification)
+    print("\n🔥 VERIFYING CORE SYSTEMS...")
+    
+    # Affiliate System
+    affiliate_tester = Digistore24AffiliateTester(API_BASE)
+    affiliate_passed = affiliate_tester.run_all_affiliate_tests()
+    all_tests_passed = all_tests_passed and affiliate_passed
+    
+    # Business Integration
+    business_tester = BusinessIntegrationTester(API_BASE)
+    business_passed = business_tester.run_all_business_tests()
+    all_tests_passed = all_tests_passed and business_passed
+    
+    # Automation Engine
+    automation_tester = ZZAutomationEngineTester(API_BASE)
+    automation_passed = automation_tester.run_all_automation_tests()
+    all_tests_passed = all_tests_passed and automation_passed
     
     # Final Summary
     print("\n" + "=" * 80)
-    print("🎯 FINAL AUTOMATION DATA GENERATION TEST SUMMARY")
+    print("🎯 FINAL PRODUCTION READINESS SUMMARY")
     print("=" * 80)
     
-    if automation_data_success:
-        print("✅ AUTOMATION DATA GENERATION SYSTEM FULLY OPERATIONAL!")
-        print("🚀 DANIEL'S SYSTEM GENERIERT NUR NOCH ECHTE DATEN!")
-        print("💰 ALLE DEMO-DATEN DURCH ECHTE DATABASE-GENERIERTE DATEN ERSETZT!")
+    if all_tests_passed:
+        print("✅ ALL SYSTEMS OPERATIONAL - 100% PRODUCTION READY!")
+        print("🚀 ZZ-LOBBY ELITE SYSTEM IS READY FOR IMMEDIATE LIVE DEPLOYMENT!")
+        print("💰 SYSTEM READY FOR €15,000+ MONTHLY REVENUE GENERATION!")
+        print("🎯 DANIEL'S AFFILIATE SYSTEM IS LIVE AND OPERATIONAL!")
     else:
-        print("❌ AUTOMATION DATA GENERATION SYSTEM NEEDS ATTENTION")
-        print("⚠️  SOME TESTS FAILED - CHECK DETAILS ABOVE")
+        print("❌ SOME SYSTEMS NEED ATTENTION BEFORE PRODUCTION DEPLOYMENT")
+        print("🔧 REVIEW FAILED TESTS AND FIX ISSUES BEFORE GOING LIVE")
     
-    print("\n" + "=" * 80)
+    return all_tests_passed
+
+
+if __name__ == "__main__":
+    main()

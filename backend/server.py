@@ -1080,6 +1080,12 @@ async def get_akquise_stats():
         # Recent outreach activities
         recent_outreach = await db.outreach_activities.find().sort("sent_at", -1).limit(10).to_list(10)
         
+        # Convert ObjectIds to strings for JSON serialization
+        for outreach in recent_outreach:
+            if '_id' in outreach:
+                outreach['id'] = str(outreach['_id'])
+                del outreach['_id']
+        
         # This week's activities
         week_ago = datetime.now() - timedelta(days=7)
         this_week_outreach = await db.outreach_activities.count_documents({

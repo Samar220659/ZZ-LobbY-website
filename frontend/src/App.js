@@ -22,6 +22,7 @@ import AffiliateExplosion from "./components/AffiliateExplosion";
 import BusinessDashboard from "./components/BusinessDashboard";
 import AutomationCenter from "./components/AutomationCenter";
 import SmartAkquiseCenter from "./components/SmartAkquiseCenter";
+import TaxCompliance from "./components/TaxCompliance";
 
 // Legal Components
 import Impressum from "./components/legal/Impressum";

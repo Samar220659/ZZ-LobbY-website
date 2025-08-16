@@ -1051,10 +1051,24 @@ async def track_outreach(data: dict):
         await db.outreach_activities.insert_one(outreach_record)
         
         # Update prospect last_contact
-        await db.prospects.update_one(
-            {"_id": prospect_id},
-            {"$set": {"last_contact": datetime.now().isoformat()}}
-        )
+        from bson import ObjectId
+        try:
+            # Try to convert prospect_id to ObjectId if it's a valid ObjectId string
+            if len(prospect_id) == 24:
+                prospect_object_id = ObjectId(prospect_id)
+            else:
+                prospect_object_id = prospect_id
+                
+            await db.prospects.update_one(
+                {"_id": prospect_object_id},
+                {"$set": {"last_contact": datetime.now().isoformat()}}
+            )
+        except Exception as e:
+            # If ObjectId conversion fails, try with string ID
+            await db.prospects.update_one(
+                {"id": prospect_id},
+                {"$set": {"last_contact": datetime.now().isoformat()}}
+            )
         
         logging.info(f"📧 Outreach getrackt: {channel} an Prospect {prospect_id}")
         

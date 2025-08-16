@@ -22,6 +22,14 @@ import AffiliateExplosion from "./components/AffiliateExplosion";
 import BusinessDashboard from "./components/BusinessDashboard";
 import AutomationCenter from "./components/AutomationCenter";
 import SmartAkquiseCenter from "./components/SmartAkquiseCenter";
+
+// Legal Components
+import Impressum from "./components/legal/Impressum";
+import Datenschutz from "./components/legal/Datenschutz";
+import AGB from "./components/legal/AGB";
+import CookieConsent from "./components/legal/CookieConsent";
+import LegalFooter from "./components/legal/LegalFooter";
+
 import "./App.css";
 
 function App() {
@@ -50,7 +58,16 @@ function App() {
           <Route path="/business-dashboard" element={<BusinessDashboard />} />
           <Route path="/automation-center" element={<AutomationCenter />} />
           <Route path="/smart-akquise" element={<SmartAkquiseCenter />} />
+          
+          {/* Legal Routes */}
+          <Route path="/impressum" element={<Impressum />} />
+          <Route path="/datenschutz" element={<Datenschutz />} />
+          <Route path="/agb" element={<AGB />} />
         </Routes>
+        
+        {/* Global Components */}
+        <CookieConsent />
+        <LegalFooter />
         <Toaster />
       </BrowserRouter>
     </div>

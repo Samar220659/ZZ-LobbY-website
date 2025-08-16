@@ -1142,12 +1142,20 @@ class ZZAutomationEngineTester:
             
             if response.status_code == 200:
                 data = response.json()
-                required_fields = ['active_apis', 'messages_sent_today', 'campaign_running', 'daily_limit']
+                required_fields = ['success', 'automation_active', 'metrics', 'total_cycles']
                 
                 missing_fields = [field for field in required_fields if field not in data]
                 if not missing_fields:
-                    self.log_test("Automation Status Endpoint", True, f"Automation status working - Campaign running: {data.get('campaign_running')}, Daily limit: {data.get('daily_limit')}")
-                    return True
+                    metrics = data.get('metrics', {})
+                    automation_active = data.get('automation_active', False)
+                    total_cycles = data.get('total_cycles', 0)
+                    
+                    if isinstance(metrics, dict) and isinstance(automation_active, bool):
+                        self.log_test("Automation Status Endpoint", True, f"Automation status working - Active: {automation_active}, Total cycles: {total_cycles}, Metrics: {metrics}")
+                        return True
+                    else:
+                        self.log_test("Automation Status Endpoint", False, f"Invalid data types in response")
+                        return False
                 else:
                     self.log_test("Automation Status Endpoint", False, f"Missing fields: {missing_fields}")
                     return False

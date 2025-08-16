@@ -28,6 +28,8 @@ import {
   Loader2,
   ChevronRight,
   ArrowLeft,
+  Calculator,
+  FileText,
   Brain,
   Rocket,
   ArrowRightLeft,

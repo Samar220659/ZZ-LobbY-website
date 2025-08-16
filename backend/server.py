@@ -96,6 +96,7 @@ async def startup_event():
     init_digistore24_system(db)  # Initialize Digistore24 affiliate system
     init_business_system(db)     # Initialize Business Integration system
     init_automation_engine(db)   # Initialize Automation Engine
+    init_tax_system(db)          # German tax compliance
     
     # Start automation engine as background task
     asyncio.create_task(start_automation())

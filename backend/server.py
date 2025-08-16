@@ -916,7 +916,17 @@ async def add_prospect(data: dict):
         
         prospect_response = {
             "id": str(result.inserted_id),
-            **prospect
+            "name": prospect["name"],
+            "company": prospect["company"],
+            "email": prospect["email"],
+            "linkedin": prospect["linkedin"],
+            "phone": prospect["phone"],
+            "industry": prospect["industry"],
+            "notes": prospect["notes"],
+            "status": prospect["status"],
+            "created_at": prospect["created_at"],
+            "last_contact": prospect["last_contact"],
+            "affiliate_link": prospect["affiliate_link"]
         }
         
         logging.info(f"🎯 Prospect hinzugefügt: {prospect['name']} - {prospect['company']}")

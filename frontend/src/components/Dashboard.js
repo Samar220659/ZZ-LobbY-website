@@ -258,6 +258,45 @@ export default function Dashboard() {
           </Card>
         </div>
 
+        {/* NEW: Advanced AI Section */}
+        <div className="mb-8">
+          <Card className="bg-gradient-to-br from-cyan-500/20 to-blue-600/30 border-cyan-500/40 hover:from-cyan-500/30 hover:to-blue-600/40 transition-all duration-300 cursor-pointer"
+                onClick={() => handleNavigation('/advanced-ai')}>
+            <CardContent className="p-8">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="text-4xl">🚀</div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-cyan-400 mb-2">Advanced AI Revenue Optimizer 2025</h2>
+                    <p className="text-gray-300">Powered by GPT-4o • Claude-3.5 • Gemini Pro</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-lg font-bold text-green-400">99.2%</div>
+                  <div className="text-sm text-gray-400">Autonomie</div>
+                  <Badge className="mt-2 bg-green-900 text-green-200 border-green-600">
+                    NEW 2025
+                  </Badge>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-blue-900/30 p-3 rounded">
+                  <div className="text-blue-400 font-semibold">🎯 Lead AI</div>
+                  <div className="text-xs text-gray-400">GPT-4o Predictive Scoring</div>
+                </div>
+                <div className="bg-purple-900/30 p-3 rounded">
+                  <div className="text-purple-400 font-semibold">💰 Pricing AI</div>
+                  <div className="text-xs text-gray-400">Claude-3.5 Dynamic Optimization</div>
+                </div>
+                <div className="bg-green-900/30 p-3 rounded">
+                  <div className="text-green-400 font-semibold">🌍 Market AI</div>
+                  <div className="text-xs text-gray-400">Gemini Pro Intelligence</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* SaaS System Status */}
         <Card className="bg-black/40 border-white/10 mb-8">
           <CardHeader>

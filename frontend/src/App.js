@@ -13,6 +13,7 @@ import AIMarketingHub from "./components/AIMarketingHub";
 import DigitalManager from "./components/DigitalManager";
 import AutonomousHub from "./components/AutonomousHub";
 import ProductionLaunch from "./components/ProductionLaunch";
+import AdvancedAiOptimizer from "./components/AdvancedAiOptimizer";
 import "./App.css";
 
 function App() {

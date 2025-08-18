@@ -1666,6 +1666,12 @@ class BackendTester:
             ("Production Launch", self.test_production_launch),
             ("Production Start Money Generation", self.test_production_start_money_generation),
             ("Production Live Dashboard", self.test_production_live_dashboard),
+            # Advanced AI Revenue Optimizer 2025 Tests - NEW SYSTEM
+            ("Advanced AI Dashboard", self.test_advanced_ai_dashboard),
+            ("Advanced AI Lead Scoring", self.test_advanced_ai_lead_scoring),
+            ("Advanced AI Pricing Optimization", self.test_advanced_ai_pricing_optimization),
+            ("Advanced AI Market Intelligence", self.test_advanced_ai_market_intelligence),
+            ("Advanced AI Full Optimization", self.test_advanced_ai_full_optimization),
         ]
         
         passed = 0

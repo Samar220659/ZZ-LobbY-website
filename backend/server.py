@@ -236,6 +236,62 @@ app.include_router(optimization_router)  # Self-Optimizing Revenue Machine
 from production_launcher import production_router
 app.include_router(production_router)  # Production Launch System
 
+# Advanced AI Revenue Optimizer 2025 Import
+from advanced_ai_revenue_optimizer import ai_optimizer
+from fastapi import APIRouter
+
+# Create Advanced AI Router
+ai_optimizer_router = APIRouter(prefix="/api/advanced-ai")
+
+@ai_optimizer_router.post("/lead-scoring")
+async def optimize_lead_scoring(lead_data: dict):
+    """GPT-4o: Advanced Lead Scoring"""
+    try:
+        result = await ai_optimizer.predictive_lead_scoring(lead_data)
+        return {"success": True, "data": result}
+    except Exception as e:
+        return {"success": False, "error": str(e), "fallback": True}
+
+@ai_optimizer_router.post("/pricing-optimization")
+async def optimize_pricing(request: dict):
+    """Claude-3.5: Dynamic Pricing Optimization"""
+    try:
+        service = request.get('service', 'Digital Marketing')
+        market_data = request.get('market_data', {})
+        result = await ai_optimizer.dynamic_pricing_optimization(service, market_data)
+        return {"success": True, "data": result}
+    except Exception as e:
+        return {"success": False, "error": str(e), "fallback": True}
+
+@ai_optimizer_router.get("/market-intelligence")
+async def get_market_intelligence(industry: str = "Digital Services", region: str = "Deutschland"):
+    """Gemini Pro: Market Intelligence Analysis"""
+    try:
+        result = await ai_optimizer.market_intelligence_analysis(industry, region)
+        return {"success": True, "data": result}
+    except Exception as e:
+        return {"success": False, "error": str(e), "fallback": True}
+
+@ai_optimizer_router.post("/full-optimization")
+async def run_full_ai_optimization(business_data: dict):
+    """Multi-AI Revenue Optimization (alle 3 Modelle)"""
+    try:
+        result = await ai_optimizer.multi_ai_revenue_optimization(business_data)
+        return {"success": True, "data": result}
+    except Exception as e:
+        return {"success": False, "error": str(e), "fallback": True}
+
+@ai_optimizer_router.get("/dashboard")
+async def get_ai_optimizer_dashboard():
+    """Advanced AI Revenue Optimizer Dashboard"""
+    try:
+        result = await ai_optimizer.get_optimization_dashboard()
+        return {"success": True, "data": result}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+app.include_router(ai_optimizer_router)  # Advanced AI Revenue Optimizer 2025
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,

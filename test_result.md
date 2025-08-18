@@ -784,7 +784,12 @@ metadata:
 
 test_plan:
   current_focus:
-    - "FINALE FRONTEND-TESTS für komplettes ZZ-Lobby Production System COMPLETE"
+    - "Advanced AI Revenue Optimizer - Setup"
+    - "Advanced AI Revenue Optimizer - Lead Scoring API"
+    - "Advanced AI Revenue Optimizer - Pricing AI API"
+    - "Advanced AI Revenue Optimizer - Market Intelligence API"
+    - "Advanced AI Revenue Optimizer - Multi-AI Optimization API"
+    - "Advanced AI Revenue Optimizer - Dashboard API"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

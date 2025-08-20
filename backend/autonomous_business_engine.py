@@ -307,33 +307,58 @@ Antworte immer auf Deutsch. Stelle gezielte Fragen um Bedürfnisse zu verstehen.
             self.llm_client = None
 
     async def analyze_lead_and_create_offer(self, lead_data: dict) -> dict:
-        """AI analysiert Lead und erstellt automatisch passendes Angebot"""
+        """AI analysiert Lead und erstellt automatisch passendes Angebot mit echter KI"""
         
         try:
-            # Lead-Analyse mit AI
+            # Lead-Analyse mit echter AI
             if self.llm_client:
-                analysis_prompt = f"""
-                Analysiere diesen Lead für ZZ-Lobby (Digital Business Automation):
+                # Lead Analysis Chat
+                lead_analysis_chat = LlmChat(
+                    api_key=os.getenv('EMERGENT_LLM_KEY'),
+                    session_id=f"lead-analysis-{uuid.uuid4()}",
+                    system_message="""Du bist ein AI Lead Analyst für ZZ-Lobby (Daniel Oettel).
+
+Analysiere Leads und erstelle passende Service-Empfehlungen.
+
+VERFÜGBARE SERVICES:
+1. Digital Marketing Automation (€500-2000) - für Online-Marketing, SEO, Social Media
+2. Business Process Automation (€800-3000) - für Workflow-Optimierung, CRM, ERP
+3. KI-Integration & Chatbots (€600-2500) - für AI-Lösungen, Chatbots, Automatisierung
+4. E-Commerce Komplettlösung (€1200-5000) - für Online-Shops, Payment, Logistik
+5. Social Media Automation (€300-1500) - für Social Media Management, Content
+
+Antworte nur mit validem JSON!"""
+                ).with_model("openai", "gpt-4o-mini")
                 
-                Lead-Daten: {json.dumps(lead_data, indent=2)}
+                analysis_response = await lead_analysis_chat.send_message(
+                    UserMessage(text=f"""Analysiere diesen Lead:
+
+LEAD-DATEN:
+{json.dumps(lead_data, indent=2, default=str)}
+
+Erstelle eine Empfehlung als JSON:
+{{
+  "recommended_service": "service_name",
+  "recommended_price": 1200,
+  "customer_needs": ["need1", "need2", "need3"],
+  "conversion_probability": 80,
+  "personalized_pitch": "Detaillierte, personalisierte Verkaufsargumentation auf Deutsch",
+  "reasoning": "Warum diese Empfehlung?"
+}}""")
+                )
                 
-                Bestimme:
-                1. Welcher Service passt am besten? (digital_marketing, automation_setup, consulting)
-                2. Welcher Preis ist angemessen? (150-2500 EUR)
-                3. Welche spezifischen Bedürfnisse hat der Kunde?
-                4. Wie hoch ist die Conversion-Wahrscheinlichkeit? (0-100%)
-                
-                Antworte nur mit JSON:
-                {
-                    "recommended_service": "service_type",
-                    "recommended_price": 500,
-                    "customer_needs": ["need1", "need2"],
-                    "conversion_probability": 75,
-                    "personalized_pitch": "Individuelle Verkaufsargumentation"
-                }
-                """
-                
-                ai_analysis = await self._get_ai_response(analysis_prompt)
+                try:
+                    ai_analysis = json.loads(analysis_response.content)
+                except json.JSONDecodeError:
+                    # Fallback bei JSON-Parse Fehler
+                    ai_analysis = {
+                        "recommended_service": "digital_marketing",
+                        "recommended_price": 800,
+                        "customer_needs": ["online_presence", "automation"],
+                        "conversion_probability": 70,
+                        "personalized_pitch": "Steigern Sie Ihren Online-Erfolg mit professioneller Digitalisierung!",
+                        "reasoning": "Standard-Empfehlung bei Parse-Fehler"
+                    }
             else:
                 # Fallback ohne AI
                 ai_analysis = {
@@ -341,7 +366,8 @@ Antworte immer auf Deutsch. Stelle gezielte Fragen um Bedürfnisse zu verstehen.
                     "recommended_price": 500,
                     "customer_needs": ["online_presence", "automation"],
                     "conversion_probability": 60,
-                    "personalized_pitch": "Steigern Sie Ihren Online-Erfolg mit professioneller Digitalisierung!"
+                    "personalized_pitch": "Steigern Sie Ihren Online-Erfolg mit professioneller Digitalisierung!",
+                    "reasoning": "Fallback ohne AI"
                 }
 
             # Rechtskonforme Angebotserstellung

@@ -486,6 +486,112 @@ Gib professionelle, umsetzbare Steuerberatung auf Deutsch."""
             self.logger.error(f"❌ Steuerberechnungs-Fehler: {e}")
             raise HTTPException(status_code=500, detail=f"❌ Steuerberechnungs-Fehler: {str(e)}")
 
+    async def _generate_ai_tax_advice(self, documents: List[TaxDocument], tax_data: Dict[str, Any]) -> List[str]:
+        """KI-basierte Steuerberatung generieren"""
+        try:
+            # Dokumentenanalyse für KI
+            doc_summary = {
+                "total_documents": len(documents),
+                "income_docs": len([d for d in documents if d.document_type == "income"]),
+                "expense_docs": len([d for d in documents if d.document_type in ["expense", "receipt"]]),
+                "categories": list(set([d.category for d in documents])),
+                "avg_expense": tax_data["total_expenses"] / max(1, len([d for d in documents if d.document_type in ["expense", "receipt"]])),
+                "vat_compliance": len([d for d in documents if d.vat_rate]) / max(1, len(documents))
+            }
+            
+            prompt = f"""Als professioneller Steuerberater für Daniel Oettel (ZZ-Lobby) analysiere die Steuersituation:
+
+STEUERLICHE KENNZAHLEN 2025:
+- Gesamteinkommen: {tax_data['total_income']:,.2f} €
+- Gesamtausgaben: {tax_data['total_expenses']:,.2f} €
+- Gewinn/Verlust: {tax_data['profit_loss']:,.2f} €
+- USt-Schuld: {tax_data['vat_due']:,.2f} €
+- Einkommensteuer: {tax_data['income_tax']:,.2f} €
+- Gewerbesteuer: {tax_data['business_tax']:,.2f} €
+- Gesamtsteuerbelastung: {tax_data['total_tax_burden']:,.2f} €
+
+DOKUMENTENANALYSE:
+- Belege gesamt: {doc_summary['total_documents']}
+- Einnahmebelege: {doc_summary['income_docs']}
+- Ausgabenbelege: {doc_summary['expense_docs']}
+- Kategorien: {', '.join(doc_summary['categories'])}
+- Durchschnittliche Ausgabe: {doc_summary['avg_expense']:,.2f} €
+- USt-Compliance: {doc_summary['vat_compliance']:.1%}
+
+DANIEL'S BUSINESS:
+- Digitale Business-Automatisierung
+- USt-ID: DE4535548228 (KEIN Kleinunternehmer)
+- Steuer-ID: 69 377 041825
+
+Gib 4-6 konkrete, umsetzbare Steueroptimierungs-Empfehlungen auf Deutsch. 
+Format: Emoji + kurze, prägnante Empfehlung (max. 80 Zeichen)."""
+
+            ai_response = await self.tax_ai.send_message(
+                UserMessage(text=prompt)
+            )
+            
+            # Response verarbeiten und in Liste umwandeln
+            content = ai_response.content if hasattr(ai_response, 'content') else str(ai_response)
+            
+            # Empfehlungen extrahieren (nach Zeilen aufteilen und filtern)
+            recommendations = []
+            for line in content.split('\n'):
+                line = line.strip()
+                if line and ('🔴' in line or '📊' in line or '💡' in line or '🏢' in line or '⚡' in line or '💰' in line or '📈' in line or '🎯' in line):
+                    recommendations.append(line)
+            
+            # Fallback falls KI keine strukturierten Empfehlungen liefert
+            if not recommendations:
+                recommendations = self._generate_standard_tax_recommendations(
+                    tax_data['profit_loss'], 
+                    tax_data['vat_due'], 
+                    tax_data['total_expenses'], 
+                    tax_data['total_income']
+                )
+            
+            return recommendations[:6]  # Max 6 Empfehlungen
+            
+        except Exception as e:
+            self.logger.error(f"❌ AI Tax Advice Error: {e}")
+            # Fallback zu Standard-Empfehlungen
+            return self._generate_standard_tax_recommendations(
+                tax_data['profit_loss'], 
+                tax_data['vat_due'], 
+                tax_data['total_expenses'], 
+                tax_data['total_income']
+            )
+
+    def _generate_standard_tax_recommendations(self, profit_loss: float, vat_due: float, total_expenses: float, total_income: float) -> List[str]:
+        """Standard-Steuerempfehlungen als Fallback"""
+        recommendations = []
+        
+        if profit_loss < 0:
+            recommendations.append("🔴 Verlust ausweisen - Verlustvortrag für nächstes Jahr prüfen")
+        elif profit_loss > 50000:
+            recommendations.append("💰 Hoher Gewinn - Investitionen mit Abschreibungsnutzen prüfen")
+        
+        if vat_due > 7500:
+            recommendations.append("📊 Vierteljährliche USt-Voranmeldung statt monatlich erwägen")
+        elif vat_due < 1000:
+            recommendations.append("📊 Jährliche USt-Voranmeldung möglich bei geringer USt-Schuld")
+        
+        if total_expenses < total_income * 0.3:
+            recommendations.append("💡 Potenzial für weitere abzugsfähige Betriebsausgaben prüfen")
+        
+        if total_income > 22000:
+            recommendations.append("🏢 USt-Pflicht beachten - keine Kleinunternehmerregelung")
+        
+        if profit_loss > 24500:
+            recommendations.append("⚡ Gewerbesteuer-Optimierung durch Steuerberater empfohlen")
+        
+        # IT-spezifische Empfehlungen für Daniel's Business
+        recommendations.append("💻 IT-Equipment: 3-Jahres-AfA oder Sofortabschreibung bis 800€")
+        
+        if not recommendations:
+            recommendations.append("📈 Steuerliche Situation stabil - regelmäßige Überprüfung empfohlen")
+        
+        return recommendations
+
     async def generate_legal_document(self, doc_request: LegalDocument) -> Dict[str, Any]:
         """Automatische Rechtsdokument-Generierung mit echter KI"""
         try:

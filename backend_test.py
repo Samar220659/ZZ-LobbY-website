@@ -1469,6 +1469,8 @@ class BackendTester:
             ("Autonomous Business Metrics", self.test_autonomous_business_metrics),
             ("Autonomous Lead Processing", self.test_autonomous_lead_processing),
             ("Autonomous AI Sales Chat", self.test_autonomous_sales_chat),
+            ("NEUE AI Sales Chat - GPT-4o-mini", self.test_new_ai_sales_chat_system),
+            ("NEUE AI Lead Analysis - Gastronomie", self.test_new_ai_lead_analysis_system),
             ("Autonomous Transaction Processing", self.test_autonomous_transaction_processing),
             # Self-Optimizing Revenue Machine Tests
             ("Self-Optimizing System Health", self.test_self_optimizing_system_health),

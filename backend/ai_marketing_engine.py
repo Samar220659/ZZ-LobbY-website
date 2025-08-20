@@ -1,16 +1,29 @@
 """
 ZZ-Lobby Elite AI Marketing & Super-Seller Engine
-Vollautomatisches Marketing und Verkaufs-System
+Vollautomatisches Marketing und Verkaufs-System mit ECHTER KI
 """
 
 import asyncio
 import json
 import random
+import os
+import uuid
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 import logging
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Echte KI Integration
+try:
+    from emergentintegrations.llm.chat import LlmChat, UserMessage
+    AI_AVAILABLE = True
+except ImportError:
+    AI_AVAILABLE = False
+    print("⚠️ emergentintegrations nicht verfügbar, Marketing-KI limitiert")
 
 # Models
 class AIMarketingConfig(BaseModel):

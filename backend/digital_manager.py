@@ -14,6 +14,17 @@ from fastapi import APIRouter, HTTPException, BackgroundTasks
 from pydantic import BaseModel, EmailStr
 from motor.motor_asyncio import AsyncIOMotorClient
 import uuid
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Echte KI Integration für Legal/Tax
+try:
+    from emergentintegrations.llm.chat import LlmChat, UserMessage
+    AI_AVAILABLE = True
+except ImportError:
+    AI_AVAILABLE = False
+    print("⚠️ emergentintegrations nicht verfügbar, Legal-KI limitiert")
 
 # Klaviyo Integration
 class KlaviyoService:

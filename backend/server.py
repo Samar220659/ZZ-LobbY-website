@@ -28,6 +28,9 @@ from ai_marketing_engine import ai_router
 # Import system monitoring
 from system_monitoring import monitoring_router
 
+# Import AdCreative service
+from adcreative_service import adcreative_router
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 

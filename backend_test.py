@@ -1675,6 +1675,10 @@ class BackendTester:
             ("Autonomous AI Sales Chat", self.test_autonomous_sales_chat),
             ("NEUE AI Sales Chat - GPT-4o-mini", self.test_new_ai_sales_chat_system),
             ("NEUE AI Lead Analysis - Gastronomie", self.test_new_ai_lead_analysis_system),
+            # NEUE AI MARKETING MESSAGES TESTING - Review Request
+            ("NEUE AI Marketing Messages - Standard", self.test_new_ai_marketing_messages_standard),
+            ("NEUE AI Marketing Messages - Restaurant", self.test_new_ai_marketing_messages_restaurant),
+            ("NEUE AI Marketing Messages - Handwerker", self.test_new_ai_marketing_messages_handwerker),
             ("Autonomous Transaction Processing", self.test_autonomous_transaction_processing),
             # Self-Optimizing Revenue Machine Tests
             ("Self-Optimizing System Health", self.test_self_optimizing_system_health),

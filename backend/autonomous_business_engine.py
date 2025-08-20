@@ -348,8 +348,10 @@ Erstelle eine Empfehlung als JSON:
                 )
                 
                 try:
-                    ai_analysis = json.loads(analysis_response.content)
-                except json.JSONDecodeError:
+                    # Handle different response formats
+                    response_text = analysis_response.content if hasattr(analysis_response, 'content') else str(analysis_response)
+                    ai_analysis = json.loads(response_text)
+                except (json.JSONDecodeError, AttributeError):
                     # Fallback bei JSON-Parse Fehler
                     ai_analysis = {
                         "recommended_service": "digital_marketing",

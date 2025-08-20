@@ -2,7 +2,7 @@ import json, httpx, secrets, time
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, List
-from .tiktok_api_mock import tiktok_api_mock
+from tiktok_api_mock import tiktok_api_mock
 
 def get_tokens():
     """Load tokens if available, otherwise return empty dict"""

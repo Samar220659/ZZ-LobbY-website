@@ -537,12 +537,14 @@ class SystemHealingEngine:
             try:
                 start_time = time.time()
                 
+                # Use external URL for API monitoring to avoid localhost timeouts
+                base_url = "https://zz-elite-lobby.preview.emergentagent.com"
                 if monitor.method == "GET":
-                    response = requests.get(f"http://localhost:8001{monitor.endpoint}", timeout=monitor.timeout)
+                    response = requests.get(f"{base_url}{monitor.endpoint}", timeout=monitor.timeout)
                 elif monitor.method == "POST":
-                    response = requests.post(f"http://localhost:8001{monitor.endpoint}", timeout=monitor.timeout)
+                    response = requests.post(f"{base_url}{monitor.endpoint}", timeout=monitor.timeout)
                 else:
-                    response = requests.request(monitor.method, f"http://localhost:8001{monitor.endpoint}", timeout=monitor.timeout)
+                    response = requests.request(monitor.method, f"{base_url}{monitor.endpoint}", timeout=monitor.timeout)
                 
                 end_time = time.time()
                 response_time = (end_time - start_time) * 1000

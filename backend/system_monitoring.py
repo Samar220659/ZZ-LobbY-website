@@ -86,6 +86,46 @@ class ChangeDetection(BaseModel):
     impact_level: str  # "low", "medium", "high", "critical"
     detected_by: str
 
+class SystemAnomaly(BaseModel):
+    anomaly_id: str
+    component: str
+    anomaly_type: str  # "performance", "error", "resource", "availability"
+    severity: str  # "low", "medium", "high", "critical"
+    description: str
+    detected_at: datetime
+    metrics: Dict[str, Any]
+    prediction_confidence: float
+    suggested_action: str
+    auto_heal_possible: bool
+
+class HealingAction(BaseModel):
+    action_id: str
+    action_type: str  # "restart_service", "clear_cache", "scale_resources", "reconnect_db"
+    component: str
+    description: str
+    executed_at: datetime
+    success: bool
+    execution_time: float
+    result_message: str
+
+class AlertConfig(BaseModel):
+    alert_id: str
+    alert_type: str  # "email", "webhook", "log"
+    trigger_conditions: Dict[str, Any]
+    recipient: str
+    enabled: bool = True
+    cooldown_minutes: int = 15
+
+class PerformanceMetrics(BaseModel):
+    timestamp: datetime
+    cpu_usage: float
+    memory_usage: float
+    disk_io: float
+    network_io: float
+    response_times: List[float]
+    error_counts: int
+    active_users: int
+
 class SystemMonitor:
     def __init__(self):
         self.logger = logging.getLogger(__name__)

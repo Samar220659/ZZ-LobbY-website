@@ -376,7 +376,7 @@ Gib professionelle, umsetzbare Steuerberatung auf Deutsch."""
             raise HTTPException(status_code=500, detail=f"❌ Versicherungsanfrage Fehler: {str(e)}")
 
     async def generate_tax_calculation(self, documents: List[TaxDocument]) -> Dict[str, Any]:
-        """KI-gesteuerte Steuerberechnung"""
+        """KI-gesteuerte Steuerberechnung mit echter Steuerberatung"""
         try:
             # Steuerliche Kategorien analysieren
             total_income = sum(doc.amount for doc in documents if doc.document_type == "income")
@@ -386,12 +386,12 @@ Gib professionelle, umsetzbare Steuerberatung auf Deutsch."""
             # Gewinn/Verlust Berechnung
             profit_loss = total_income - total_expenses
             
-            # USt-Berechnung (vereinfacht)
-            vat_due = total_income * 0.19 - total_vat_paid if total_income > 22000 else 0  # Kleinunternehmer
+            # USt-Berechnung (Daniel ist KEIN Kleinunternehmer - USt-ID vorhanden)
+            vat_due = total_income * 0.19 - total_vat_paid
             
-            # Einkommensteuer Schätzung (vereinfacht)
+            # Einkommensteuer Schätzung (2025 Freibeträge)
             income_tax = 0
-            if profit_loss > 9984:  # Grundfreibetrag 2024
+            if profit_loss > 9984:  # Grundfreibetrag 2025
                 if profit_loss <= 58596:
                     income_tax = profit_loss * 0.14  # Eingangssteuersatz
                 else:
@@ -405,17 +405,20 @@ Gib professionelle, umsetzbare Steuerberatung auf Deutsch."""
             
             total_tax_burden = income_tax + business_tax + solidarity_surcharge + vat_due
             
-            # KI-Empfehlungen generieren
-            recommendations = []
-            
-            if profit_loss < 0:
-                recommendations.append("🔴 Verlust ausweisen - Verlustvortrag prüfen")
-            if vat_due > 7500:
-                recommendations.append("📊 Vierteljährliche USt-Voranmeldung empfohlen")
-            if total_expenses < total_income * 0.3:
-                recommendations.append("💡 Potenzial für weitere abzugsfähige Ausgaben prüfen")
-            if business_tax > 0:
-                recommendations.append("🏢 Gewerbesteuer-Optimierung durch Steuerberater prüfen")
+            # Echte KI-Steuerberatung generieren
+            if self.tax_ai:
+                recommendations = await self._generate_ai_tax_advice(documents, {
+                    "total_income": total_income,
+                    "total_expenses": total_expenses,
+                    "profit_loss": profit_loss,
+                    "vat_due": vat_due,
+                    "income_tax": income_tax,
+                    "business_tax": business_tax,
+                    "total_tax_burden": total_tax_burden
+                })
+            else:
+                # Fallback zu Standard-Empfehlungen
+                recommendations = self._generate_standard_tax_recommendations(profit_loss, vat_due, total_expenses, total_income)
             
             # Bericht erstellen
             tax_report = {

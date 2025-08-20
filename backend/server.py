@@ -229,6 +229,9 @@ app.include_router(monitoring_router)  # System Monitoring
 # Google Ads Marketing Automation
 app.include_router(google_ads_router)  # Google Ads Engine
 
+# Social Media Marketing Automation
+app.include_router(social_router)  # Instagram + LinkedIn APIs
+
 # Digital Manager System Import
 from digital_manager import digital_manager_router
 app.include_router(digital_manager_router)  # Digital Manager System

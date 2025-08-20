@@ -551,20 +551,6 @@ Antwort als JSON:
                 "ai_powered": False
             }
 
-    async def _get_ai_response(self, prompt: str) -> dict:
-        """AI-Response mit Error Handling"""
-        try:
-            if self.llm_client:
-                response = await self.llm_client.send_message(
-                    UserMessage(content=prompt)
-                )
-                return json.loads(response.content)
-            else:
-                return {"error": "AI not available"}
-        except Exception as e:
-            self.logger.error(f"AI Response Error: {e}")
-            return {"error": str(e)}
-
     async def _trigger_automated_offer(self, conversation_id: str, detected_needs: list):
         """Automatische Angebotserstellung basierend auf AI-Analyse"""
         conversation = await self.db.sales_conversations.find_one({"conversation_id": conversation_id})

@@ -124,8 +124,78 @@ Erstelle überzeugende Marketing-Messages die echte Probleme lösen und Daniel's
             )
             self.leads.append(lead)
     
-    def generate_marketing_messages(self) -> List[Dict[str, str]]:
-        """Generate AI-powered marketing messages"""
+    async def generate_marketing_messages(self, target_industry: str = None, campaign_goal: str = "lead_generation") -> List[Dict[str, str]]:
+        """Generate AI-powered marketing messages mit echter KI"""
+        
+        if not self.marketing_ai:
+            # Fallback: Template-basierte Messages
+            return self._get_fallback_messages()
+        
+        try:
+            # KI-generierte Marketing Messages
+            ai_response = await self.marketing_ai.send_message(
+                UserMessage(text=f"""Erstelle 4 verschiedene Marketing-E-Mails für ZZ-Lobby:
+
+ZIELGRUPPE: {target_industry or 'Deutsche KMUs (Restaurants, Handwerker, Dienstleister)'}
+KAMPAGNENZIEL: {campaign_goal}
+
+ERSTELLE 4 E-MAILS:
+1. Cold Outreach E-Mail
+2. Follow-Up E-Mail (nach 3 Tagen)
+3. Value-Add E-Mail (Tipps/Mehrwert)
+4. Finale Angebot E-Mail
+
+WICHTIG:
+- Deutsche Sprache
+- Konkrete Nutzen statt Buzzwords
+- Personalisierbar mit {{name}} und {{company}}
+- Professionell aber nahbar
+- Fokus auf Zeitersparnis und ROI
+- Daniel Oettel als Absender
+- Portfolio Link: https://zz-payments-app.emergent.host/
+
+ANTWORT-FORMAT als JSON:
+[
+  {{
+    "type": "cold_outreach",
+    "subject": "Betreff-Text",
+    "content": "E-Mail Inhalt mit Personalisierung",
+    "follow_up_days": 0
+  }},
+  ...
+]""")
+            )
+            
+            try:
+                # Parse AI Response
+                ai_messages = json.loads(ai_response.content if hasattr(ai_response, 'content') else str(ai_response))
+                
+                # Validiere und verbessere AI-Messages
+                validated_messages = []
+                for msg in ai_messages:
+                    if isinstance(msg, dict) and "type" in msg and "subject" in msg and "content" in msg:
+                        # Add AI-powered marker
+                        msg["ai_generated"] = True
+                        msg["generated_at"] = datetime.now().isoformat()
+                        msg["target_industry"] = target_industry
+                        validated_messages.append(msg)
+                
+                if validated_messages:
+                    self.logger.info(f"✅ KI-Marketing Messages erstellt: {len(validated_messages)} Messages für {target_industry}")
+                    return validated_messages
+                else:
+                    return self._get_fallback_messages()
+                    
+            except (json.JSONDecodeError, AttributeError) as e:
+                self.logger.warning(f"⚠️ AI Response Parse Error: {e}, using fallback")
+                return self._get_fallback_messages()
+                
+        except Exception as e:
+            self.logger.error(f"❌ AI Marketing Messages Error: {e}")
+            return self._get_fallback_messages()
+    
+    def _get_fallback_messages(self) -> List[Dict[str, str]]:
+        """Fallback template-basierte Messages wenn AI nicht verfügbar"""
         messages = [
             {
                 "type": "cold_outreach",

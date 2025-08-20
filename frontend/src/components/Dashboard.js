@@ -15,7 +15,8 @@ import {
   Settings,
   BarChart3,
   Zap,
-  Crown
+  Crown,
+  Target
 } from "lucide-react";
 import { toast } from "sonner";
 import { dashboardApi } from "../services/api";

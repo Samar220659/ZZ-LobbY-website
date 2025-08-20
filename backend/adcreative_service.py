@@ -60,7 +60,17 @@ class AdCreativeService:
             "crosspost_tokens": "configured" if self.crosspost_available else "need_oauth_setup",
             "oauth_setup_command": "python crosspost/crosspost_setup.py",
             "supported_platforms": ["tiktok", "instagram", "youtube", "facebook", "twitter"],
-            "system_ready": self.adcreative_available and self.crosspost_available
+            "system_ready": self.adcreative_available and self.crosspost_available,
+            "tiktok_setup_required": True,
+            "setup_guide": "/app/services/crosspost/TIKTOK_SETUP_GUIDE.md",
+            "daniel_credentials": "a22061981@gmx.de (configured)",
+            "next_steps": [
+                "1. Create TikTok Developer App at developers.tiktok.com",
+                "2. Get Client Key & Secret after approval", 
+                "3. Update crosspost_setup.py with real credentials",
+                "4. Run OAuth setup: python crosspost_setup.py",
+                "5. Start Daily Campaigns for ZZ-Lobby Services"
+            ]
         }
     
     async def create_campaign(self, request: CampaignRequest) -> CampaignResult:

@@ -632,7 +632,7 @@ class SystemHealingEngine:
         return max(0, score)
 
 # Initialize system monitor
-system_monitor = SystemMonitor()
+system_monitor = SystemHealingEngine()
 
 # API Router
 monitoring_router = APIRouter(prefix="/api/monitoring", tags=["monitoring"])

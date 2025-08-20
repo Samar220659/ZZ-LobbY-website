@@ -126,7 +126,7 @@ class PerformanceMetrics(BaseModel):
     error_counts: int
     active_users: int
 
-class SystemMonitor:
+class SystemHealingEngine:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
         self.mongo_client = AsyncIOMotorClient(os.getenv('MONGO_URL'))

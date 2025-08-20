@@ -703,7 +703,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "FINALE FRONTEND-TESTS für komplettes ZZ-Lobby Production System COMPLETE"
+    - "System Healing Module - 100% Complete - DEEP BACKEND TESTING REQUIRED"
+    - "Test neue Healing-Endpunkte: /anomalies, /heal, /healing-actions, /full-cycle, /system-healing-dashboard"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

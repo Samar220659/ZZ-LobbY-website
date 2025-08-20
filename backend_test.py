@@ -1896,6 +1896,11 @@ class BackendTester:
             ("Digital Manager - Versicherungsanfrage", self.test_digital_manager_insurance_request),
             ("Digital Manager - KI-Steuerberechnung", self.test_digital_manager_tax_calculation),
             ("Digital Manager - Rechtsdokumente", self.test_digital_manager_legal_documents),
+            # 🤖 NEW AI LEGAL & TAX FEATURES TESTING (Review Request)
+            ("🤖 AI Legal Documents - AGB Generation", self.test_ai_legal_documents_agb),
+            ("🤖 AI Legal Documents - DSGVO", self.test_ai_legal_documents_dsgvo),
+            ("🤖 AI Tax Calculation mit Echte KI-Beratung", self.test_ai_tax_calculation_with_real_ai),
+            ("🤖 AI vs Template Quality Comparison", self.test_ai_vs_template_comparison),
             # Autonomous Business Engine Tests
             ("Autonomous System Status", self.test_autonomous_system_status),
             ("Autonomous Business Metrics", self.test_autonomous_business_metrics),

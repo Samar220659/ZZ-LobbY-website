@@ -130,16 +130,28 @@ class SystemHealingEngine:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
         self.mongo_client = AsyncIOMotorClient(os.getenv('MONGO_URL'))
-        self.db = self.mongo_client[os.getenv('DB_NAME')]
+        self.db = self.mongo_client[os.getenv('DB_NAME', 'zz_lobby_elite')]
         self.monitoring_active = True
+        self.healing_enabled = True
         self.dependencies = []
         self.ab_tests = []
         self.api_monitors = []
         self.change_log = []
         self.system_baseline = {}
+        self.performance_history = []
+        self.anomalies = []
+        self.healing_actions = []
+        self.alert_configs = []
+        self.last_alerts = {}
+        
+        # Performance prediction
+        self.performance_window = 50  # Number of data points for prediction
+        self.anomaly_threshold = 2.0  # Standard deviations for anomaly detection
         
         # Initialize default configurations
         self._initialize_default_configs()
+        self._initialize_healing_rules()
+        self._initialize_alert_configs()
     
     def _initialize_default_configs(self):
         """Initialize default monitoring configurations"""

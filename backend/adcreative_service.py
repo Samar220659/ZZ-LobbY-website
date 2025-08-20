@@ -225,8 +225,8 @@ class AdCreativeService:
             
         except Exception as e:
             self.logger.error(f"Daniel's daily campaign failed: {e}")
-            # Fallback to simple campaign
-            return await self._run_fallback_campaign()
+            # Return error details for debugging
+            raise HTTPException(status_code=500, detail=f"Campaign failed: {str(e)}")
 
 # Initialize service
 adcreative_service = AdCreativeService()

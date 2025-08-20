@@ -222,6 +222,7 @@ app.include_router(api_router)
 app.include_router(automation_router)  # Automation Engine
 app.include_router(ai_router)  # AI Marketing Engine
 app.include_router(monitoring_router)  # System Monitoring
+app.include_router(adcreative_router)  # AdCreative Killer Integration
 
 # Digital Manager System Import
 from digital_manager import digital_manager_router

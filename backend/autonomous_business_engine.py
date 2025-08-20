@@ -520,7 +520,7 @@ Antwort als JSON:
             conversation["messages"].append({
                 "timestamp": datetime.now(),
                 "sender": "ai_sales",
-                "message": ai_response.content,
+                "message": ai_response_text,
                 "action": analysis_data.get("suggested_action"),
                 "confidence": analysis_data.get("confidence")
             })

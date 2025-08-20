@@ -167,8 +167,16 @@ ANTWORT-FORMAT als JSON:
             )
             
             try:
-                # Parse AI Response
-                ai_messages = json.loads(ai_response.content if hasattr(ai_response, 'content') else str(ai_response))
+                # Parse AI Response - handle markdown code blocks
+                response_text = ai_response.content if hasattr(ai_response, 'content') else str(ai_response)
+                
+                # Remove markdown code blocks if present
+                if response_text.startswith('```json'):
+                    response_text = response_text.replace('```json', '').replace('```', '').strip()
+                elif response_text.startswith('```'):
+                    response_text = response_text.replace('```', '').strip()
+                
+                ai_messages = json.loads(response_text)
                 
                 # Validiere und verbessere AI-Messages
                 validated_messages = []

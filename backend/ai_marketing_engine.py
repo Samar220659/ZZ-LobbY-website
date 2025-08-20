@@ -520,9 +520,9 @@ async def add_lead(lead: Lead):
     return ai_marketing_engine.add_lead(lead)
 
 @ai_router.get("/marketing-messages")
-async def get_marketing_messages():
-    """Get AI-generated marketing messages"""
-    return ai_marketing_engine.generate_marketing_messages()
+async def get_marketing_messages(target_industry: str = None, campaign_goal: str = "lead_generation"):
+    """Get AI-generated marketing messages mit echter KI"""
+    return await ai_marketing_engine.generate_marketing_messages(target_industry, campaign_goal)
 
 @ai_router.get("/sales-scripts")
 async def get_sales_scripts():

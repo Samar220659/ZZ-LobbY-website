@@ -171,25 +171,59 @@ class AdCreativeService:
             self.logger.error(f"Campaign failed: {e}")
             raise HTTPException(status_code=500, detail=f"Campaign execution failed: {str(e)}")
     
-    async def run_daily_campaign(self, daniel_services: List[str] = None) -> CampaignResult:
-        """Run automated daily campaign for Daniel's services"""
-        if not daniel_services:
-            daniel_services = [
-                "https://zz-lobby-elite.de/website-entwicklung",
-                "https://zz-lobby-elite.de/social-media-automation", 
-                "https://zz-lobby-elite.de/business-digitalisierung"
-            ]
-        
-        # Use first service as primary promo link
-        primary_service = daniel_services[0] if daniel_services else "https://zz-lobby-elite.de"
-        
-        campaign_request = CampaignRequest(
-            promo_link=primary_service,
-            target_platforms=["tiktok", "instagram", "youtube", "facebook"],
-            campaign_name=f"Daniel_Daily_{datetime.now().strftime('%Y%m%d')}"
-        )
-        
-        return await self.create_campaign(campaign_request)
+    async def run_daily_campaign(self, service_focus: str = None) -> CampaignResult:
+        """Run automated daily campaign using Daniel's advanced campaign engine"""
+        try:
+            # Import Daniel's campaign engine
+            import sys
+            sys.path.append(self.crosspost_path)
+            from daniel_campaign_engine import daniel_campaign_engine
+            
+            # Run automated campaign
+            campaign_data = daniel_campaign_engine.run_automated_campaign(service_focus)
+            
+            # Convert to CampaignResult format
+            creatives = []
+            platform_results = campaign_data["cross_posting_results"]["platform_results"]
+            
+            for platform, result in platform_results.items():
+                if result.get("success", False):
+                    creative_result = CreativeResult(
+                        video_url=campaign_data["content_used"].get("video_url", "mock_video_url"),
+                        score=campaign_data["content_used"]["estimated_score"],
+                        copy={
+                            "primary": campaign_data["content_used"]["caption"],
+                            "headline": campaign_data["service_promoted"]["name"],
+                            "cta": campaign_data["content_used"]["cta"]
+                        },
+                        platform=platform,
+                        posted=True,
+                        post_id=result.get("post_id", result.get("video_id"))
+                    )
+                    creatives.append(creative_result)
+            
+            campaign_result = CampaignResult(
+                campaign_id=campaign_data["campaign_id"],
+                status="completed",
+                creatives=creatives,
+                total_creatives=len(creatives),
+                successful_posts=len(creatives),
+                timestamp=datetime.now()
+            )
+            
+            # Store campaign data for analytics
+            await self.db.daniel_campaigns.insert_one({
+                **campaign_data,
+                "_id": campaign_data["campaign_id"],
+                "created_at": datetime.now()
+            })
+            
+            return campaign_result
+            
+        except Exception as e:
+            self.logger.error(f"Daniel's daily campaign failed: {e}")
+            # Fallback to simple campaign
+            return await self._run_fallback_campaign()
 
 # Initialize service
 adcreative_service = AdCreativeService()

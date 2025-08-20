@@ -1869,6 +1869,181 @@ class BackendTester:
             self.log_test("AI vs Template Quality Comparison", False, f"Qualitätsvergleich Fehler: {str(e)}")
             return False
 
+    def test_google_ads_dashboard(self):
+        """Test Google Ads Dashboard für ZZ-Lobby"""
+        try:
+            response = self.session.get(f"{self.api_url}/google-ads/dashboard")
+            if response.status_code == 200:
+                data = response.json()
+                if ("business" in data and 
+                    "summary" in data and 
+                    "campaigns" in data and
+                    "recommendations" in data):
+                    
+                    business = data["business"]
+                    summary = data["summary"]
+                    campaigns = data["campaigns"]
+                    
+                    # Validiere Daniel's Geschäftsdaten
+                    if (business.get("business_name") == "ZZ-Lobby" and
+                        business.get("owner") == "Daniel Oettel" and
+                        business.get("location") == "Zeitz, Deutschland"):
+                        
+                        self.log_test("Google Ads Dashboard", True, "Dashboard mit Daniel's Geschäftsdaten vollständig",
+                                    {"business_name": business["business_name"],
+                                     "owner": business["owner"],
+                                     "location": business["location"],
+                                     "total_campaigns": summary.get("total_campaigns", 0),
+                                     "active_campaigns": summary.get("active_campaigns", 0),
+                                     "total_cost_euros": summary.get("total_cost_euros", 0),
+                                     "recommendations_count": len(data["recommendations"])})
+                        return True
+                    else:
+                        self.log_test("Google Ads Dashboard", False, "Daniel's Geschäftsdaten unvollständig")
+                        return False
+                else:
+                    self.log_test("Google Ads Dashboard", False, "Dashboard-Struktur unvollständig")
+                    return False
+            else:
+                self.log_test("Google Ads Dashboard", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Google Ads Dashboard", False, f"Dashboard Test Fehler: {str(e)}")
+            return False
+
+    def test_google_ads_campaign_creation(self):
+        """Test Google Ads Campaign Creation"""
+        try:
+            # Test Campaign Creation wie in der Anfrage spezifiziert
+            campaign_data = {
+                "name": "ZZ-Lobby Restaurant Marketing Test",
+                "budget_micros": 3000000,  # 3€ täglich
+                "target_locations": ["Germany", "Sachsen-Anhalt"],
+                "keywords": [
+                    "restaurant digitalisierung",
+                    "gastronomie marketing", 
+                    "restaurant website zeitz"
+                ],
+                "landing_page_url": "https://zz-payments-app.emergent.host/digital-manager",
+                "campaign_type": "SEARCH"
+            }
+            
+            response = self.session.post(f"{self.api_url}/google-ads/campaigns/create", json=campaign_data)
+            if response.status_code == 200:
+                data = response.json()
+                if ("status" in data and 
+                    data["status"] == "success" and
+                    "campaign_id" in data and
+                    "campaign" in data):
+                    
+                    campaign = data["campaign"]
+                    campaign_id = data["campaign_id"]
+                    
+                    # Validiere Kampagnen-Erstellung
+                    if (campaign.get("name") == campaign_data["name"] and
+                        campaign.get("budget_micros") == campaign_data["budget_micros"] and
+                        "daniel_business" in campaign):
+                        
+                        self.log_test("Google Ads Campaign Creation", True, "Kampagne erfolgreich erstellt",
+                                    {"campaign_id": campaign_id,
+                                     "campaign_name": campaign["name"],
+                                     "budget_euros": campaign["budget_micros"] / 1000000,
+                                     "target_locations": campaign["target_locations"],
+                                     "keywords_count": len(campaign["keywords"]),
+                                     "daniel_integration": True})
+                        return True
+                    else:
+                        self.log_test("Google Ads Campaign Creation", False, "Kampagnen-Daten unvollständig")
+                        return False
+                else:
+                    self.log_test("Google Ads Campaign Creation", False, "Campaign Creation Response unvollständig")
+                    return False
+            else:
+                self.log_test("Google Ads Campaign Creation", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Google Ads Campaign Creation", False, f"Campaign Creation Fehler: {str(e)}")
+            return False
+
+    def test_google_ads_campaigns_management(self):
+        """Test Google Ads Campaigns Management"""
+        try:
+            response = self.session.get(f"{self.api_url}/google-ads/campaigns")
+            if response.status_code == 200:
+                campaigns = response.json()
+                if isinstance(campaigns, list) and len(campaigns) > 0:
+                    
+                    # Validiere Kampagnen-Struktur
+                    first_campaign = campaigns[0]
+                    required_fields = ["id", "name", "budget_micros", "target_locations", 
+                                     "keywords", "status", "performance"]
+                    
+                    missing_fields = [field for field in required_fields if field not in first_campaign]
+                    if not missing_fields:
+                        
+                        # Prüfe Performance-Daten und Euro-Umrechnung
+                        performance = first_campaign.get("performance", {})
+                        budget_euros = first_campaign.get("budget_daily_euros", 0)
+                        cost_euros = first_campaign.get("cost_euros", 0)
+                        
+                        self.log_test("Google Ads Campaigns Management", True, "Kampagnen mit Performance-Daten verfügbar",
+                                    {"total_campaigns": len(campaigns),
+                                     "first_campaign_name": first_campaign["name"],
+                                     "budget_euros": budget_euros,
+                                     "cost_euros": cost_euros,
+                                     "impressions": performance.get("impressions", 0),
+                                     "clicks": performance.get("clicks", 0),
+                                     "conversions": performance.get("conversions", 0)})
+                        return True
+                    else:
+                        self.log_test("Google Ads Campaigns Management", False, f"Fehlende Kampagnen-Felder: {missing_fields}")
+                        return False
+                else:
+                    self.log_test("Google Ads Campaigns Management", False, "Keine Kampagnen gefunden")
+                    return False
+            else:
+                self.log_test("Google Ads Campaigns Management", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Google Ads Campaigns Management", False, f"Campaigns Management Fehler: {str(e)}")
+            return False
+
+    def test_google_ads_budget_optimization(self):
+        """Test Google Ads Budget Optimization"""
+        try:
+            # Test mit existierender Kampagne camp_001
+            campaign_id = "camp_001"
+            target_roas = 4.0
+            
+            response = self.session.post(f"{self.api_url}/google-ads/campaigns/{campaign_id}/optimize", 
+                                       params={"target_roas": target_roas})
+            if response.status_code == 200:
+                data = response.json()
+                if ("campaign_id" in data and
+                    "old_budget_euros" in data and
+                    "new_budget_euros" in data and
+                    "current_roas" in data and
+                    "recommendation" in data):
+                    
+                    self.log_test("Google Ads Budget Optimization", True, "Budget-Optimierung basierend auf Performance erfolgreich",
+                                {"campaign_id": data["campaign_id"],
+                                 "old_budget_euros": data["old_budget_euros"],
+                                 "new_budget_euros": data["new_budget_euros"],
+                                 "current_roas": data["current_roas"],
+                                 "target_roas": data["target_roas"],
+                                 "recommendation": data["recommendation"],
+                                 "optimized": data.get("optimized", False)})
+                    return True
+                else:
+                    self.log_test("Google Ads Budget Optimization", False, "Budget Optimization Response unvollständig")
+                    return False
+            else:
+                self.log_test("Google Ads Budget Optimization", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("Google Ads Budget Optimization", False, f"Budget Optimization Fehler: {str(e)}")
+            return False
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("=" * 60)

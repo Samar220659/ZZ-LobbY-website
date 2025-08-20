@@ -715,10 +715,11 @@ class AutonomousBusinessService:
             
             return {
                 "status": "success",
-                "message": "Lead vollautomatisch verarbeitet - Angebot wird versendet",
+                "message": f"Lead vollautomatisch verarbeitet - {automated_offer['ai_analysis']['personalized_pitch'][:100]}... - Angebot wird versendet",
                 "lead_id": lead_record["lead_id"],
                 "offer_id": automated_offer["offer_id"],
-                "estimated_conversion": automated_offer["ai_analysis"]["conversion_probability"]
+                "estimated_conversion": automated_offer["ai_analysis"]["conversion_probability"],
+                "ai_powered": True  # Mark as AI-powered lead analysis
             }
             
         except Exception as e:

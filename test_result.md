@@ -732,6 +732,8 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: "🚀 PHASE 1 - ECHTE KI INTEGRATION GESTARTET: Ersetzt template-basierte AI Sales Chat durch echte KI mit emergentintegrations. OpenAI GPT-4o-mini integriert für autonome Verkaufsgespräche und Lead-Analyse. EMERGENT_LLM_KEY konfiguriert. Sales Chat und Lead Analysis verwenden jetzt echte LlmChat-Instanzen mit personalisierten System-Messages für Daniel Oettel's ZZ-Lobby Services. Bereit für Backend-Testing der neuen AI-Features."
+  - agent: "main"
+    message: "🚀 PHASE 1.2 - AI MARKETING MESSAGES UPGRADE: Template-basierte Marketing Messages durch echte KI ersetzt. Neue async generate_marketing_messages() Methode mit OpenAI GPT-4o-mini. KI erstellt jetzt 4 verschiedene E-Mail-Typen (Cold Outreach, Follow-Up, Value-Add, Finale Angebot) basierend auf Zielgruppe und Kampagnenziel. AI-Marketing-Engine mit personalisierten System-Messages für deutsche KMUs. Backend neugestartet, bereit für Testing."
   - agent: "testing"
     message: "✅ BACKEND TESTING COMPLETE: All 6 backend tasks tested successfully. FastAPI server, PayPal integration, MongoDB, Automation Engine, AI Marketing Engine, and System Monitoring all working. Fixed System Monitoring router inclusion issue. All API endpoints responding correctly. Backend is production-ready with 100% test success rate."
   - agent: "testing"

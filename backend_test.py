@@ -1437,6 +1437,210 @@ class BackendTester:
             self.log_test("Production Live Dashboard", False, f"Live Dashboard Fehler: {str(e)}")
             return False
 
+    def test_new_ai_marketing_messages_standard(self):
+        """Test NEUE AI Marketing Messages - Standard Messages (ohne Parameter)"""
+        try:
+            response = self.session.get(f"{self.api_url}/ai-marketing/marketing-messages")
+            if response.status_code == 200:
+                data = response.json()
+                if isinstance(data, list) and len(data) >= 4:
+                    # Prüfe auf 4 verschiedene E-Mail-Typen
+                    email_types = [msg.get("type") for msg in data]
+                    expected_types = ["cold_outreach", "follow_up", "value_add", "finale_offer"]
+                    
+                    # Prüfe AI-Generated Markierung
+                    ai_generated_count = sum(1 for msg in data if msg.get("ai_generated") == True)
+                    
+                    # Prüfe deutsche Sprache und professionellen Ton
+                    german_content = 0
+                    personalization_placeholders = 0
+                    
+                    for msg in data:
+                        content = msg.get("content", "")
+                        subject = msg.get("subject", "")
+                        
+                        # Deutsche Sprache Check
+                        if any(word in content.lower() for word in ["hallo", "beste grüße", "unternehmen", "digitalisierung", "marketing"]):
+                            german_content += 1
+                        
+                        # Personalisierung Check
+                        if "{name}" in content and "{company}" in content:
+                            personalization_placeholders += 1
+                    
+                    # JSON-Struktur Check
+                    valid_structure = all(
+                        isinstance(msg, dict) and 
+                        "subject" in msg and 
+                        "content" in msg and 
+                        "type" in msg and 
+                        "follow_up_days" in msg 
+                        for msg in data
+                    )
+                    
+                    if (len(data) == 4 and 
+                        ai_generated_count >= 2 and  # Mindestens 2 AI-generierte Messages
+                        german_content >= 3 and 
+                        personalization_placeholders >= 3 and 
+                        valid_structure):
+                        
+                        self.log_test("NEUE AI Marketing Messages - Standard", True, 
+                                    "✅ Standard Marketing Messages mit echter KI erfolgreich",
+                                    {"total_messages": len(data),
+                                     "ai_generated_count": ai_generated_count,
+                                     "email_types": email_types,
+                                     "german_content": german_content,
+                                     "personalization": personalization_placeholders,
+                                     "valid_json_structure": valid_structure})
+                        return True
+                    else:
+                        self.log_test("NEUE AI Marketing Messages - Standard", False, 
+                                    f"❌ Qualitätsprüfung fehlgeschlagen - Messages: {len(data)}, AI: {ai_generated_count}, Deutsch: {german_content}")
+                        return False
+                else:
+                    self.log_test("NEUE AI Marketing Messages - Standard", False, 
+                                f"❌ Unvollständige Response - erwartet 4 Messages, erhalten: {len(data) if isinstance(data, list) else 'nicht-Liste'}")
+                    return False
+            else:
+                self.log_test("NEUE AI Marketing Messages - Standard", False, f"❌ HTTP {response.status_code}: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("NEUE AI Marketing Messages - Standard", False, f"❌ Standard Messages Fehler: {str(e)}")
+            return False
+
+    def test_new_ai_marketing_messages_restaurant(self):
+        """Test NEUE AI Marketing Messages - Restaurant-spezifische Messages"""
+        try:
+            params = {
+                "target_industry": "Restaurant",
+                "campaign_goal": "lead_generation"
+            }
+            
+            response = self.session.get(f"{self.api_url}/ai-marketing/marketing-messages", params=params)
+            if response.status_code == 200:
+                data = response.json()
+                if isinstance(data, list) and len(data) >= 4:
+                    # Prüfe auf Restaurant-spezifische Inhalte
+                    restaurant_context = 0
+                    ai_generated_count = sum(1 for msg in data if msg.get("ai_generated") == True)
+                    
+                    for msg in data:
+                        content = msg.get("content", "").lower()
+                        subject = msg.get("subject", "").lower()
+                        
+                        # Restaurant-Kontext Check
+                        if any(word in content or word in subject for word in 
+                               ["restaurant", "gastronomie", "gäste", "speisekarte", "reservierung", "online-präsenz", "bewertungen"]):
+                            restaurant_context += 1
+                    
+                    # Prüfe target_industry Markierung
+                    industry_marked = sum(1 for msg in data if msg.get("target_industry") == "Restaurant")
+                    
+                    # Deutsche Sprache und Personalisierung
+                    german_professional = sum(1 for msg in data 
+                                            if "hallo" in msg.get("content", "").lower() and 
+                                               "{name}" in msg.get("content", "") and 
+                                               "{company}" in msg.get("content", ""))
+                    
+                    if (restaurant_context >= 3 and 
+                        ai_generated_count >= 2 and 
+                        industry_marked >= 2 and 
+                        german_professional >= 3):
+                        
+                        self.log_test("NEUE AI Marketing Messages - Restaurant", True, 
+                                    "✅ Restaurant-spezifische Marketing Messages erfolgreich",
+                                    {"total_messages": len(data),
+                                     "restaurant_context": restaurant_context,
+                                     "ai_generated": ai_generated_count,
+                                     "industry_marked": industry_marked,
+                                     "german_professional": german_professional,
+                                     "target_industry": "Restaurant",
+                                     "campaign_goal": "lead_generation"})
+                        return True
+                    else:
+                        self.log_test("NEUE AI Marketing Messages - Restaurant", False, 
+                                    f"❌ Restaurant-Kontext unzureichend - Kontext: {restaurant_context}, AI: {ai_generated_count}")
+                        return False
+                else:
+                    self.log_test("NEUE AI Marketing Messages - Restaurant", False, 
+                                f"❌ Unvollständige Restaurant-Messages: {len(data) if isinstance(data, list) else 'nicht-Liste'}")
+                    return False
+            else:
+                self.log_test("NEUE AI Marketing Messages - Restaurant", False, f"❌ HTTP {response.status_code}: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("NEUE AI Marketing Messages - Restaurant", False, f"❌ Restaurant Messages Fehler: {str(e)}")
+            return False
+
+    def test_new_ai_marketing_messages_handwerker(self):
+        """Test NEUE AI Marketing Messages - Handwerker-spezifische Messages"""
+        try:
+            params = {
+                "target_industry": "Handwerker",
+                "campaign_goal": "conversion_optimization"
+            }
+            
+            response = self.session.get(f"{self.api_url}/ai-marketing/marketing-messages", params=params)
+            if response.status_code == 200:
+                data = response.json()
+                if isinstance(data, list) and len(data) >= 4:
+                    # Prüfe auf Handwerker-spezifische Inhalte
+                    handwerker_context = 0
+                    ai_generated_count = sum(1 for msg in data if msg.get("ai_generated") == True)
+                    
+                    for msg in data:
+                        content = msg.get("content", "").lower()
+                        subject = msg.get("subject", "").lower()
+                        
+                        # Handwerker-Kontext Check
+                        if any(word in content or word in subject for word in 
+                               ["handwerk", "handwerker", "betrieb", "kunden", "aufträge", "termine", "digitalisierung", "online"]):
+                            handwerker_context += 1
+                    
+                    # Prüfe conversion_optimization Fokus
+                    conversion_focus = sum(1 for msg in data 
+                                         if any(word in msg.get("content", "").lower() for word in 
+                                               ["conversion", "umsatz", "mehr kunden", "effizienz", "automatisierung"]))
+                    
+                    # Prüfe target_industry und campaign_goal Markierung
+                    industry_marked = sum(1 for msg in data if msg.get("target_industry") == "Handwerker")
+                    
+                    # Deutsche Sprache und professioneller Ton
+                    professional_tone = sum(1 for msg in data 
+                                          if "beste grüße" in msg.get("content", "").lower() and 
+                                             len(msg.get("content", "")) > 100)
+                    
+                    if (handwerker_context >= 3 and 
+                        ai_generated_count >= 2 and 
+                        conversion_focus >= 2 and 
+                        industry_marked >= 2 and 
+                        professional_tone >= 3):
+                        
+                        self.log_test("NEUE AI Marketing Messages - Handwerker", True, 
+                                    "✅ Handwerker-spezifische Marketing Messages erfolgreich",
+                                    {"total_messages": len(data),
+                                     "handwerker_context": handwerker_context,
+                                     "ai_generated": ai_generated_count,
+                                     "conversion_focus": conversion_focus,
+                                     "industry_marked": industry_marked,
+                                     "professional_tone": professional_tone,
+                                     "target_industry": "Handwerker",
+                                     "campaign_goal": "conversion_optimization"})
+                        return True
+                    else:
+                        self.log_test("NEUE AI Marketing Messages - Handwerker", False, 
+                                    f"❌ Handwerker-Kontext unzureichend - Kontext: {handwerker_context}, AI: {ai_generated_count}, Conversion: {conversion_focus}")
+                        return False
+                else:
+                    self.log_test("NEUE AI Marketing Messages - Handwerker", False, 
+                                f"❌ Unvollständige Handwerker-Messages: {len(data) if isinstance(data, list) else 'nicht-Liste'}")
+                    return False
+            else:
+                self.log_test("NEUE AI Marketing Messages - Handwerker", False, f"❌ HTTP {response.status_code}: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("NEUE AI Marketing Messages - Handwerker", False, f"❌ Handwerker Messages Fehler: {str(e)}")
+            return False
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("=" * 60)

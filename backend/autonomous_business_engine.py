@@ -738,7 +738,8 @@ class AutonomousBusinessService:
                 "ai_response": ai_response["response"],
                 "sales_stage": ai_response.get("sales_stage"),
                 "suggested_action": ai_response.get("suggested_action"),
-                "conversation_id": message.conversation_id
+                "conversation_id": message.conversation_id,
+                "ai_powered": ai_response.get("ai_powered", False)  # Pass through AI powered flag
             }
             
         except Exception as e:

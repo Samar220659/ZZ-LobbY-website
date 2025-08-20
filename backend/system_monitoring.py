@@ -180,13 +180,13 @@ class SystemHealingEngine:
             )
         ]
         
-        # Default API monitors
+        # Optimized API monitors with reduced timeouts
         self.api_monitors = [
             APIMonitoringConfig(
                 endpoint="/api/dashboard/stats",
                 method="GET",
                 expected_status=200,
-                timeout=10,
+                timeout=5,  # Reduced from 10
                 check_interval=60,
                 alert_threshold=2.0
             ),
@@ -194,17 +194,17 @@ class SystemHealingEngine:
                 endpoint="/api/paypal/payments",
                 method="GET",
                 expected_status=200,
-                timeout=15,
+                timeout=8,  # Reduced from 15
                 check_interval=120,
-                alert_threshold=5.0
+                alert_threshold=3.0  # Reduced from 5.0
             ),
             APIMonitoringConfig(
                 endpoint="/api/automations",
                 method="GET",
                 expected_status=200,
-                timeout=10,
+                timeout=5,  # Keep at 5
                 check_interval=60,
-                alert_threshold=3.0
+                alert_threshold=2.0  # Reduced from 3.0
             )
         ]
         

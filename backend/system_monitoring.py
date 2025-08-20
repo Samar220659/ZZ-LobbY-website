@@ -1129,8 +1129,8 @@ class SystemHealingEngine:
             self.logger.error(f"Error checking alert conditions: {e}")
             return False
 
-# Initialize system monitor
-system_monitor = SystemHealingEngine()
+# Initialize system healing engine
+system_healing_engine = SystemHealingEngine()
 
 # API Router
 monitoring_router = APIRouter(prefix="/api/monitoring", tags=["monitoring"])
@@ -1138,47 +1138,47 @@ monitoring_router = APIRouter(prefix="/api/monitoring", tags=["monitoring"])
 @monitoring_router.get("/health")
 async def get_system_health():
     """Get system health status"""
-    return await system_monitor.get_system_health()
+    return await system_healing_engine.get_system_health()
 
 @monitoring_router.get("/dependencies")
 async def get_dependencies():
     """Get dependency status"""
-    return await system_monitor.check_dependencies()
+    return await system_healing_engine.check_dependencies()
 
 @monitoring_router.get("/api-monitoring")
 async def get_api_monitoring():
     """Get API monitoring results"""
-    return await system_monitor.monitor_api_endpoints()
+    return await system_healing_engine.monitor_api_endpoints()
 
 @monitoring_router.get("/ab-tests/{test_id}")
 async def get_ab_test_results(test_id: str):
     """Get A/B test results"""
-    return await system_monitor.get_ab_test_results(test_id)
+    return await system_healing_engine.get_ab_test_results(test_id)
 
 @monitoring_router.post("/ab-tests/{test_id}/track")
 async def track_ab_test_result(test_id: str, variant: str, metric_value: float, user_id: str):
     """Track A/B test result"""
-    await system_monitor.track_ab_test_result(test_id, variant, metric_value, user_id)
+    await system_healing_engine.track_ab_test_result(test_id, variant, metric_value, user_id)
     return {"status": "success"}
 
 @monitoring_router.get("/changes")
 async def get_changes():
     """Get detected changes"""
-    return await system_monitor.detect_changes()
+    return await system_healing_engine.detect_changes()
 
 @monitoring_router.get("/dashboard")
 async def get_monitoring_dashboard():
     """Get comprehensive monitoring dashboard"""
-    return await system_monitor.get_monitoring_dashboard()
+    return await system_healing_engine.get_monitoring_dashboard()
 
 @monitoring_router.post("/start-monitoring")
 async def start_monitoring():
     """Start continuous monitoring"""
-    system_monitor.monitoring_active = True
+    system_healing_engine.monitoring_active = True
     return {"status": "monitoring started"}
 
 @monitoring_router.post("/stop-monitoring")
 async def stop_monitoring():
     """Stop continuous monitoring"""
-    system_monitor.monitoring_active = False
+    system_healing_engine.monitoring_active = False
     return {"status": "monitoring stopped"}

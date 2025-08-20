@@ -226,14 +226,82 @@ class SystemHealingEngine:
         ]
     
     def _initialize_healing_rules(self):
-        """Initialize healing rules and configurations"""
-        # This method will be implemented with healing logic
-        pass
+        """Initialize healing rules and configurations for autonomous system healing"""
+        # Define healing rules for different scenarios
+        self.healing_rules = {
+            "high_cpu_usage": {
+                "condition": lambda metrics: metrics.get("cpu_usage", 0) > 85,
+                "actions": ["restart_backend", "optimize_processes", "clear_cache"],
+                "auto_heal": True,
+                "severity": "high"
+            },
+            "high_memory_usage": {
+                "condition": lambda metrics: metrics.get("memory_usage", 0) > 90,
+                "actions": ["clear_cache", "restart_backend", "garbage_collect"],
+                "auto_heal": True,
+                "severity": "high"
+            },
+            "database_connection_lost": {
+                "condition": lambda metrics: metrics.get("database_status") == "unhealthy",
+                "actions": ["reconnect_database", "restart_mongodb", "check_network"],
+                "auto_heal": True,
+                "severity": "critical"
+            },
+            "slow_api_response": {
+                "condition": lambda metrics: metrics.get("api_response_time", 0) > 5000,
+                "actions": ["restart_backend", "clear_cache", "optimize_queries"],
+                "auto_heal": True,
+                "severity": "medium"
+            },
+            "paypal_api_down": {
+                "condition": lambda deps: any(d.get("service_name") == "PayPal API" and d.get("status") == "down" for d in deps),
+                "actions": ["check_paypal_status", "notify_admin", "enable_backup_payment"],
+                "auto_heal": False,
+                "severity": "high"
+            },
+            "frontend_unavailable": {
+                "condition": lambda deps: any(d.get("service_name") == "Frontend" and d.get("status") == "down" for d in deps),
+                "actions": ["restart_frontend", "check_build", "rollback_deployment"],
+                "auto_heal": True,
+                "severity": "high"
+            }
+        }
     
     def _initialize_alert_configs(self):
-        """Initialize alert configurations"""
-        # This method will be implemented with alert logic
-        pass
+        """Initialize alert configurations for proactive notifications"""
+        self.alert_configs = [
+            AlertConfig(
+                alert_id="critical_system_health",
+                alert_type="email",
+                trigger_conditions={
+                    "health_score": {"operator": "<", "value": 50},
+                    "cpu_usage": {"operator": ">", "value": 90},
+                    "memory_usage": {"operator": ">", "value": 95}
+                },
+                recipient="daniel@zz-lobby-elite.de",
+                cooldown_minutes=30
+            ),
+            AlertConfig(
+                alert_id="service_down",
+                alert_type="webhook",
+                trigger_conditions={
+                    "dependency_status": {"operator": "==", "value": "down"},
+                    "service_critical": {"operator": "==", "value": True}
+                },
+                recipient="https://hooks.slack.com/services/webhook",
+                cooldown_minutes=10
+            ),
+            AlertConfig(
+                alert_id="performance_degradation",
+                alert_type="log",
+                trigger_conditions={
+                    "api_response_time": {"operator": ">", "value": 3000},
+                    "error_rate": {"operator": ">", "value": 5.0}
+                },
+                recipient="/var/log/zz-lobby/alerts.log",
+                cooldown_minutes=5
+            )
+        ]
     async def get_system_health(self) -> SystemHealth:
         """Get comprehensive system health status"""
         try:

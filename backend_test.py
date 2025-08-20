@@ -1613,6 +1613,15 @@ class BackendTester:
             ("AI Marketing Engine", self.test_ai_marketing_engine),
             ("System Monitoring", self.test_system_monitoring),
             ("SaaS Status API", self.test_saas_status_api),
+            # 🔄 SYSTEM HEALING MODULE - DEEP TESTING 🔄
+            ("System Healing - Anomalie-Erkennung", self.test_system_healing_anomalies),
+            ("System Healing - Auto-Healing", self.test_system_healing_auto_heal),
+            ("System Healing - Actions History", self.test_system_healing_actions_history),
+            ("System Healing - Enable/Disable", self.test_system_healing_enable_disable),
+            ("System Healing - Full Cycle", self.test_system_healing_full_cycle),
+            ("System Healing - Performance History", self.test_system_healing_performance_history),
+            ("System Healing - Alert Config", self.test_system_healing_alert_config),
+            ("System Healing - Comprehensive Dashboard", self.test_system_healing_comprehensive_dashboard),
             # Digital Manager System Tests
             ("Digital Manager - Daniel Info", self.test_digital_manager_daniel_info),
             ("Digital Manager - Dashboard", self.test_digital_manager_dashboard),

@@ -2105,6 +2105,11 @@ class BackendTester:
             ("Production Launch", self.test_production_launch),
             ("Production Start Money Generation", self.test_production_start_money_generation),
             ("Production Live Dashboard", self.test_production_live_dashboard),
+            # 🚀 NEW GOOGLE ADS MARKETING AUTOMATION TESTING (Review Request)
+            ("🚀 Google Ads Dashboard", self.test_google_ads_dashboard),
+            ("🚀 Google Ads Campaign Creation", self.test_google_ads_campaign_creation),
+            ("🚀 Google Ads Campaigns Management", self.test_google_ads_campaigns_management),
+            ("🚀 Google Ads Budget Optimization", self.test_google_ads_budget_optimization),
         ]
         
         passed = 0

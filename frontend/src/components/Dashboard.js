@@ -322,6 +322,28 @@ export default function Dashboard() {
           <Card className="bg-black/40 border-white/10">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-blue-400" />
+                Google Ads Manager
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-400 mb-4">
+                Vollautomatische Google Ads Kampagnen-Verwaltung mit KI-Optimierung
+              </p>
+              <Button 
+                variant="outline" 
+                className="w-full border-white/20 text-white hover:bg-white/10"
+                onClick={() => navigate('/google-ads')}
+              >
+                <Target className="mr-2 h-4 w-4" />
+                Google Ads öffnen
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-black/40 border-white/10">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
                 <Settings className="h-5 w-5 text-purple-400" />
                 Erweiterte Einstellungen
               </CardTitle>

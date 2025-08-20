@@ -447,45 +447,182 @@ Erstelle rechtskonforme, professionelle Dokumente die Daniel's Geschäft schütz
             raise HTTPException(status_code=500, detail=f"❌ Steuerberechnungs-Fehler: {str(e)}")
 
     async def generate_legal_document(self, doc_request: LegalDocument) -> Dict[str, Any]:
-        """Automatische Rechtsdokument-Generierung"""
+        """Automatische Rechtsdokument-Generierung mit echter KI"""
         try:
-            # Template basierend auf Dokumenttyp
-            if doc_request.document_type == "agb":
-                content = self._generate_agb_template(doc_request)
-            elif doc_request.document_type == "dsgvo":
-                content = self._generate_dsgvo_template(doc_request)
-            elif doc_request.document_type == "impressum":
-                content = self._generate_impressum_template(doc_request)
+            # Echte KI-basierte Dokumentenerstellung
+            if self.legal_ai:
+                ai_content = await self._generate_ai_legal_document(doc_request)
             else:
-                content = self._generate_contract_template(doc_request)
+                # Fallback zu Templates
+                ai_content = self._generate_template_legal_document(doc_request)
             
             # Dokument in Datenbank speichern
             legal_doc = {
                 "document_id": str(uuid.uuid4()),
                 "type": doc_request.document_type,
-                "content": content,
+                "content": ai_content["content"],
+                "ai_generated": ai_content.get("ai_generated", False),
                 "company_data": doc_request.dict(),
                 "generated_date": datetime.now(),
                 "status": "generated",
-                "daniel_data": self.daniel_data
+                "daniel_data": self.daniel_data,
+                "legal_compliance": ai_content.get("legal_compliance", "template_based")
             }
             
             legal_doc_copy = legal_doc.copy()
             await self.db.legal_documents.insert_one(legal_doc_copy)
             
-            self.logger.info(f"⚖️ Rechtsdokument ({doc_request.document_type}) generiert")
+            self.logger.info(f"⚖️ {'KI-' if ai_content.get('ai_generated') else 'Template-'}Rechtsdokument ({doc_request.document_type}) generiert")
             
             return {
                 "status": "success",
                 "document_id": legal_doc["document_id"],
                 "type": doc_request.document_type,
-                "content": content,
+                "content": ai_content["content"],
+                "ai_generated": ai_content.get("ai_generated", False),
+                "legal_compliance": ai_content.get("legal_compliance"),
                 "generated_date": legal_doc["generated_date"]
             }
             
         except Exception as e:
             self.logger.error(f"❌ Rechtsdokument-Fehler: {e}")
             raise HTTPException(status_code=500, detail=f"❌ Rechtsdokument-Fehler: {str(e)}")
+
+    async def _generate_ai_legal_document(self, doc_request: LegalDocument) -> Dict[str, Any]:
+        """KI-basierte Rechtsdokument-Generierung"""
+        try:
+            # Dokumentspezifische KI-Prompts
+            doc_prompts = {
+                "agb": f"""Erstelle professionelle AGB für ZZ-Lobby:
+
+FIRMENDETAILS:
+- Firmenname: {doc_request.company_name}
+- Adresse: {doc_request.business_address}
+- E-Mail: {doc_request.contact_email}
+- USt-ID: {doc_request.vat_id or 'DE4535548228'}
+- Geschäftstätigkeit: {doc_request.business_type}
+
+ANFORDERUNGEN:
+- Deutsche AGB für digitale Dienstleistungen
+- DSGVO-konform
+- Widerrufsrecht für Online-Geschäfte (14 Tage)
+- Transparente Preise und Leistungen
+- Haftungsausschluss soweit rechtlich zulässig
+- Gerichtsstand Deutschland
+
+STRUKTUR:
+1. Geltungsbereich
+2. Vertragsschluss
+3. Leistungen und Preise
+4. Zahlungsbedingungen
+5. Widerrufsrecht
+6. Haftung
+7. Datenschutz
+8. Streitbeilegung
+9. Schlussbestimmungen
+
+Erstelle ein vollständiges, rechtskonformes Dokument auf Deutsch.""",
+
+                "dsgvo": f"""Erstelle eine DSGVO-konforme Datenschutzerklärung für ZZ-Lobby:
+
+FIRMENDETAILS:
+- Verantwortlicher: Daniel Oettel
+- Firma: {doc_request.company_name}
+- Adresse: {doc_request.business_address}
+- E-Mail: {doc_request.contact_email}
+
+DATENVERARBEITUNG:
+- Website-Analyse (Google Analytics)
+- E-Mail-Marketing (Klaviyo)
+- Kundendaten (CRM)
+- PayPal-Zahlungen
+- Social Media Integration
+
+RECHTSGRUNDLAGEN:
+- Art. 6 Abs. 1 lit. a DSGVO (Einwilligung)
+- Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung)
+- Art. 6 Abs. 1 lit. f DSGVO (berechtigte Interessen)
+
+STRUKTUR:
+1. Verantwortlicher
+2. Erhobene Daten
+3. Zweck der Datenverarbeitung
+4. Rechtsgrundlage
+5. Speicherdauer
+6. Betroffenenrechte
+7. Drittländer
+8. Cookies
+9. Kontaktdaten Datenschutzbeauftragter
+
+Erstelle vollständige DSGVO-Erklärung auf Deutsch.""",
+
+                "impressum": f"""Erstelle ein rechtskonformes Impressum für ZZ-Lobby:
+
+PFLICHTANGABEN:
+- Name: Daniel Oettel
+- Firma: {doc_request.company_name}
+- Adresse: {doc_request.business_address}
+- E-Mail: {doc_request.contact_email}
+- Steuer-ID: 69 377 041825
+- USt-ID: {doc_request.vat_id or 'DE4535548228'}
+
+WEITERE ANGABEN:
+- Geschäftstätigkeit: {doc_request.business_type}
+- Zuständige Aufsichtsbehörde: IHK Halle-Dessau
+- Berufsbezeichnung: Digitalisierungsberater
+
+STRUKTUR:
+1. Angaben gemäß § 5 TMG
+2. Kontaktdaten
+3. Umsatzsteuer-ID
+4. Wirtschafts-ID
+5. Aufsichtsbehörde
+6. Verantwortlich für den Inhalt
+7. Streitschlichtung
+8. Haftungsausschluss
+
+Erstelle vollständiges Impressum nach deutschem Recht."""
+            }
+            
+            prompt = doc_prompts.get(doc_request.document_type, doc_prompts["agb"])
+            
+            # KI-Antwort generieren
+            ai_response = await self.legal_ai.send_message(
+                UserMessage(text=prompt)
+            )
+            
+            # Response verarbeiten
+            content = ai_response.content if hasattr(ai_response, 'content') else str(ai_response)
+            
+            return {
+                "content": content,
+                "ai_generated": True,
+                "legal_compliance": "ai_generated_german_law",
+                "generated_at": datetime.now().isoformat()
+            }
+            
+        except Exception as e:
+            self.logger.error(f"❌ AI Legal Document Error: {e}")
+            # Fallback zu Templates
+            return self._generate_template_legal_document(doc_request)
+
+    def _generate_template_legal_document(self, doc_request: LegalDocument) -> Dict[str, Any]:
+        """Fallback Template-basierte Dokumentenerstellung"""
+        # Template basierend auf Dokumenttyp
+        if doc_request.document_type == "agb":
+            content = self._generate_agb_template(doc_request)
+        elif doc_request.document_type == "dsgvo":
+            content = self._generate_dsgvo_template(doc_request)
+        elif doc_request.document_type == "impressum":
+            content = self._generate_impressum_template(doc_request)
+        else:
+            content = self._generate_contract_template(doc_request)
+            
+        return {
+            "content": content,
+            "ai_generated": False,
+            "legal_compliance": "template_based"
+        }
 
     def _generate_agb_template(self, data: LegalDocument) -> str:
         return f"""

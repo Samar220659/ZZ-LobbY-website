@@ -262,3 +262,53 @@ async def get_oauth_setup_guide():
         ],
         "platforms": ["TikTok", "Instagram", "YouTube", "Facebook", "Twitter"]
     }
+
+@adcreative_router.get("/daniel-analytics")
+async def get_daniel_campaign_analytics():
+    """Get Daniel's comprehensive campaign analytics"""
+    try:
+        import sys
+        sys.path.append(adcreative_service.crosspost_path)
+        from daniel_campaign_engine import daniel_campaign_engine
+        
+        return daniel_campaign_engine.crossPoster.get_campaign_analytics()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Analytics error: {str(e)}")
+
+@adcreative_router.get("/daniel-schedule")
+async def get_daniel_weekly_schedule():
+    """Get Daniel's weekly campaign schedule"""
+    try:
+        import sys
+        sys.path.append(adcreative_service.crosspost_path)
+        from daniel_campaign_engine import daniel_campaign_engine
+        
+        return daniel_campaign_engine.schedule_weekly_campaigns()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Schedule error: {str(e)}")
+
+@adcreative_router.post("/daniel-campaign/{service_type}")
+async def run_daniel_service_campaign(service_type: str):
+    """Run campaign for specific Daniel service"""
+    valid_services = ["website_development", "social_automation", "complete_digitalization"]
+    if service_type not in valid_services:
+        raise HTTPException(status_code=400, detail=f"Invalid service. Choose from: {valid_services}")
+    
+    return await adcreative_service.run_daily_campaign(service_type)
+
+@adcreative_router.get("/daniel-business-info")
+async def get_daniel_business_info():
+    """Get Daniel's business information"""
+    try:
+        import sys
+        sys.path.append(adcreative_service.crosspost_path)
+        from daniel_campaign_engine import daniel_campaign_engine
+        
+        return {
+            "business": daniel_campaign_engine.daniel_business,
+            "services": daniel_campaign_engine.services,
+            "automation_level": "100%",
+            "system_status": "ready_for_campaigns"
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Business info error: {str(e)}")

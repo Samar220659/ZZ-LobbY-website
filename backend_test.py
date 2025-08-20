@@ -1331,6 +1331,268 @@ class BackendTester:
             self.log_test("Production Live Dashboard", False, f"Live Dashboard Fehler: {str(e)}")
             return False
 
+    def test_system_healing_anomalies(self):
+        """Test System Healing - Anomalie-Erkennung"""
+        try:
+            response = self.session.get(f"{self.api_url}/monitoring/anomalies")
+            if response.status_code == 200:
+                data = response.json()
+                if ("anomalies_detected" in data and 
+                    "anomalies" in data and
+                    "timestamp" in data):
+                    
+                    anomalies_count = data["anomalies_detected"]
+                    anomalies = data["anomalies"]
+                    
+                    self.log_test("System Healing - Anomalie-Erkennung", True, f"Anomalie-Erkennung funktional - {anomalies_count} Anomalien erkannt",
+                                {"anomalies_detected": anomalies_count,
+                                 "anomaly_types": [a.get("anomaly_type") for a in anomalies] if anomalies else [],
+                                 "severity_levels": [a.get("severity") for a in anomalies] if anomalies else [],
+                                 "ml_analysis": True})
+                    return True
+                else:
+                    self.log_test("System Healing - Anomalie-Erkennung", False, "Anomalie-Erkennung Antwort unvollständig")
+                    return False
+            else:
+                self.log_test("System Healing - Anomalie-Erkennung", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("System Healing - Anomalie-Erkennung", False, f"Anomalie-Erkennung Fehler: {str(e)}")
+            return False
+
+    def test_system_healing_auto_heal(self):
+        """Test System Healing - Automatische Selbstheilung"""
+        try:
+            response = self.session.post(f"{self.api_url}/monitoring/heal")
+            if response.status_code == 200:
+                data = response.json()
+                if ("healing_triggered" in data and 
+                    "actions_executed" in data and
+                    "actions" in data):
+                    
+                    healing_triggered = data["healing_triggered"]
+                    actions_executed = data["actions_executed"]
+                    actions = data["actions"]
+                    
+                    self.log_test("System Healing - Auto-Healing", True, f"Automatische Selbstheilung erfolgreich - {actions_executed} Aktionen ausgeführt",
+                                {"healing_triggered": healing_triggered,
+                                 "actions_executed": actions_executed,
+                                 "action_types": [a.get("action_type") for a in actions] if actions else [],
+                                 "success_rate": sum(1 for a in actions if a.get("success")) / len(actions) * 100 if actions else 100})
+                    return True
+                else:
+                    self.log_test("System Healing - Auto-Healing", False, "Auto-Healing Antwort unvollständig")
+                    return False
+            else:
+                self.log_test("System Healing - Auto-Healing", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("System Healing - Auto-Healing", False, f"Auto-Healing Fehler: {str(e)}")
+            return False
+
+    def test_system_healing_actions_history(self):
+        """Test System Healing - Healing Actions History"""
+        try:
+            response = self.session.get(f"{self.api_url}/monitoring/healing-actions")
+            if response.status_code == 200:
+                data = response.json()
+                if ("total_actions" in data and 
+                    "healing_actions" in data and
+                    "timestamp" in data):
+                    
+                    total_actions = data["total_actions"]
+                    healing_actions = data["healing_actions"]
+                    
+                    self.log_test("System Healing - Actions History", True, f"Healing Actions History verfügbar - {total_actions} Aktionen gespeichert",
+                                {"total_actions": total_actions,
+                                 "recent_actions": len(healing_actions),
+                                 "action_types": list(set([a.get("action_type") for a in healing_actions])) if healing_actions else [],
+                                 "success_rate": sum(1 for a in healing_actions if a.get("success")) / len(healing_actions) * 100 if healing_actions else 0})
+                    return True
+                else:
+                    self.log_test("System Healing - Actions History", False, "Healing Actions History Antwort unvollständig")
+                    return False
+            else:
+                self.log_test("System Healing - Actions History", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("System Healing - Actions History", False, f"Healing Actions History Fehler: {str(e)}")
+            return False
+
+    def test_system_healing_enable_disable(self):
+        """Test System Healing - Enable/Disable Auto-Healing"""
+        try:
+            # Test Enable Auto-Healing
+            enable_response = self.session.post(f"{self.api_url}/monitoring/healing/enable")
+            enable_success = enable_response.status_code == 200 and enable_response.json().get("status") == "auto healing enabled"
+            
+            # Test Disable Auto-Healing
+            disable_response = self.session.post(f"{self.api_url}/monitoring/healing/disable")
+            disable_success = disable_response.status_code == 200 and disable_response.json().get("status") == "auto healing disabled"
+            
+            # Test Status Check
+            status_response = self.session.get(f"{self.api_url}/monitoring/healing/status")
+            status_success = status_response.status_code == 200
+            
+            if enable_success and disable_success and status_success:
+                status_data = status_response.json()
+                self.log_test("System Healing - Enable/Disable", True, "Auto-Healing Enable/Disable Kontrolle funktional",
+                            {"enable_working": enable_success,
+                             "disable_working": disable_success,
+                             "status_check": status_success,
+                             "healing_rules": status_data.get("healing_rules_count", 0),
+                             "alert_configs": status_data.get("alert_configs_count", 0)})
+                return True
+            else:
+                self.log_test("System Healing - Enable/Disable", False, f"Enable/Disable Kontrolle fehlerhaft - Enable: {enable_success}, Disable: {disable_success}, Status: {status_success}")
+                return False
+        except Exception as e:
+            self.log_test("System Healing - Enable/Disable", False, f"Enable/Disable Test Fehler: {str(e)}")
+            return False
+
+    def test_system_healing_full_cycle(self):
+        """Test System Healing - Kompletter Healing-Zyklus"""
+        try:
+            response = self.session.post(f"{self.api_url}/monitoring/healing/full-cycle")
+            if response.status_code == 200:
+                data = response.json()
+                if ("cycle_completed_at" in data and 
+                    "system_health" in data and
+                    "overall_health_score" in data):
+                    
+                    cycle_duration = data.get("cycle_duration", 0)
+                    health_score = data.get("overall_health_score", 0)
+                    anomalies_detected = data.get("anomalies_detected", 0)
+                    healing_actions = data.get("healing_actions_executed", 0)
+                    alerts_sent = data.get("alerts_sent", 0)
+                    
+                    self.log_test("System Healing - Full Cycle", True, f"Kompletter Healing-Zyklus erfolgreich - Health Score: {health_score}",
+                                {"cycle_duration": f"{cycle_duration:.2f}s",
+                                 "health_score": health_score,
+                                 "anomalies_detected": anomalies_detected,
+                                 "healing_actions": healing_actions,
+                                 "alerts_sent": alerts_sent,
+                                 "healing_enabled": data.get("healing_enabled", False),
+                                 "monitoring_active": data.get("monitoring_active", False)})
+                    return True
+                else:
+                    self.log_test("System Healing - Full Cycle", False, "Full Cycle Antwort unvollständig")
+                    return False
+            else:
+                self.log_test("System Healing - Full Cycle", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("System Healing - Full Cycle", False, f"Full Cycle Test Fehler: {str(e)}")
+            return False
+
+    def test_system_healing_performance_history(self):
+        """Test System Healing - Performance History für ML-Analyse"""
+        try:
+            response = self.session.get(f"{self.api_url}/monitoring/performance-history")
+            if response.status_code == 200:
+                data = response.json()
+                if ("history_length" in data and 
+                    "performance_data" in data and
+                    "analysis_window" in data and
+                    "anomaly_threshold" in data):
+                    
+                    history_length = data["history_length"]
+                    analysis_window = data["analysis_window"]
+                    anomaly_threshold = data["anomaly_threshold"]
+                    
+                    self.log_test("System Healing - Performance History", True, f"Performance History für ML-Analyse verfügbar - {history_length} Datenpunkte",
+                                {"history_length": history_length,
+                                 "analysis_window": analysis_window,
+                                 "anomaly_threshold": anomaly_threshold,
+                                 "ml_ready": history_length >= 10})
+                    return True
+                else:
+                    self.log_test("System Healing - Performance History", False, "Performance History Antwort unvollständig")
+                    return False
+            else:
+                self.log_test("System Healing - Performance History", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("System Healing - Performance History", False, f"Performance History Test Fehler: {str(e)}")
+            return False
+
+    def test_system_healing_alert_config(self):
+        """Test System Healing - Alert Konfigurationen"""
+        try:
+            response = self.session.get(f"{self.api_url}/monitoring/alerts/config")
+            if response.status_code == 200:
+                data = response.json()
+                if ("alert_configs" in data and 
+                    "last_alerts" in data and
+                    "timestamp" in data):
+                    
+                    alert_configs = data["alert_configs"]
+                    last_alerts = data["last_alerts"]
+                    
+                    # Check for different alert types
+                    alert_types = [config.get("alert_type") for config in alert_configs]
+                    
+                    self.log_test("System Healing - Alert Config", True, f"Alert Konfigurationen verfügbar - {len(alert_configs)} Alerts konfiguriert",
+                                {"total_alerts": len(alert_configs),
+                                 "alert_types": list(set(alert_types)),
+                                 "last_alerts_count": len(last_alerts),
+                                 "email_alerts": alert_types.count("email"),
+                                 "webhook_alerts": alert_types.count("webhook"),
+                                 "log_alerts": alert_types.count("log")})
+                    return True
+                else:
+                    self.log_test("System Healing - Alert Config", False, "Alert Config Antwort unvollständig")
+                    return False
+            else:
+                self.log_test("System Healing - Alert Config", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("System Healing - Alert Config", False, f"Alert Config Test Fehler: {str(e)}")
+            return False
+
+    def test_system_healing_comprehensive_dashboard(self):
+        """Test System Healing - Comprehensive Dashboard"""
+        try:
+            response = self.session.get(f"{self.api_url}/monitoring/system-healing-dashboard")
+            if response.status_code == 200:
+                data = response.json()
+                if ("dashboard_type" in data and 
+                    "system_status" in data and
+                    "current_metrics" in data and
+                    "anomalies" in data and
+                    "healing_system" in data and
+                    "performance_analysis" in data):
+                    
+                    system_status = data["system_status"]
+                    current_metrics = data["current_metrics"]
+                    anomalies = data["anomalies"]
+                    healing_system = data["healing_system"]
+                    performance_analysis = data["performance_analysis"]
+                    
+                    health_score = system_status.get("overall_health_score", 0)
+                    health_status = system_status.get("health_status", "unknown")
+                    
+                    self.log_test("System Healing - Comprehensive Dashboard", True, f"System Healing Dashboard vollständig - Health: {health_status} ({health_score})",
+                                {"dashboard_type": data.get("dashboard_type"),
+                                 "health_score": health_score,
+                                 "health_status": health_status,
+                                 "healing_enabled": system_status.get("healing_enabled", False),
+                                 "monitoring_active": system_status.get("monitoring_active", False),
+                                 "current_anomalies": anomalies.get("current_anomalies", 0),
+                                 "healing_rules": healing_system.get("healing_rules", 0),
+                                 "recent_actions": healing_system.get("recent_actions", 0),
+                                 "performance_points": performance_analysis.get("history_points", 0)})
+                    return True
+                else:
+                    self.log_test("System Healing - Comprehensive Dashboard", False, "Comprehensive Dashboard Antwort unvollständig")
+                    return False
+            else:
+                self.log_test("System Healing - Comprehensive Dashboard", False, f"HTTP {response.status_code}: {response.text}")
+                return False
+        except Exception as e:
+            self.log_test("System Healing - Comprehensive Dashboard", False, f"Comprehensive Dashboard Test Fehler: {str(e)}")
+            return False
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("=" * 60)

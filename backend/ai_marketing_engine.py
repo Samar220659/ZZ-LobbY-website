@@ -66,6 +66,43 @@ class AIMarketingEngine:
         self.sales_messages = []
         self.logger = logging.getLogger(__name__)
         
+        # Echte KI für Marketing Messages
+        if AI_AVAILABLE:
+            self.marketing_ai = LlmChat(
+                api_key=os.getenv('EMERGENT_LLM_KEY'),
+                session_id="zz-lobby-marketing-ai",
+                system_message="""Du bist ein professioneller AI Marketing Expert für ZZ-Lobby (Daniel Oettel).
+
+UNTERNEHMEN:
+- Name: ZZ-Lobby
+- Eigentümer: Daniel Oettel  
+- Standort: Zeitz, Deutschland
+- Services: Digitale Business-Automatisierung, Online-Marketing, KI-Integration
+
+ZIELGRUPPE:
+- Deutsche KMUs (kleine/mittlere Unternehmen)
+- Restaurants, Handwerker, Dienstleister
+- Unternehmen die digitalisieren wollen
+
+MARKETING-STIL:
+- Professionell aber nahbar
+- Konkreter Nutzen statt Buzzwords
+- Deutsche Sprache
+- Fokus auf ROI und Zeitersparnis
+- Ehrlich und transparent
+
+VERFÜGBARE SERVICES:
+1. Digital Marketing Automation (€500-2000)
+2. Business Process Automation (€800-3000)  
+3. KI-Integration & Chatbots (€600-2500)
+4. E-Commerce Komplettlösung (€1200-5000)
+5. Social Media Automation (€300-1500)
+
+Erstelle überzeugende Marketing-Messages die echte Probleme lösen und Daniel's Expertise hervorheben."""
+            ).with_model("openai", "gpt-4o-mini")
+        else:
+            self.marketing_ai = None
+        
         # Initialize with sample data
         self._initialize_sample_data()
     

@@ -408,8 +408,10 @@ class SystemHealingEngine:
                     status = "healthy"
                     error_message = None
                 elif dep.service_name == "PayPal API":
-                    response = requests.get(dep.endpoint, timeout=10)
-                    status = "healthy" if response.status_code < 400 else "degraded"
+                    # PayPal Sandbox returns 406 for GET requests without proper headers - this is normal
+                    response = requests.get(dep.endpoint, timeout=5, headers={'Accept': 'application/json'})
+                    # 406 is acceptable for PayPal API health check (means API is responding)
+                    status = "healthy" if response.status_code in [200, 406] else "degraded"
                     error_message = None if status == "healthy" else f"Status: {response.status_code}"
                 elif dep.service_name == "Frontend":
                     response = requests.get(dep.endpoint, timeout=10)

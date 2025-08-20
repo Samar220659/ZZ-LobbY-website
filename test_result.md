@@ -343,6 +343,30 @@ except Exception as e:
 self.log_test("Autonomous Transaction Processing", False, f"Transaktions-Processing Fehler: {str(e)}")
 return False
 
+  - task: "NEUE AI Sales Chat - GPT-4o-mini Integration"
+    implemented: true
+    working: true
+    file: "/app/backend/autonomous_business_engine.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: ECHTE KI-Integration erfolgreich! Restaurant Marketing Automation Szenario getestet mit conversation_id 'test-ai-chat-001'. AI Response: Deutsche Sprache ✅, Restaurant-Kontext erkannt ✅, ai_powered: true ✅, Sales Stage: interest, Suggested Action: continue_conversation. Response Length: 857 Zeichen. Professionelle, kontextspezifische Antworten (nicht template-basiert). OpenAI GPT-4o-mini Integration vollständig funktional."
+
+  - task: "NEUE AI Lead Analysis - Gastronomie Kontext"
+    implemented: true
+    working: true
+    file: "/app/backend/autonomous_business_engine.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: ECHTE KI-Lead-Analyse erfolgreich! Max Müller Restaurant Szenario getestet. Lead ID: e1d88d00-680d-43b8-afa4-e1c44b901f02, Offer ID: e25e0f43-4bdf-4810-a623-3f79998126c2, Conversion Estimate: 80%, ai_powered: true ✅. Gastronomie-Kontext erkannt ✅, Service-Empfehlung basierend auf Restaurant-Branche. Personalisierte AI-Nachricht: 'Max, mit unserem Digital Marketing Automation Service können wir Ihnen helfen, die Sichtbarkeit Ihre...' Vollautomatische Lead-Verarbeitung mit echter KI-Analyse funktional."
+
   - task: "Self-Optimizing System Health"
     implemented: true
     working: true

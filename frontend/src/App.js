@@ -35,6 +35,7 @@ function App() {
           <Route path="/autonomous-hub" element={<AutonomousHub />} />
           <Route path="/production-launch" element={<ProductionLaunch />} />
           <Route path="/system-healing" element={<SystemHealing />} />
+          <Route path="/adcreative-hub" element={<AdCreativeHub />} />
         </Routes>
         <Toaster />
       </BrowserRouter>

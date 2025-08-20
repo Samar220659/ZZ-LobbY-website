@@ -211,12 +211,15 @@ class AdCreativeService:
                 timestamp=datetime.now()
             )
             
-            # Store campaign data for analytics
-            await self.db.daniel_campaigns.insert_one({
-                **campaign_data,
-                "_id": campaign_data["campaign_id"],
-                "created_at": datetime.now()
-            })
+            # Store campaign data for analytics (optional - skip if DB not available)
+            try:
+                await self.db.daniel_campaigns.insert_one({
+                    **campaign_data,
+                    "_id": campaign_data["campaign_id"],
+                    "created_at": datetime.now()
+                })
+            except:
+                self.logger.info("Campaign data not stored in DB - continuing with campaign")
             
             return campaign_result
             

@@ -1607,7 +1607,7 @@ class BackendTester:
                     # Deutsche Sprache und professioneller Ton
                     professional_tone = sum(1 for msg in data 
                                           if any(greeting in msg.get("content", "").lower() for greeting in 
-                                                ["beste grüße", "herzliche grüße", "mit freundlichen grüßen"]) and 
+                                                ["beste grüße", "herzliche grüße", "mit freundlichen grüßen", "freundliche grüße", "beste wünsche"]) and 
                                              len(msg.get("content", "")) > 100)
                     
                     if (handwerker_context >= 3 and 

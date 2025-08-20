@@ -27,11 +27,15 @@ import hashlib
 from digital_manager import KlaviyoService, DigitalManagerService
 
 # AI/LLM Integration für autonome Entscheidungen
+from dotenv import load_dotenv
+load_dotenv()
+
 try:
-    from emergentintegrations import get_llm_client
+    from emergentintegrations.llm.chat import LlmChat, UserMessage
     LLM_AVAILABLE = True
 except ImportError:
     LLM_AVAILABLE = False
+    print("⚠️ emergentintegrations nicht verfügbar, KI-Features limitiert")
 
 class LegalComplianceEngine:
     """Automatische Rechtskonformitäts-Engine"""
@@ -272,7 +276,7 @@ class AutonomousAIEngine:
         
         # AI Client für autonome Entscheidungen
         if LLM_AVAILABLE:
-            self.llm_client = get_llm_client()
+            self.llm_client = LlmChat()
         else:
             self.llm_client = None
 

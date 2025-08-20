@@ -396,7 +396,7 @@ Antworte immer auf Deutsch. Stelle gezielte Fragen um Bedürfnisse zu verstehen.
             raise HTTPException(status_code=500, detail=f"AI-Angebots-Fehler: {str(e)}")
 
     async def autonomous_sales_conversation(self, customer_message: str, conversation_id: str) -> dict:
-        """AI führt autonome Verkaufsgespräche"""
+        """AI führt autonome Verkaufsgespräche mit echter KI"""
         
         if not self.llm_client:
             return {"response": "AI-Chat derzeit nicht verfügbar", "action": "manual_followup"}
@@ -414,35 +414,68 @@ Antworte immer auf Deutsch. Stelle gezielte Fragen um Bedürfnisse zu verstehen.
                     "sales_stage": "initial_contact"
                 }
             
-            # AI-Sales-Prompt mit Rechtskonformität
-            sales_prompt = f"""
-            Du bist der AI-Verkaufsassistent für ZZ-Lobby (Daniel Oettel).
+            # Neue LlmChat Session für diese Konversation erstellen
+            conversation_chat = LlmChat(
+                api_key=os.getenv('EMERGENT_LLM_KEY'),
+                session_id=conversation_id,
+                system_message=f"""Du bist ein professioneller AI Sales Agent für ZZ-Lobby (Daniel Oettel).
+
+BISHERIGE CONVERSATION:
+{json.dumps(conversation.get('messages', [])[-3:], indent=2, default=str)}
+
+VERKAUFSZIEL: Erkenne Kundenbedürfnisse und führe zum passenden Service-Angebot.
+
+VERFÜGBARE SERVICES:
+1. Digital Marketing Automation (€500-2000)
+2. Business Process Automation (€800-3000)  
+3. KI-Integration & Chatbots (€600-2500)
+4. E-Commerce Komplettlösung (€1200-5000)
+5. Social Media Automation (€300-1500)
+
+WICHTIG: Rechtskonforme Kommunikation!
+- Keine übertriebenen Versprechen
+- Widerrufsrecht bei Vertragsabschluss erwähnen
+- Transparente Preise
+
+Antworte auf die Kundennachricht auf Deutsch. Sei professionell, freundlich und lösungsorientiert."""
+            ).with_model("openai", "gpt-4o-mini")
             
-            WICHTIG: Sei immer rechtskonform und transparent!
-            - Keine irreführenden Versprechen
-            - Widerrufsrecht erwähnen bei Vertragsabschluss
-            - DSGVO-konforme Kommunikation
+            # AI Response holen
+            ai_response = await conversation_chat.send_message(
+                UserMessage(text=customer_message)
+            )
             
-            Services:
-            1. Digital Marketing (ab 150€)
-            2. Business Automation Setup (ab 500€) 
-            3. Strategieberatung (ab 200€)
+            # Sales Stage und Action analysieren
+            analysis_chat = LlmChat(
+                api_key=os.getenv('EMERGENT_LLM_KEY'),
+                session_id=f"{conversation_id}-analysis",
+                system_message="Du analysierst Verkaufsgespräche. Antworte nur mit validem JSON."
+            ).with_model("openai", "gpt-4o-mini")
             
-            Bisherige Conversation: {json.dumps(conversation.get('messages', [])[-5:], indent=2)}
+            analysis_response = await analysis_chat.send_message(
+                UserMessage(text=f"""Analysiere diese Kundennachricht und AI-Antwort:
+
+KUNDE: "{customer_message}"
+AI-ANTWORT: "{ai_response.content}"
+
+Antwort als JSON:
+{{
+  "sales_stage": "initial_contact|interest|consideration|decision|closed",
+  "suggested_action": "continue_conversation|send_offer|schedule_call|close_deal",
+  "detected_needs": ["need1", "need2"],
+  "confidence": 0.8
+}}""")
+            )
             
-            Aktuelle Nachricht: "{customer_message}"
-            
-            Antworte professionell und verkaufsorientiert, aber rechtskonform:
-            {
-                "response": "Deine Antwort",
-                "sales_stage": "interest/consideration/decision/closed",
-                "suggested_action": "send_offer/schedule_call/close_deal/nurture",
-                "detected_needs": ["need1", "need2"],
-                "compliance_notes": "Rechtliche Hinweise"
-            }
-            """
-            
-            ai_response = await self._get_ai_response(sales_prompt)
+            try:
+                analysis_data = json.loads(analysis_response.content)
+            except:
+                analysis_data = {
+                    "sales_stage": "interest",
+                    "suggested_action": "continue_conversation",
+                    "detected_needs": [],
+                    "confidence": 0.5
+                }
             
             # Conversation aktualisieren
             conversation["messages"].append({
@@ -454,12 +487,12 @@ Antworte immer auf Deutsch. Stelle gezielte Fragen um Bedürfnisse zu verstehen.
             conversation["messages"].append({
                 "timestamp": datetime.now(),
                 "sender": "ai_sales",
-                "message": ai_response["response"],
-                "action": ai_response.get("suggested_action"),
-                "compliance": ai_response.get("compliance_notes")
+                "message": ai_response.content,
+                "action": analysis_data.get("suggested_action"),
+                "confidence": analysis_data.get("confidence")
             })
             
-            conversation["sales_stage"] = ai_response.get("sales_stage", "interest")
+            conversation["sales_stage"] = analysis_data.get("sales_stage", "interest")
             conversation["last_updated"] = datetime.now()
             
             # Conversation speichern
@@ -470,18 +503,26 @@ Antworte immer auf Deutsch. Stelle gezielte Fragen um Bedürfnisse zu verstehen.
             )
             
             # Automatische Follow-up-Aktionen
-            if ai_response.get("suggested_action") == "send_offer":
-                # Automatisches Angebot erstellen und senden
-                await self._trigger_automated_offer(conversation_id, ai_response.get("detected_needs", []))
+            if analysis_data.get("suggested_action") == "send_offer":
+                await self._trigger_automated_offer(conversation_id, analysis_data.get("detected_needs", []))
             
-            self.logger.info(f"💬 AI-Sales-Gespräch: {conversation_id} - Stage: {ai_response.get('sales_stage')}")
-            return ai_response
+            self.logger.info(f"💬 ECHTE AI-Sales-Gespräch: {conversation_id} - Stage: {analysis_data.get('sales_stage')}")
+            
+            return {
+                "response": ai_response.content,
+                "sales_stage": analysis_data.get("sales_stage"),
+                "suggested_action": analysis_data.get("suggested_action"),
+                "detected_needs": analysis_data.get("detected_needs"),
+                "confidence": analysis_data.get("confidence"),
+                "ai_powered": True  # Markierung für echte KI
+            }
             
         except Exception as e:
             self.logger.error(f"❌ AI-Sales-Conversation Fehler: {e}")
             return {
                 "response": "Entschuldigung, ein technischer Fehler ist aufgetreten. Ich melde mich schnellstmöglich bei Ihnen.",
-                "action": "manual_followup"
+                "action": "manual_followup",
+                "ai_powered": False
             }
 
     async def _get_ai_response(self, prompt: str) -> dict:

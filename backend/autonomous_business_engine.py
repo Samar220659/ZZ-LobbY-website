@@ -462,12 +462,10 @@ class AutonomousAIEngine:
         """AI-Response mit Error Handling"""
         try:
             if self.llm_client:
-                response = await self.llm_client.chat.completions.create(
-                    model="gpt-4",
-                    messages=[{"role": "user", "content": prompt}],
-                    temperature=0.3
+                response = await self.llm_client.send_message(
+                    UserMessage(content=prompt)
                 )
-                return json.loads(response.choices[0].message.content)
+                return json.loads(response.content)
             else:
                 return {"error": "AI not available"}
         except Exception as e:

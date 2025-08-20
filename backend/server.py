@@ -28,6 +28,9 @@ from ai_marketing_engine import ai_router
 # Import system monitoring
 from system_monitoring import monitoring_router
 
+# Import Google Ads engine  
+from google_ads_engine import google_ads_router
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 

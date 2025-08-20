@@ -7,7 +7,7 @@ import json
 import secrets
 from datetime import datetime, timedelta
 from typing import Dict, List
-from .crosspost_module import CrossPoster
+from crosspost_module import CrossPoster
 
 class DanielCampaignEngine:
     """Automatische Kampagnen speziell für Daniel's ZZ-Lobby Elite Business"""

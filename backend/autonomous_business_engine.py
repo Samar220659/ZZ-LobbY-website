@@ -542,7 +542,7 @@ Antwort als JSON:
             self.logger.info(f"💬 ECHTE AI-Sales-Gespräch: {conversation_id} - Stage: {analysis_data.get('sales_stage')}")
             
             return {
-                "response": ai_response.content,
+                "response": ai_response_text,
                 "sales_stage": analysis_data.get("sales_stage"),
                 "suggested_action": analysis_data.get("suggested_action"),
                 "detected_needs": analysis_data.get("detected_needs"),

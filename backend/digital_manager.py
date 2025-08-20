@@ -220,8 +220,45 @@ DOKUMENTTYPEN:
 
 Erstelle rechtskonforme, professionelle Dokumente die Daniel's Geschäft schützen und gleichzeitig kundenfreundlich sind."""
             ).with_model("openai", "gpt-4o-mini")
+            
+            # Echte KI für Tax Consulting
+            self.tax_ai = LlmChat(
+                api_key=os.getenv('EMERGENT_LLM_KEY'),
+                session_id="zz-lobby-tax-ai",
+                system_message="""Du bist ein professioneller Steuerberater für ZZ-Lobby (Daniel Oettel).
+
+DANIEL OETTEL STEUERDETAILS:
+- Name: Daniel Oettel
+- Unternehmen: ZZ-Lobby  
+- Steuer-ID: 69 377 041825
+- USt-ID: DE4535548228
+- Geschäftstätigkeit: Digitale Business-Automatisierung und Online-Marketing
+- Kleinunternehmer: NEIN (USt-ID vorhanden)
+
+STEUERLICHE EXPERTISE:
+- Deutsche Steuergesetze 2025
+- Einkommensteuer, Gewerbesteuer, Umsatzsteuer
+- Abschreibungen (AfA) für IT-Equipment
+- Betriebsausgaben-Optimierung
+- Verlustvorträge und Rückstellungen
+
+WICHTIGE FREIBETRÄGE 2025:
+- Grundfreibetrag: €9,984
+- Gewerbesteuer-Freibetrag: €24,500
+- Kleinunternehmer-Grenze: €22,000
+
+BERATUNGSANSATZ:
+- Konkrete Steueroptimierung
+- Legale Steuerminimierung
+- Risikobewertung bei Ausgaben
+- Monatliche vs. vierteljährliche USt-Anmeldung
+- Investitionsempfehlungen mit Abschreibungsnutzen
+
+Gib professionelle, umsetzbare Steuerberatung auf Deutsch."""
+            ).with_model("openai", "gpt-4o-mini")
         else:
             self.legal_ai = None
+            self.tax_ai = None
 
     async def request_insurance_consultation(self, request: InsuranceRequest) -> Dict[str, Any]:
         """Automatische Versicherungsanfrage an Thomas Kaiser ERGO"""

@@ -473,6 +473,9 @@ Antworte auf die Kundennachricht auf Deutsch. Sei professionell, freundlich und 
                 UserMessage(text=customer_message)
             )
             
+            # Handle different response formats
+            ai_response_text = ai_response.content if hasattr(ai_response, 'content') else str(ai_response)
+            
             # Sales Stage und Action analysieren
             analysis_chat = LlmChat(
                 api_key=os.getenv('EMERGENT_LLM_KEY'),
@@ -484,7 +487,7 @@ Antworte auf die Kundennachricht auf Deutsch. Sei professionell, freundlich und 
                 UserMessage(text=f"""Analysiere diese Kundennachricht und AI-Antwort:
 
 KUNDE: "{customer_message}"
-AI-ANTWORT: "{ai_response.content}"
+AI-ANTWORT: "{ai_response_text}"
 
 Antwort als JSON:
 {{
@@ -496,7 +499,9 @@ Antwort als JSON:
             )
             
             try:
-                analysis_data = json.loads(analysis_response.content)
+                # Handle different response formats
+                analysis_text = analysis_response.content if hasattr(analysis_response, 'content') else str(analysis_response)
+                analysis_data = json.loads(analysis_text)
             except:
                 analysis_data = {
                     "sales_stage": "interest",

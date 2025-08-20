@@ -375,7 +375,7 @@ class SystemHealingEngine:
         """Check API response time"""
         try:
             start_time = time.time()
-            response = requests.get("http://localhost:8001/api/", timeout=10)
+            response = requests.get("https://zz-elite-lobby.preview.emergentagent.com/api/", timeout=10)
             end_time = time.time()
             return (end_time - start_time) * 1000  # ms
         except:

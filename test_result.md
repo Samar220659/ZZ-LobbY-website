@@ -736,7 +736,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "NEUE AI MARKETING MESSAGES TESTING COMPLETE - OpenAI GPT-4o-mini Integration erfolgreich"
+    - "NEUE AI LEGAL & TAX FEATURES TESTING COMPLETE - OpenAI GPT-4o-mini Integration erfolgreich"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

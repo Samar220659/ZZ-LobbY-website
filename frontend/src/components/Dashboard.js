@@ -272,6 +272,21 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
+          <Card className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 border-purple-500/30 hover:from-purple-500/30 hover:to-pink-500/30 transition-all duration-300 cursor-pointer"
+                onClick={() => handleNavigation('/adcreative-hub')}>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="text-2xl">🎬</div>
+                <div className="text-right">
+                  <div className="text-sm text-purple-400">AUTO</div>
+                  <div className="text-xs text-gray-400">95+ Score</div>
+                </div>
+              </div>
+              <h3 className="text-lg font-semibold mb-2">AdCreative Killer</h3>
+              <p className="text-sm text-gray-400">Automatische Videos + Cross-Posting</p>
+            </CardContent>
+          </Card>
+
         </div>
 
         {/* SaaS System Status */}

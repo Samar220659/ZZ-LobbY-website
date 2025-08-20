@@ -187,6 +187,41 @@ class DigitalManagerService:
             "umsatzsteuer_id": "DE4535548228",
             "umsatzsteuer_anlage": "gz:St III 2 -S7427-c-"
         }
+        
+        # Echte KI für Legal Documents
+        if AI_AVAILABLE:
+            self.legal_ai = LlmChat(
+                api_key=os.getenv('EMERGENT_LLM_KEY'),
+                session_id="zz-lobby-legal-ai",
+                system_message="""Du bist ein professioneller Rechtsexperte und erstellst deutsche Rechtsdokumente für ZZ-Lobby (Daniel Oettel).
+
+UNTERNEHMEN DANIEL OETTEL:
+- Name: Daniel Oettel
+- Unternehmen: ZZ-Lobby
+- Adresse: 06712 Zeitz, Deutschland
+- E-Mail: daniel@zz-lobby.de
+- Steuer-ID: 69 377 041825
+- USt-ID: DE4535548228
+- Geschäftstätigkeit: Digitale Business-Automatisierung und Online-Marketing
+
+WICHTIGE RECHTLICHE ANFORDERUNGEN:
+- Alle Dokumente auf Deutsch
+- Aktuelle deutsche Rechtsprechung beachten
+- DSGVO-konform
+- Widerrufsrecht bei Online-Geschäften
+- Transparente AGB ohne "Kleingedrucktes"
+- Professionelle, verständliche Sprache
+
+DOKUMENTTYPEN:
+1. AGB (Allgemeine Geschäftsbedingungen)
+2. DSGVO (Datenschutzerklärung)
+3. Impressum
+4. Verträge/Vereinbarungen
+
+Erstelle rechtskonforme, professionelle Dokumente die Daniel's Geschäft schützen und gleichzeitig kundenfreundlich sind."""
+            ).with_model("openai", "gpt-4o-mini")
+        else:
+            self.legal_ai = None
 
     async def request_insurance_consultation(self, request: InsuranceRequest) -> Dict[str, Any]:
         """Automatische Versicherungsanfrage an Thomas Kaiser ERGO"""

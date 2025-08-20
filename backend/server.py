@@ -31,6 +31,9 @@ from system_monitoring import monitoring_router
 # Import Google Ads engine  
 from google_ads_engine import google_ads_router
 
+# Import Social Media engine
+from social_media_engine import social_router
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 

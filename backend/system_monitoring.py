@@ -1182,3 +1182,164 @@ async def stop_monitoring():
     """Stop continuous monitoring"""
     system_healing_engine.monitoring_active = False
     return {"status": "monitoring stopped"}
+
+# 🔄 ERWEITERTE SYSTEM HEALING ENDPOINTS 🔄
+
+@monitoring_router.get("/anomalies")
+async def detect_system_anomalies():
+    """Detect system anomalies using advanced algorithms"""
+    try:
+        system_health = await system_healing_engine.get_system_health()
+        anomalies = await system_healing_engine.detect_anomalies(system_health.dict())
+        return {
+            "anomalies_detected": len(anomalies),
+            "anomalies": [anomaly.dict() for anomaly in anomalies],
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error detecting anomalies: {str(e)}")
+
+@monitoring_router.post("/heal")
+async def trigger_auto_healing():
+    """Trigger automatic system healing"""
+    try:
+        healing_actions = await system_healing_engine.auto_heal_system()
+        return {
+            "healing_triggered": True,
+            "actions_executed": len(healing_actions),
+            "actions": [action.dict() for action in healing_actions],
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error in auto healing: {str(e)}")
+
+@monitoring_router.get("/healing-actions")
+async def get_healing_history():
+    """Get history of healing actions"""
+    try:
+        # Get recent healing actions from database
+        actions = await system_healing_engine.db.healing_actions.find().sort("executed_at", -1).limit(50).to_list(50)
+        
+        # Convert ObjectId to string for JSON serialization
+        for action in actions:
+            if '_id' in action:
+                action['_id'] = str(action['_id'])
+        
+        return {
+            "total_actions": len(actions),
+            "healing_actions": actions,
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting healing history: {str(e)}")
+
+@monitoring_router.post("/healing/enable")
+async def enable_auto_healing():
+    """Enable automatic system healing"""
+    system_healing_engine.healing_enabled = True
+    return {"status": "auto healing enabled"}
+
+@monitoring_router.post("/healing/disable")
+async def disable_auto_healing():
+    """Disable automatic system healing"""
+    system_healing_engine.healing_enabled = False
+    return {"status": "auto healing disabled"}
+
+@monitoring_router.get("/healing/status")
+async def get_healing_status():
+    """Get current healing system status"""
+    return {
+        "healing_enabled": system_healing_engine.healing_enabled,
+        "monitoring_active": system_healing_engine.monitoring_active,
+        "healing_rules_count": len(system_healing_engine.healing_rules),
+        "alert_configs_count": len(system_healing_engine.alert_configs),
+        "timestamp": datetime.now().isoformat()
+    }
+
+@monitoring_router.post("/healing/full-cycle")
+async def run_full_healing_cycle():
+    """Run complete healing cycle - detection, analysis, and healing"""
+    try:
+        cycle_result = await system_healing_engine.run_full_healing_cycle()
+        return cycle_result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error in healing cycle: {str(e)}")
+
+@monitoring_router.get("/performance-history")
+async def get_performance_history():
+    """Get system performance history for analysis"""
+    try:
+        history_length = min(len(system_healing_engine.performance_history), 50)
+        return {
+            "history_length": history_length,
+            "performance_data": system_healing_engine.performance_history[-history_length:] if history_length > 0 else [],
+            "analysis_window": system_healing_engine.performance_window,
+            "anomaly_threshold": system_healing_engine.anomaly_threshold,
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting performance history: {str(e)}")
+
+@monitoring_router.get("/alerts/config")
+async def get_alert_configurations():
+    """Get current alert configurations"""
+    return {
+        "alert_configs": [config.dict() for config in system_healing_engine.alert_configs],
+        "last_alerts": system_healing_engine.last_alerts,
+        "timestamp": datetime.now().isoformat()
+    }
+
+@monitoring_router.get("/system-healing-dashboard")
+async def get_system_healing_dashboard():
+    """Get comprehensive system healing dashboard with all metrics"""
+    try:
+        # Get all system data
+        system_health = await system_healing_engine.get_system_health()
+        dependencies = await system_healing_engine.check_dependencies()
+        api_monitoring = await system_healing_engine.monitor_api_endpoints()
+        
+        # Detect current anomalies
+        anomalies = await system_healing_engine.detect_anomalies(system_health.dict())
+        
+        # Get recent healing actions
+        recent_actions = await system_healing_engine.db.healing_actions.find().sort("executed_at", -1).limit(10).to_list(10)
+        for action in recent_actions:
+            if '_id' in action:
+                action['_id'] = str(action['_id'])
+        
+        # Calculate health score
+        health_score = system_healing_engine._calculate_health_score(system_health, dependencies, api_monitoring)
+        
+        return {
+            "dashboard_type": "System Healing Dashboard",
+            "timestamp": datetime.now().isoformat(),
+            "system_status": {
+                "healing_enabled": system_healing_engine.healing_enabled,
+                "monitoring_active": system_healing_engine.monitoring_active,
+                "overall_health_score": health_score,
+                "health_status": "excellent" if health_score > 90 else "good" if health_score > 70 else "degraded" if health_score > 50 else "critical"
+            },
+            "current_metrics": {
+                "system_health": system_health.dict(),
+                "dependencies": [dep.dict() for dep in dependencies],
+                "api_monitoring": api_monitoring
+            },
+            "anomalies": {
+                "current_anomalies": len(anomalies),
+                "anomaly_details": [anomaly.dict() for anomaly in anomalies]
+            },
+            "healing_system": {
+                "healing_rules": len(system_healing_engine.healing_rules),
+                "alert_configs": len(system_healing_engine.alert_configs),
+                "recent_actions": len(recent_actions),
+                "action_details": recent_actions
+            },
+            "performance_analysis": {
+                "history_points": len(system_healing_engine.performance_history),
+                "analysis_window": system_healing_engine.performance_window,
+                "anomaly_threshold": system_healing_engine.anomaly_threshold
+            }
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting healing dashboard: {str(e)}")

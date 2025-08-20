@@ -14,6 +14,7 @@ import DigitalManager from "./components/DigitalManager";
 import AutonomousHub from "./components/AutonomousHub";
 import ProductionLaunch from "./components/ProductionLaunch";
 import SystemHealing from "./components/SystemHealing";
+import AdCreativeHub from "./components/AdCreativeHub";
 import "./App.css";
 
 function App() {

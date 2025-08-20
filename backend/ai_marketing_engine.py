@@ -365,7 +365,7 @@ Oder haben Sie noch Fragen?"""
                 "revenue_generated": 0.0
             }
             
-            messages = self.generate_marketing_messages()
+            messages = await self.generate_marketing_messages()
             
             # Simulate sending messages to leads
             for lead in self.leads:

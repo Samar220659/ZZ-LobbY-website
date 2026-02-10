@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZZ Lobby | KI-Automation & Passives Einkommen</title>
+    <meta name="description" content="Lerne wie du mit KI-Automation ein passives Einkommen aufbaust. Kostenlose Tipps, Telegram-Community und bewährte Strategien.">
+    <meta property="og:title" content="ZZ Lobby | KI-Automation & Passives Einkommen">
+    <meta property="og:description" content="Dein Einstieg in automatisiertes Online-Business mit KI">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+    <style>
+        :root{--bg:#0a0a0f;--card:#12121a;--border:#1e1e2e;--primary:#7c3aed;--accent:#06d6a0;--text:#e2e8f0;--muted:#64748b;--danger:#ef4444}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+        .wrap{max-width:480px;margin:0 auto;padding:16px}
+        header{text-align:center;padding:32px 0 16px}
+        .brand{font-size:1.1rem;font-weight:700;letter-spacing:2px;color:var(--primary);text-transform:uppercase}
+        h1{font-size:1.8rem;font-weight:800;margin:12px 0 8px;background:linear-gradient(135deg,#fff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .sub{color:var(--muted);font-size:.95rem;margin-bottom:24px}
+        .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:12px}
+        .card h3{font-size:1rem;margin-bottom:8px}
+        .card p{color:var(--muted);font-size:.85rem}
+        .links{display:flex;flex-direction:column;gap:10px;margin:20px 0}
+        .link-btn{display:flex;align-items:center;gap:12px;padding:16px 20px;border-radius:14px;text-decoration:none;color:#fff;font-weight:600;font-size:.95rem;transition:transform .2s,box-shadow .2s;border:1px solid transparent}
+        .link-btn:hover{transform:translateY(-2px)}
+        .link-btn .icon{font-size:1.4rem;width:28px;text-align:center}
+        .link-btn .arrow{margin-left:auto;opacity:.5}
+        .tg{background:linear-gradient(135deg,#0088cc,#00b4d8);box-shadow:0 4px 20px rgba(0,136,204,.3)}
+        .lead{background:linear-gradient(135deg,#7c3aed,#a855f7);box-shadow:0 4px 20px rgba(124,58,237,.3)}
+        .product{background:linear-gradient(135deg,#06d6a0,#00b894);box-shadow:0 4px 20px rgba(6,214,160,.2)}
+        .yt{background:linear-gradient(135deg,#ef4444,#dc2626);box-shadow:0 4px 20px rgba(239,68,68,.2)}
+        .tw{background:linear-gradient(135deg,#1d9bf0,#0c7abf);box-shadow:0 4px 20px rgba(29,155,240,.2)}
+        .ig{background:linear-gradient(135deg,#f09433,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888);box-shadow:0 4px 20px rgba(225,48,108,.2)}
+        .form-section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin:20px 0;text-align:center}
+        .form-section h2{font-size:1.2rem;margin-bottom:4px}
+        .form-section .desc{color:var(--muted);font-size:.85rem;margin-bottom:16px}
+        .form-row{display:flex;gap:8px}
+        .form-row input{flex:1;padding:14px 16px;border-radius:12px;border:1px solid var(--border);background:#0a0a0f;color:var(--text);font-size:.95rem;outline:none}
+        .form-row input:focus{border-color:var(--primary)}
+        .form-row button{padding:14px 20px;border-radius:12px;border:none;background:var(--primary);color:#fff;font-weight:700;font-size:.95rem;cursor:pointer;white-space:nowrap;transition:background .2s}
+        .form-row button:hover{background:#6d28d9}
+        .form-msg{margin-top:8px;font-size:.85rem;min-height:20px}
+        .form-msg.ok{color:var(--accent)}
+        .form-msg.err{color:var(--danger)}
+        .trust{display:flex;justify-content:center;gap:24px;margin:20px 0;text-align:center}
+        .trust-item .num{font-size:1.4rem;font-weight:800;color:var(--accent)}
+        .trust-item .lbl{font-size:.75rem;color:var(--muted)}
+        footer{text-align:center;padding:24px 0;color:var(--muted);font-size:.75rem}
+        footer a{color:var(--muted);text-decoration:underline}
+        .badge{display:inline-block;background:var(--accent);color:#000;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:8px;vertical-align:middle}
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <header>
+        <div class="brand">ZZ Lobby</div>
+        <h1>KI-Automation & Passives Einkommen</h1>
+        <p class="sub">Automatisiere dein Business mit KI. Kostenlose Tipps, Tools & Community.</p>
+    </header>
+
+    <div class="form-section">
+        <h2>Gratis KI-Starter Kit</h2>
+        <p class="desc">100 ChatGPT Prompts + KI-Checklist. Sofort per Email.</p>
+        <div class="form-row">
+            <input type="email" id="email" placeholder="Deine Email..." autocomplete="email" required>
+            <button onclick="submitLead()">Senden</button>
+        </div>
+        <div class="form-msg" id="formMsg"></div>
+    </div>
+
+    <div class="links">
+        <a href="https://t.me/autonomepasiveincome" class="link-btn tg" target="_blank" rel="noopener">
+            <span class="icon">📱</span> Telegram Community<span class="badge">GRATIS</span><span class="arrow">→</span>
+        </a>
+        <a href="https://t.me/zZBlotbot" class="link-btn tg" target="_blank" rel="noopener">
+            <span class="icon">🤖</span> KI-Bot starten<span class="arrow">→</span>
+        </a>
+        <a href="https://www.digistore24.com/redir/580935/Samarkande/" class="link-btn product" target="_blank" rel="noopener">
+            <span class="icon">🎯</span> KI-Business Kurs<span class="badge">NEU</span><span class="arrow">→</span>
+        </a>
+        <a href="https://zzlobby.gumroad.com/" class="link-btn lead" target="_blank" rel="noopener">
+            <span class="icon">📚</span> Digitale Produkte<span class="arrow">→</span>
+        </a>
+        <a href="https://www.instagram.com/zz_lobby/" class="link-btn ig" target="_blank" rel="noopener">
+            <span class="icon">📸</span> Instagram<span class="arrow">→</span>
+        </a>
+        <a href="https://twitter.com/ZZ_lobby_byDO" class="link-btn tw" target="_blank" rel="noopener">
+            <span class="icon">🐦</span> Twitter / X<span class="arrow">→</span>
+        </a>
+    </div>
+
+    <div class="trust">
+        <div class="trust-item"><div class="num">500+</div><div class="lbl">Follower</div></div>
+        <div class="trust-item"><div class="num">24/7</div><div class="lbl">KI-Bot</div></div>
+        <div class="trust-item"><div class="num">100%</div><div class="lbl">Gratis Start</div></div>
+    </div>
+
+    <div class="card">
+        <h3>Was ist ZZ Lobby?</h3>
+        <p>Wir zeigen dir, wie du mit KI-Tools wie ChatGPT, Midjourney und Automation ein Online-Business aufbaust - auch ohne Vorkenntnisse. Alles getestet, alles automatisiert.</p>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 ZZ Lobby &middot; Daniel Oettel</p>
+        <p style="margin-top:6px">
+            <a href="impressum.html">Impressum</a> &middot;
+            <a href="datenschutz.html">Datenschutz</a>
+        </p>
+        <p style="margin-top:6px">Hinweis: Einige Links sind Affiliate-Links.</p>
+    </footer>
+</div>
+
+<script>
+const SB_URL='https://mkiliztwhxzwizwwjhqn.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1raWxpenR3aHh6d2l6d3dqaHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA1NjY1ODksImV4cCI6MjA3NjE0MjU4OX0.olvY21Ppazo8d9z76FPZ4KzeLOY2UVqk8nUpnr1Xc-w';
+
+async function submitLead(){
+    const el=document.getElementById('email');
+    const msg=document.getElementById('formMsg');
+    const email=el.value.trim();
+    if(!email||!email.includes('@')){msg.className='form-msg err';msg.textContent='Bitte gültige Email eingeben.';return}
+    msg.className='form-msg';msg.textContent='Wird gesendet...';
+    try{
+        const r=await fetch(SB_URL+'/rest/v1/leads',{
+            method:'POST',
+            headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=minimal'},
+            body:JSON.stringify({email:email,source:'landing_page',created_at:new Date().toISOString()})
+        });
+        if(r.ok||r.status===201){
+            msg.className='form-msg ok';msg.textContent='Danke! Check deine Email.';el.value='';
+            if(typeof gtag==='function')gtag('event','lead_capture',{method:'email'});
+        }else{
+            const d=await r.json().catch(()=>({}));
+            if(d.code==='23505'){msg.className='form-msg ok';msg.textContent='Du bist bereits registriert!';}
+            else{msg.className='form-msg err';msg.textContent='Fehler - versuch es nochmal.';}
+        }
+    }catch(e){msg.className='form-msg err';msg.textContent='Netzwerk-Fehler. Bitte nochmal versuchen.';}
+}
+document.getElementById('email').addEventListener('keydown',function(e){if(e.key==='Enter')submitLead()});
+</script>
+</body>
+</html>

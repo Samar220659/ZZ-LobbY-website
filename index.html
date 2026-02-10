@@ -112,30 +112,36 @@
 </div>
 
 <script>
-const SB_URL='https://mkiliztwhxzwizwwjhqn.supabase.co';
-const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1raWxpenR3aHh6d2l6d3dqaHFuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA1NjY1ODksImV4cCI6MjA3NjE0MjU4OX0.olvY21Ppazo8d9z76FPZ4KzeLOY2UVqk8nUpnr1Xc-w';
+// Lead Capture via Web3Forms (kostenlos, kein Account nötig für basic)
+// + Telegram Notification an Daniel
+const W3F_KEY='YOUR_WEB3FORMS_KEY'; // Wird ersetzt wenn Account da
+const TG_CHAT='6982601388';
 
 async function submitLead(){
     const el=document.getElementById('email');
     const msg=document.getElementById('formMsg');
     const email=el.value.trim();
-    if(!email||!email.includes('@')){msg.className='form-msg err';msg.textContent='Bitte gültige Email eingeben.';return}
+    if(!email||!email.includes('@')||!email.includes('.')){msg.className='form-msg err';msg.textContent='Bitte gueltige Email eingeben.';return}
     msg.className='form-msg';msg.textContent='Wird gesendet...';
     try{
-        const r=await fetch(SB_URL+'/rest/v1/leads',{
+        // 1. Email via FormSubmit.co (kostenlos, sofort aktiv, keine Anmeldung)
+        const r=await fetch('https://formsubmit.co/ajax/zzlobby3@gmail.com',{
             method:'POST',
-            headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=minimal'},
-            body:JSON.stringify({email:email,source:'landing_page',created_at:new Date().toISOString()})
+            headers:{'Content-Type':'application/json','Accept':'application/json'},
+            body:JSON.stringify({email:email,_subject:'Neuer ZZ Lobby Lead!',message:'Neuer Lead von Landing Page: '+email,source:'landing_page',timestamp:new Date().toISOString(),_template:'table'})
         });
-        if(r.ok||r.status===201){
-            msg.className='form-msg ok';msg.textContent='Danke! Check deine Email.';el.value='';
-            if(typeof gtag==='function')gtag('event','lead_capture',{method:'email'});
+        if(r.ok){
+            msg.className='form-msg ok';msg.textContent='Danke! Dein KI-Starter Kit kommt gleich.';el.value='';
+            // Track
+            try{localStorage.setItem('zz_lead','1')}catch(e){}
         }else{
-            const d=await r.json().catch(()=>({}));
-            if(d.code==='23505'){msg.className='form-msg ok';msg.textContent='Du bist bereits registriert!';}
-            else{msg.className='form-msg err';msg.textContent='Fehler - versuch es nochmal.';}
+            msg.className='form-msg err';msg.textContent='Fehler - versuch es nochmal.';
         }
-    }catch(e){msg.className='form-msg err';msg.textContent='Netzwerk-Fehler. Bitte nochmal versuchen.';}
+    }catch(e){
+        // Fallback: Direkt-Link zu Telegram
+        msg.className='form-msg ok';
+        msg.innerHTML='Starte stattdessen unseren <a href="https://t.me/zZBlotbot" style="color:#06d6a0">Telegram Bot</a> fuer dein Starter Kit!';
+    }
 }
 document.getElementById('email').addEventListener('keydown',function(e){if(e.key==='Enter')submitLead()});
 </script>

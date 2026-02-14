@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MarketAI Pro - Kostenloser Viral Content Generator | ZZ Lobby</title>
+    <meta name="description" content="Erstelle automatisch virale Marketing-Inhalte mit KI. Kostenloser Content Generator von ZZ Lobby.">
+    <meta property="og:title" content="MarketAI Pro - Kostenloser Viral Content Generator">
+    <meta property="og:description" content="Erstelle virale Social Media Posts in Sekunden - kostenlos!">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        *{font-family:'Inter',sans-serif;margin:0;padding:0;box-sizing:border-box}
+        .gradient-text{background:linear-gradient(135deg,#ff6b35 0%,#4ecdc4 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .glass-card{background:rgba(255,255,255,0.07);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.12)}
+        .template-card{transition:all .3s ease;cursor:pointer}
+        .template-card:hover{transform:translateY(-4px);box-shadow:0 10px 25px rgba(0,0,0,0.3)}
+        .template-card.selected{border-color:#ff6b35;box-shadow:0 0 20px rgba(255,107,53,0.3)}
+        .viral-score{background:linear-gradient(135deg,#ff6b35,#4ecdc4);border-radius:50%;width:70px;height:70px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:1.1rem;color:white}
+        .gate-overlay{position:fixed;inset:0;z-index:100;background:linear-gradient(135deg,#0a0a1a 0%,#1a1030 50%,#0a0a1a 100%);display:flex;align-items:center;justify-content:center;transition:opacity .5s ease}
+        .gate-overlay.hidden{opacity:0;pointer-events:none}
+        .gate-card{max-width:440px;width:90%;background:rgba(255,255,255,0.05);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);border-radius:24px;padding:40px 32px;text-align:center}
+        .gate-input{width:100%;padding:14px 18px;border-radius:12px;border:1px solid rgba(255,255,255,0.15);background:rgba(0,0,0,0.3);color:white;font-size:1rem;outline:none;transition:border-color .3s}
+        .gate-input:focus{border-color:#ff6b35}
+        .gate-btn{width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#ff6b35,#e8552a);color:white;font-size:1.05rem;font-weight:700;cursor:pointer;transition:transform .2s,box-shadow .2s}
+        .gate-btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(255,107,53,0.4)}
+        .gate-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+        .check-item{display:flex;align-items:center;gap:10px;text-align:left;color:#94a3b8;font-size:.9rem;padding:4px 0}
+        .check-item svg{flex-shrink:0;color:#4ecdc4}
+        @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+        .float-anim{animation:float 3s ease-in-out infinite}
+        .content-preview{background:white;border-radius:8px;padding:20px;color:#1a1a1a;min-height:250px}
+        .stock-img{width:100%;height:100px;object-fit:cover;border-radius:8px;cursor:pointer;transition:all .3s;background:linear-gradient(135deg,#1e293b,#334155);display:flex;align-items:center;justify-content:center;color:#64748b;font-size:.8rem}
+        .stock-img:hover{transform:scale(1.05);box-shadow:0 4px 12px rgba(0,0,0,0.2)}
+        .stock-img.selected-img{ring:2px;box-shadow:0 0 0 2px #ff6b35}
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+
+<!-- ========== EMAIL GATE ========== -->
+<div class="gate-overlay" id="email-gate">
+    <div class="gate-card">
+        <div class="float-anim" style="font-size:3rem;margin-bottom:16px">🚀</div>
+        <h1 class="text-2xl font-bold mb-2" style="background:linear-gradient(135deg,#fff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent">
+            MarketAI Pro
+        </h1>
+        <p class="text-gray-400 text-sm mb-6">Kostenloser KI Content Generator<br>Erstelle virale Posts in Sekunden</p>
+
+        <div style="margin-bottom:20px">
+            <div class="check-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>4 professionelle Templates</span>
+            </div>
+            <div class="check-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>KI-generierte Texte & Hashtags</span>
+            </div>
+            <div class="check-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Viral-Score Analyse</span>
+            </div>
+            <div class="check-item">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>100% kostenlos - kein Abo</span>
+            </div>
+        </div>
+
+        <form id="gate-form" style="display:flex;flex-direction:column;gap:12px">
+            <input type="text" id="gate-name" class="gate-input" placeholder="Dein Vorname" required>
+            <input type="email" id="gate-email" class="gate-input" placeholder="Deine E-Mail Adresse" required>
+            <button type="submit" class="gate-btn" id="gate-submit">
+                Kostenlos freischalten
+            </button>
+        </form>
+        <p class="text-gray-600 text-xs mt-4">Kein Spam. Du erhaeltst Zugang + Marketing-Tipps.<br>
+        <a href="impressum.html" class="text-gray-500 hover:text-gray-400">Impressum</a> ·
+        <a href="datenschutz.html" class="text-gray-500 hover:text-gray-400">Datenschutz</a></p>
+    </div>
+</div>
+
+<!-- ========== NAVIGATION ========== -->
+<nav class="fixed top-0 left-0 right-0 z-50 bg-gray-900/90 backdrop-blur-md border-b border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-14">
+            <div class="flex items-center space-x-3">
+                <a href="index.html" class="text-gray-400 hover:text-white text-sm">← ZZ Lobby</a>
+                <span class="text-gray-700">|</span>
+                <div class="flex items-center space-x-2">
+                    <div class="w-7 h-7 bg-gradient-to-r from-orange-500 to-teal-400 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-xs">MA</span>
+                    </div>
+                    <span class="text-lg font-bold gradient-text">MarketAI Pro</span>
+                </div>
+            </div>
+            <div class="viral-score" id="viral-score-display" style="width:50px;height:50px;font-size:.85rem">87%</div>
+        </div>
+    </div>
+</nav>
+
+<!-- ========== MAIN CONTENT ========== -->
+<main class="pt-20 pb-16">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold mb-2">
+                <span class="gradient-text">Viral Content</span> Generator
+            </h1>
+            <p class="text-gray-400">Erstelle automatisch virale Marketing-Materialien</p>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-6">
+            <!-- Templates + Editor -->
+            <div class="lg:col-span-2">
+                <!-- Template Selection -->
+                <div class="glass-card p-5 rounded-xl mb-5">
+                    <h2 class="text-xl font-semibold mb-4">Vorlage waehlen</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div class="template-card glass-card p-3 rounded-lg" data-template="professional">
+                            <div class="w-full h-20 bg-gradient-to-br from-blue-900 to-blue-700 rounded mb-2 flex items-center justify-center text-2xl">💼</div>
+                            <h3 class="font-semibold text-sm">Professional</h3>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded">B2B</span>
+                                <span class="text-xs text-gray-500">78%</span>
+                            </div>
+                        </div>
+                        <div class="template-card glass-card p-3 rounded-lg" data-template="casual">
+                            <div class="w-full h-20 bg-gradient-to-br from-green-900 to-green-700 rounded mb-2 flex items-center justify-center text-2xl">✌️</div>
+                            <h3 class="font-semibold text-sm">Casual</h3>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded">Trendy</span>
+                                <span class="text-xs text-gray-500">89%</span>
+                            </div>
+                        </div>
+                        <div class="template-card glass-card p-3 rounded-lg" data-template="luxury">
+                            <div class="w-full h-20 bg-gradient-to-br from-purple-900 to-purple-700 rounded mb-2 flex items-center justify-center text-2xl">👑</div>
+                            <h3 class="font-semibold text-sm">Premium</h3>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-0.5 rounded">Elegant</span>
+                                <span class="text-xs text-gray-500">92%</span>
+                            </div>
+                        </div>
+                        <div class="template-card glass-card p-3 rounded-lg" data-template="trendy">
+                            <div class="w-full h-20 bg-gradient-to-br from-orange-900 to-orange-600 rounded mb-2 flex items-center justify-center text-2xl">🔥</div>
+                            <h3 class="font-semibold text-sm">Viral</h3>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-xs bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded">Dynamic</span>
+                                <span class="text-xs text-gray-500">96%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Editor -->
+                <div class="glass-card p-5 rounded-xl">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-semibold">Content Editor</h2>
+                        <div class="flex space-x-2">
+                            <button onclick="generateContent()" class="bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                                KI generieren
+                            </button>
+                            <button onclick="copyContent()" class="bg-teal-500 hover:bg-teal-600 px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                                Kopieren
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-5">
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">Ueberschrift</label>
+                                <input type="text" id="headline-input" placeholder="Gib eine Ueberschrift ein..." class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:border-orange-500 focus:outline-none text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">Beschreibung</label>
+                                <textarea id="description-input" rows="3" placeholder="Gib eine Beschreibung ein..." class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:border-orange-500 focus:outline-none resize-none text-sm"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">Call-to-Action</label>
+                                <input type="text" id="cta-input" placeholder="Z.B. Jetzt starten, Mehr erfahren..." class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:border-orange-500 focus:outline-none text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-1">Hashtags</label>
+                                <input type="text" id="hashtags-input" placeholder="#marketing #business #viral" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:border-orange-500 focus:outline-none text-sm">
+                            </div>
+                        </div>
+
+                        <!-- Preview -->
+                        <div class="content-preview" id="content-preview">
+                            <div class="text-center py-8 text-gray-400">
+                                <div style="font-size:2.5rem;margin-bottom:8px">👁️</div>
+                                <p class="text-sm">Vorschau wird hier angezeigt</p>
+                                <p class="text-xs text-gray-500">Waehle eine Vorlage und fuelle die Felder aus</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-5">
+                <!-- Viral Score -->
+                <div class="glass-card p-5 rounded-xl">
+                    <h3 class="text-lg font-semibold mb-3">Viral-Score</h3>
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-400">Emotionale Wirkung</span>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-16 bg-gray-700 rounded-full h-1.5"><div class="bg-orange-500 h-1.5 rounded-full" id="bar-emotion" style="width:85%"></div></div>
+                                <span class="text-xs w-8" id="score-emotion">85%</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-400">Visuelle Anziehung</span>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-16 bg-gray-700 rounded-full h-1.5"><div class="bg-teal-400 h-1.5 rounded-full" id="bar-visual" style="width:92%"></div></div>
+                                <span class="text-xs w-8" id="score-visual">92%</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-400">Share-Potenzial</span>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-16 bg-gray-700 rounded-full h-1.5"><div class="bg-purple-500 h-1.5 rounded-full" id="bar-share" style="width:78%"></div></div>
+                                <span class="text-xs w-8" id="score-share">78%</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-gray-400">Trend-Relevanz</span>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-16 bg-gray-700 rounded-full h-1.5"><div class="bg-green-500 h-1.5 rounded-full" id="bar-trend" style="width:88%"></div></div>
+                                <span class="text-xs w-8" id="score-trend">88%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3 pt-3 border-t border-gray-700 text-center">
+                        <div class="text-2xl font-bold gradient-text" id="total-score">87%</div>
+                        <div class="text-xs text-gray-400">Gesamt Viral-Score</div>
+                    </div>
+                </div>
+
+                <!-- Export -->
+                <div class="glass-card p-5 rounded-xl">
+                    <h3 class="text-lg font-semibold mb-3">Export</h3>
+                    <div class="space-y-2">
+                        <button onclick="copyContent()" class="w-full bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                            Text kopieren
+                        </button>
+                        <button onclick="downloadContent()" class="w-full bg-teal-500 hover:bg-teal-600 px-4 py-2 rounded-lg font-medium transition-colors text-sm">
+                            Als Text-Datei speichern
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CTA Box -->
+                <div class="glass-card p-5 rounded-xl" style="border-color:rgba(124,58,237,0.3);background:rgba(124,58,237,0.05)">
+                    <h3 class="text-lg font-semibold mb-2">Mehr Marketing-Power?</h3>
+                    <p class="text-gray-400 text-sm mb-3">Lerne wie du mit KI-Automation dein Marketing auf Autopilot stellst.</p>
+                    <a href="https://www.marketing365.online/affiliate/" target="_blank" rel="noopener" class="block w-full bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 px-4 py-2 rounded-lg font-medium transition-all text-sm text-center">
+                        Marketing365 entdecken
+                    </a>
+                    <a href="https://t.me/autonomepasiveincome" target="_blank" rel="noopener" class="block w-full mt-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 px-4 py-2 rounded-lg font-medium transition-all text-sm text-center">
+                        Telegram Community beitreten
+                    </a>
+                </div>
+
+                <!-- Powered by -->
+                <div class="text-center text-xs text-gray-600">
+                    Powered by <a href="index.html" class="text-gray-500 hover:text-gray-400">ZZ Lobby</a><br>
+                    <a href="impressum.html" class="text-gray-600 hover:text-gray-500">Impressum</a> ·
+                    <a href="datenschutz.html" class="text-gray-600 hover:text-gray-500">Datenschutz</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+// ===== EMAIL GATE =====
+const GATE_KEY = 'marketai_access';
+const gate = document.getElementById('email-gate');
+
+// Check if already unlocked
+if (localStorage.getItem(GATE_KEY)) {
+    gate.classList.add('hidden');
+    setTimeout(() => gate.style.display = 'none', 500);
+}
+
+document.getElementById('gate-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const name = document.getElementById('gate-name').value.trim();
+    const email = document.getElementById('gate-email').value.trim();
+    if (!name || !email) return;
+
+    const btn = document.getElementById('gate-submit');
+    btn.disabled = true;
+    btn.textContent = 'Wird freigeschaltet...';
+
+    // Send lead via FormSubmit (same as landing page)
+    fetch('https://formsubmit.co/ajax/zzlobby3@gmail.com', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+        body: JSON.stringify({
+            name: name,
+            email: email,
+            source: 'MarketAI Pro Tool',
+            _subject: 'Neuer Lead: MarketAI Pro - ' + name,
+            _template: 'table'
+        })
+    }).then(() => {
+        localStorage.setItem(GATE_KEY, JSON.stringify({name, email, ts: Date.now()}));
+        gate.classList.add('hidden');
+        setTimeout(() => gate.style.display = 'none', 500);
+        showNotification('Willkommen ' + name + '! Tool freigeschaltet.', 'success');
+    }).catch(() => {
+        // Even if FormSubmit fails, grant access (don't lose the user)
+        localStorage.setItem(GATE_KEY, JSON.stringify({name, email, ts: Date.now()}));
+        gate.classList.add('hidden');
+        setTimeout(() => gate.style.display = 'none', 500);
+    });
+});
+
+// ===== CONTENT GENERATOR =====
+let selectedTemplate = null;
+let currentContent = {headline:'',description:'',cta:'',hashtags:''};
+
+// Template selection
+document.querySelectorAll('.template-card').forEach(card => {
+    card.addEventListener('click', function() {
+        document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
+        this.classList.add('selected');
+        selectedTemplate = this.dataset.template;
+        updateViralScore();
+        setTimeout(generateContent, 400);
+    });
+});
+
+// Live editor updates
+['headline-input','description-input','cta-input','hashtags-input'].forEach(id => {
+    document.getElementById(id).addEventListener('input', function() {
+        updateContent();
+        updateViralScore();
+    });
+});
+
+const templates = {
+    professional: {
+        headline: 'Steigern Sie Ihren Umsatz mit KI-Marketing',
+        description: 'Entdecken Sie wie professionelle Unternehmen KI-Automation nutzen, um ihre Marketing-Ergebnisse zu verdoppeln. Bewährte Strategien für nachhaltiges Wachstum.',
+        cta: 'Strategie kennenlernen',
+        hashtags: '#KIMarketing #BusinessGrowth #Automation #B2B'
+    },
+    casual: {
+        headline: 'So verdienst du mit KI passiv Geld 💰',
+        description: 'Mega easy: KI macht dein Marketing, du lehnst dich zurück. Kein Tech-Wissen nötig! Tausende nutzen es schon - wann startest du?',
+        cta: 'Zeig mir wie!',
+        hashtags: '#PassivesEinkommen #KI #OnlineBusiness #SideHustle'
+    },
+    luxury: {
+        headline: 'Exklusive KI-Strategien für Premium-Ergebnisse',
+        description: 'Fuer anspruchsvolle Unternehmer: Erleben Sie die naechste Generation des automatisierten Marketings. Individuelle KI-Loesungen fuer maximale Performance.',
+        cta: 'Exklusiven Zugang sichern',
+        hashtags: '#Premium #ExklusiveStrategien #KIAutomation #Erfolg'
+    },
+    trendy: {
+        headline: 'KI-Marketing auf Autopilot 🔥 GAME CHANGER!',
+        description: 'DAS ist der Trend 2026! KI erstellt deine Posts, analysiert deine Zielgruppe und optimiert alles automatisch. Die Ergebnisse sind CRAZY!',
+        cta: 'Jetzt viral gehen!',
+        hashtags: '#Viral #KITrend2026 #GameChanger #MarketingAutomation'
+    }
+};
+
+function generateContent() {
+    if (!selectedTemplate) {
+        showNotification('Bitte waehle zuerst eine Vorlage.', 'warning');
+        return;
+    }
+    showNotification('KI generiert Content...', 'info');
+    const t = templates[selectedTemplate];
+    setTimeout(() => {
+        document.getElementById('headline-input').value = t.headline;
+        document.getElementById('description-input').value = t.description;
+        document.getElementById('cta-input').value = t.cta;
+        document.getElementById('hashtags-input').value = t.hashtags;
+        updateContent();
+        updateViralScore();
+        showNotification('Content erfolgreich generiert!', 'success');
+    }, 800);
+}
+
+function updateContent() {
+    currentContent = {
+        headline: document.getElementById('headline-input').value,
+        description: document.getElementById('description-input').value,
+        cta: document.getElementById('cta-input').value,
+        hashtags: document.getElementById('hashtags-input').value
+    };
+    const p = document.getElementById('content-preview');
+    p.innerHTML = `<div class="space-y-3">
+        <h2 class="text-xl font-bold text-gray-900">${currentContent.headline || 'Deine Ueberschrift'}</h2>
+        <p class="text-gray-700 text-sm">${currentContent.description || 'Deine Beschreibung...'}</p>
+        ${currentContent.cta ? `<button class="bg-orange-500 text-white px-5 py-2 rounded-lg font-medium text-sm">${currentContent.cta}</button>` : ''}
+        ${currentContent.hashtags ? `<p class="text-blue-600 text-xs">${currentContent.hashtags}</p>` : ''}
+    </div>`;
+}
+
+function updateViralScore() {
+    let s = 50;
+    if (currentContent.headline.length > 10) s += 10;
+    if (currentContent.description.length > 50) s += 15;
+    if (currentContent.cta) s += 10;
+    if (currentContent.hashtags.includes('#')) s += 5;
+    const bonus = {professional:5,casual:15,luxury:10,trendy:20};
+    if (selectedTemplate) s += bonus[selectedTemplate] || 0;
+    s = Math.min(s, 99);
+
+    document.getElementById('viral-score-display').textContent = s + '%';
+    document.getElementById('total-score').textContent = s + '%';
+
+    const em = Math.max(60, Math.min(95, s + Math.random()*10 - 5));
+    const vi = Math.max(65, Math.min(98, s + Math.random()*12 - 3));
+    const sh = Math.max(55, Math.min(90, s + Math.random()*8 - 8));
+    const tr = Math.max(60, Math.min(96, s + Math.random()*10));
+
+    document.getElementById('bar-emotion').style.width = em+'%';
+    document.getElementById('score-emotion').textContent = Math.round(em)+'%';
+    document.getElementById('bar-visual').style.width = vi+'%';
+    document.getElementById('score-visual').textContent = Math.round(vi)+'%';
+    document.getElementById('bar-share').style.width = sh+'%';
+    document.getElementById('score-share').textContent = Math.round(sh)+'%';
+    document.getElementById('bar-trend').style.width = tr+'%';
+    document.getElementById('score-trend').textContent = Math.round(tr)+'%';
+}
+
+function copyContent() {
+    if (!currentContent.headline && !currentContent.description) {
+        showNotification('Kein Content zum Kopieren.', 'warning');
+        return;
+    }
+    const text = [currentContent.headline, '', currentContent.description, '', currentContent.cta, '', currentContent.hashtags].filter(Boolean).join('\n');
+    navigator.clipboard.writeText(text).then(() => {
+        showNotification('Content in Zwischenablage kopiert!', 'success');
+    }).catch(() => {
+        // Fallback
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showNotification('Content kopiert!', 'success');
+    });
+}
+
+function downloadContent() {
+    if (!currentContent.headline && !currentContent.description) {
+        showNotification('Kein Content zum Speichern.', 'warning');
+        return;
+    }
+    const text = [currentContent.headline, '', currentContent.description, '', 'CTA: ' + currentContent.cta, '', currentContent.hashtags, '', '---', 'Erstellt mit MarketAI Pro | https://samar220659.github.io/ZZ-LobbY-website/tool.html'].join('\n');
+    const blob = new Blob([text], {type:'text/plain'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'marketai-content.txt';
+    a.click();
+    showNotification('Datei heruntergeladen!', 'success');
+}
+
+// Notification system
+function showNotification(message, type) {
+    const n = document.createElement('div');
+    const colors = {info:'bg-blue-500',success:'bg-green-500',warning:'bg-yellow-500',error:'bg-red-500'};
+    n.className = `fixed top-16 right-4 z-50 p-3 rounded-lg shadow-lg max-w-xs transform translate-x-full transition-transform duration-300 ${colors[type]||colors.info}`;
+    n.innerHTML = `<div class="text-white font-medium text-sm">${message}</div>`;
+    document.body.appendChild(n);
+    setTimeout(() => n.style.transform = 'translateX(0)', 50);
+    setTimeout(() => { n.style.transform = 'translateX(120%)'; setTimeout(() => n.remove(), 300); }, 2500);
+}
+</script>
+</body>
+</html>

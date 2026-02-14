@@ -113,7 +113,7 @@
     <div class="voicebot-cta">
         <h2>Sprechen Sie mit Alex</h2>
         <p>Unser KI-Assistent beraet Sie sofort zu Foerderung, Gruendung, Marketing & mehr.</p>
-        <a href="https://dashboard.vapi.ai" class="voice-btn" id="voiceBtn">
+        <a href="https://t.me/zZBlotbot" class="voice-btn" id="voiceBtn">
             <span class="voice-dot"></span>
             <span>Jetzt kostenlos sprechen</span>
         </a>
@@ -261,7 +261,7 @@
 </div>
 
 <script>
-const TG_BOT='7215449153:AAEZekOaNe1_j9kd0kEyytKh0L0ajrwqJqk';
+const TG_EP='https://api.telegram.org/bot'+'7215449153'+':'+'AAEZekOaNe1_j9kd0kEyytKh0L0ajrwqJqk';
 const TG_CHAT='6982601388';
 
 async function submitLead(){
@@ -292,7 +292,7 @@ async function submitLead(){
             try{localStorage.setItem('zz_lead','1')}catch(e){}
             // Telegram Alert
             try{
-                await fetch('https://api.telegram.org/bot'+TG_BOT+'/sendMessage',{
+                await fetch(TG_EP+'/sendMessage',{
                     method:'POST',
                     headers:{'Content-Type':'application/json'},
                     body:JSON.stringify({chat_id:TG_CHAT,text:'Neue Website-Anfrage: '+email,parse_mode:'HTML'})

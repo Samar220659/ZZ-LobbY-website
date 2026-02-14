@@ -10,7 +10,6 @@
     <meta property="og:type" content="website">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
         *{font-family:'Inter',sans-serif;margin:0;padding:0;box-sizing:border-box}
@@ -256,7 +255,7 @@
                 <div class="glass-card p-5 rounded-xl" style="border-color:rgba(124,58,237,0.3);background:rgba(124,58,237,0.05)">
                     <h3 class="text-lg font-semibold mb-2">Mehr Marketing-Power?</h3>
                     <p class="text-gray-400 text-sm mb-3">Lerne wie du mit KI-Automation dein Marketing auf Autopilot stellst.</p>
-                    <a href="https://www.marketing365.online/affiliate/" target="_blank" rel="noopener" class="block w-full bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 px-4 py-2 rounded-lg font-medium transition-all text-sm text-center">
+                    <a href="https://marketing365.online/affiliate-secrets-blackbook/#aff=samarkande" target="_blank" rel="noopener" class="block w-full bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 px-4 py-2 rounded-lg font-medium transition-all text-sm text-center">
                         Marketing365 entdecken
                     </a>
                     <a href="https://t.me/autonomepasiveincome" target="_blank" rel="noopener" class="block w-full mt-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 px-4 py-2 rounded-lg font-medium transition-all text-sm text-center">
@@ -312,6 +311,8 @@ document.getElementById('gate-form').addEventListener('submit', function(e) {
         gate.classList.add('hidden');
         setTimeout(() => gate.style.display = 'none', 500);
         showNotification('Willkommen ' + name + '! Tool freigeschaltet.', 'success');
+        // Telegram alert
+        try{fetch('https://api.telegram.org/bot7215449153:AAEZekOaNe1_j9kd0kEyytKh0L0ajrwqJqk/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:'6982601388',text:'MarketAI Lead: '+name+' ('+email+')',parse_mode:'HTML'})})}catch(e){}
     }).catch(() => {
         // Even if FormSubmit fails, grant access (don't lose the user)
         localStorage.setItem(GATE_KEY, JSON.stringify({name, email, ts: Date.now()}));
@@ -388,6 +389,8 @@ function generateContent() {
     }, 800);
 }
 
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+
 function updateContent() {
     currentContent = {
         headline: document.getElementById('headline-input').value,
@@ -397,10 +400,10 @@ function updateContent() {
     };
     const p = document.getElementById('content-preview');
     p.innerHTML = `<div class="space-y-3">
-        <h2 class="text-xl font-bold text-gray-900">${currentContent.headline || 'Deine Ueberschrift'}</h2>
-        <p class="text-gray-700 text-sm">${currentContent.description || 'Deine Beschreibung...'}</p>
-        ${currentContent.cta ? `<button class="bg-orange-500 text-white px-5 py-2 rounded-lg font-medium text-sm">${currentContent.cta}</button>` : ''}
-        ${currentContent.hashtags ? `<p class="text-blue-600 text-xs">${currentContent.hashtags}</p>` : ''}
+        <h2 class="text-xl font-bold text-gray-900">${esc(currentContent.headline) || 'Deine Ueberschrift'}</h2>
+        <p class="text-gray-700 text-sm">${esc(currentContent.description) || 'Deine Beschreibung...'}</p>
+        ${currentContent.cta ? `<button class="bg-orange-500 text-white px-5 py-2 rounded-lg font-medium text-sm">${esc(currentContent.cta)}</button>` : ''}
+        ${currentContent.hashtags ? `<p class="text-blue-600 text-xs">${esc(currentContent.hashtags)}</p>` : ''}
     </div>`;
 }
 

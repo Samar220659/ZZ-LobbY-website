@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Response>
-    <Say language="de-DE" voice="Polly.Vicki">Guten Morgen Daniel, hier ist Sarah, deine KI Assistentin von ZZ Lobby. Hier ist dein aktueller Status vom 15. 02. 2026 um 06 Uhr 08. Die autonome Engine laeuft stabil. Du hast 2 Leads in der Datenbank. Heute wurden 0 Posts veroeffentlicht und 0 Emails versendet. Alle aktiven Plattformen sind Telegram, Facebook und Twitter. Das war dein Live-Status. Schoenen Tag, Chef!</Say>
+    <Say language="de-DE" voice="Polly.Vicki">Guten Morgen Daniel, hier ist Sarah. Status vom 15. 02. 2026 um 11 Uhr 03. Achtung: Die Engine ist gestoppt. 2 Leads. 0 Posts heute. Schoenen Tag, Chef!</Say>
 </Response>

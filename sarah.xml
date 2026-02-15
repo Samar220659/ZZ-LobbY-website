@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    <Say language="de-DE" voice="Polly.Vicki">Hallo Daniel, hier ist Sarah, deine KI Assistentin von ZZ Lobby. Einen Moment, ich pruefe den aktuellen System-Status.</Say>
+    <Pause length="2"/>
+    <Say language="de-DE" voice="Polly.Vicki">Die autonome Engine laeuft stabil. Du hast 2 Leads in der Datenbank. Alle Plattformen sind aktiv. Fuer Details schaue in Telegram oder ruf mich erneut an. Schoenen Tag, Chef!</Say>
+</Response>

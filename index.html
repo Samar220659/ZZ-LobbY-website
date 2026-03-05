@@ -11,32 +11,27 @@
     <meta property="og:url" content="https://samar220659.github.io/ZZ-LobbY-website/">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>Z</text></svg>">
     <style>
-        :root{--bg:#05050a;--card:#0c0c14;--card2:#10101c;--border:#1a1a2e;--primary:#7c3aed;--accent:#06d6a0;--gold:#f59e0b;--red:#ef4444;--text:#e2e8f0;--muted:#64748b;--white:#ffffff}
+        :root{--bg:#05050a;--card:#0c0c14;--card2:#10101c;--border:#1a1a2e;--primary:#7c3aed;--accent:#06d6a0;--gold:#f59e0b;--red:#ef4444;--text:#e2e8f0;--muted:#64748b;--white:#ffffff;--orange:#ff6b35}
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
         .wrap{max-width:520px;margin:0 auto;padding:16px}
-
         header{text-align:center;padding:30px 0 16px}
         .logo{width:64px;height:64px;margin:0 auto 12px;border-radius:16px;background:linear-gradient(135deg,var(--primary),#a855f7);display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:900;color:#fff;box-shadow:0 8px 32px rgba(124,58,237,.4)}
         .brand{font-size:.75rem;font-weight:700;letter-spacing:3px;color:var(--primary);text-transform:uppercase;margin-bottom:4px}
         h1{font-size:1.5rem;font-weight:800;margin:8px 0;background:linear-gradient(135deg,#fff 0%,#a78bfa 50%,var(--accent) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
         .tagline{color:var(--muted);font-size:.88rem;max-width:380px;margin:0 auto}
-
-        /* HERO CTA - das Wichtigste zuerst */
+        .urgency-banner{background:linear-gradient(135deg,var(--red),#dc2626);border-radius:12px;padding:10px 16px;margin:12px 0;text-align:center;font-size:.82rem;font-weight:700;color:#fff;animation:urgencyPulse 2s ease-in-out infinite}
+        @keyframes urgencyPulse{0%,100%{opacity:1}50%{opacity:.85}}
         .hero-cta{background:linear-gradient(135deg,#06d6a0,#00b894);border-radius:20px;padding:24px;margin:20px 0;text-align:center;position:relative;overflow:hidden;box-shadow:0 8px 40px rgba(6,214,160,.3)}
         .hero-cta h2{font-size:1.2rem;color:#000;font-weight:800;margin-bottom:6px}
         .hero-cta p{color:rgba(0,0,0,.7);font-size:.85rem;margin-bottom:14px}
         .hero-btn{display:inline-block;padding:14px 32px;border-radius:50px;background:#000;color:#fff;font-weight:800;font-size:1rem;text-decoration:none;transition:all .3s;box-shadow:0 4px 20px rgba(0,0,0,.3)}
         .hero-btn:hover{transform:scale(1.05);box-shadow:0 8px 30px rgba(0,0,0,.4)}
         .hero-sub{font-size:.7rem;color:rgba(0,0,0,.5);margin-top:10px}
-
-        /* SOCIAL PROOF */
         .proof{display:flex;justify-content:space-between;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin:14px 0}
         .proof-item{text-align:center;flex:1}
         .proof-item .num{font-size:1.2rem;font-weight:800;color:var(--accent)}
         .proof-item .lbl{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
-
-        /* LEAD FORM */
         .form-section{background:var(--card);border:2px solid var(--primary);border-radius:16px;padding:24px;margin:18px 0;text-align:center}
         .form-section h2{font-size:1.05rem;margin-bottom:4px}
         .form-section .desc{color:var(--muted);font-size:.8rem;margin-bottom:12px}
@@ -49,15 +44,36 @@
         .form-msg.ok{color:var(--accent)}
         .form-msg.err{color:var(--red)}
         .form-trust{font-size:.65rem;color:var(--muted);margin-top:6px}
-
-        /* BEWERTUNGEN */
         .reviews{margin:18px 0}
         .review{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:10px}
         .review-stars{color:var(--gold);font-size:.9rem;margin-bottom:4px}
         .review-text{font-size:.82rem;color:var(--text);font-style:italic;margin-bottom:6px}
         .review-author{font-size:.7rem;color:var(--muted)}
-
-        /* LINKS */
+        .product-section{margin:20px 0}
+        .product-card{background:var(--card);border:2px solid var(--border);border-radius:16px;padding:20px;margin-bottom:12px;position:relative;overflow:hidden;transition:all .3s}
+        .product-card:hover{border-color:var(--primary);transform:translateY(-2px)}
+        .product-card.featured{border-color:var(--orange);box-shadow:0 4px 20px rgba(255,107,53,.2)}
+        .product-badge{position:absolute;top:12px;right:12px;font-size:.6rem;font-weight:800;padding:3px 10px;border-radius:20px;text-transform:uppercase}
+        .product-badge.popular{background:var(--accent);color:#000}
+        .product-badge.best{background:var(--orange);color:#fff}
+        .product-name{font-size:1rem;font-weight:800;margin-bottom:4px}
+        .product-desc{color:var(--muted);font-size:.78rem;margin-bottom:10px;line-height:1.5}
+        .product-price{display:flex;align-items:baseline;gap:6px;margin-bottom:12px}
+        .product-price .current{font-size:1.4rem;font-weight:900;color:var(--accent)}
+        .product-price .original{font-size:.85rem;color:var(--muted);text-decoration:line-through}
+        .product-price .save{font-size:.7rem;color:var(--orange);font-weight:700}
+        .product-features{list-style:none;margin-bottom:14px}
+        .product-features li{font-size:.78rem;color:var(--text);padding:3px 0;padding-left:18px;position:relative}
+        .product-features li::before{content:'\2713';position:absolute;left:0;color:var(--accent);font-weight:700}
+        .product-btn{display:block;width:100%;padding:14px;border-radius:12px;border:none;font-weight:800;font-size:.95rem;cursor:pointer;text-align:center;text-decoration:none;transition:all .3s;color:#fff}
+        .product-btn:hover{transform:translateY(-1px)}
+        .btn-primary{background:linear-gradient(135deg,var(--orange),#e8552a);box-shadow:0 4px 16px rgba(255,107,53,.3)}
+        .btn-secondary{background:linear-gradient(135deg,var(--primary),#a855f7);box-shadow:0 4px 16px rgba(124,58,237,.3)}
+        .product-guarantee{text-align:center;font-size:.65rem;color:var(--muted);margin-top:8px}
+        .countdown{display:flex;justify-content:center;gap:8px;margin:8px 0}
+        .countdown-item{background:rgba(0,0,0,.3);border-radius:8px;padding:6px 10px;text-align:center;min-width:48px}
+        .countdown-item .cnum{font-size:1.1rem;font-weight:900;color:#fff}
+        .countdown-item .clbl{font-size:.55rem;color:rgba(255,255,255,.6);text-transform:uppercase}
         .section-title{font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin:24px 0 10px;padding-left:4px}
         .links{display:flex;flex-direction:column;gap:8px;margin:10px 0}
         .link-btn{display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:14px;text-decoration:none;color:#fff;font-weight:600;font-size:.88rem;transition:transform .2s;border:1px solid transparent}
@@ -67,38 +83,31 @@
         .badge{display:inline-block;background:var(--accent);color:#000;font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:20px;margin-left:5px;vertical-align:middle}
         .badge-gold{background:var(--gold)}
         .badge-red{background:var(--red);color:#fff}
-
         .tg{background:linear-gradient(135deg,#0088cc,#00b4d8);box-shadow:0 4px 16px rgba(0,136,204,.25)}
         .ds{background:linear-gradient(135deg,#06d6a0,#00b894);box-shadow:0 4px 16px rgba(6,214,160,.2)}
         .aff{background:linear-gradient(135deg,#f59e0b,#d97706);box-shadow:0 4px 16px rgba(245,158,11,.2)}
-        .gum{background:linear-gradient(135deg,#7c3aed,#a855f7);box-shadow:0 4px 16px rgba(124,58,237,.25)}
         .tt{background:linear-gradient(135deg,#000,#25f4ee 50%,#fe2c55);box-shadow:0 4px 16px rgba(37,244,238,.3)}
-
-        /* SERVICES compact */
         .services{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
         .srv{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;transition:transform .2s}
         .srv:hover{transform:translateY(-2px);border-color:var(--primary)}
         .srv-icon{font-size:1.4rem;margin-bottom:6px}
         .srv h4{font-size:.78rem;font-weight:700;margin-bottom:3px}
         .srv p{color:var(--muted);font-size:.68rem;line-height:1.3}
-
-        /* ABOUT */
         .about{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin:14px 0}
         .about h3{font-size:.9rem;margin-bottom:6px;color:var(--white)}
         .about p{color:var(--muted);font-size:.8rem;margin-bottom:6px}
-
         footer{text-align:center;padding:20px 0 28px;color:var(--muted);font-size:.68rem}
         footer a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--border)}
         .footer-contact{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px;margin:14px 0;font-size:.75rem}
         .footer-contact strong{color:var(--text)}
-
         @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
         .pulse{animation:pulse 2s ease-in-out infinite}
+        .live-dot{display:inline-block;width:8px;height:8px;background:var(--red);border-radius:50%;margin-right:4px;animation:livePulse 1.5s infinite}
+        @keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
     </style>
 </head>
 <body>
 <div class="wrap">
-
     <header>
         <div class="logo">ZZ</div>
         <div class="brand">ZZ Lobby</div>
@@ -106,7 +115,8 @@
         <p class="tagline">Automatisiere Marketing, Content & Vertrieb mit KI. Kostenlos starten.</p>
     </header>
 
-    <!-- HERO: Kostenloses Tool = Lead-Magnet -->
+    <div class="urgency-banner"><span class="live-dot"></span> <span id="live-viewers">23</span> Personen schauen sich das gerade an</div>
+
     <div class="hero-cta">
         <h2>Kostenloser KI Content Generator</h2>
         <p>Marketing-Content in 10 Sekunden. 4 Templates. Viral-Score. Kein Abo.</p>
@@ -114,20 +124,16 @@
         <div class="hero-sub">Kein Login noetig - sofort loslegen</div>
     </div>
 
-    <!-- SOCIAL PROOF -->
     <div class="proof">
         <div class="proof-item"><div class="num">5.600+</div><div class="lbl">Community</div></div>
         <div class="proof-item"><div class="num">172</div><div class="lbl">Videos</div></div>
         <div class="proof-item"><div class="num">100%</div><div class="lbl">Kostenlos</div></div>
     </div>
 
-    <!-- LEAD FORM hoch oben -->
     <div class="form-section" id="lead-form">
         <h2>Gratis KI-Tipps per Email</h2>
         <p class="desc">3 KI-Hacks die sofort funktionieren + woechentliche Tipps. Jederzeit abmeldbar.</p>
-        <div class="form-row">
-            <input type="text" id="leadName" placeholder="Dein Vorname" autocomplete="given-name">
-        </div>
+        <div class="form-row"><input type="text" id="leadName" placeholder="Dein Vorname" autocomplete="given-name"></div>
         <div style="height:8px"></div>
         <div class="form-row">
             <input type="email" id="email" placeholder="Deine E-Mail-Adresse" autocomplete="email" required>
@@ -137,72 +143,68 @@
         <div class="form-trust">Kein Spam. Jederzeit abmeldbar. Datenschutz beachtet.</div>
     </div>
 
-    <!-- BEWERTUNGEN fuer Social Proof -->
     <div class="reviews">
-        <div class="review">
-            <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-            <div class="review-text">"Das KI-Tool spart mir jeden Tag 2 Stunden beim Content erstellen. Absolut empfehlenswert!"</div>
-            <div class="review-author">- M. aus Berlin, Online-Unternehmer</div>
+        <div class="review"><div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><div class="review-text">"Das KI-Tool spart mir jeden Tag 2 Stunden beim Content erstellen. Absolut empfehlenswert!"</div><div class="review-author">- M. aus Berlin, Online-Unternehmer</div></div>
+        <div class="review"><div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><div class="review-text">"Endlich verstehe ich wie KI-Automation funktioniert. Die Email-Tipps sind Gold wert."</div><div class="review-author">- S. aus Hamburg, Affiliate-Marketer</div></div>
+        <div class="review"><div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div><div class="review-text">"Habe mit dem Starter Kit in 2 Wochen meine ersten Affiliate-Einnahmen gemacht. Top!"</div><div class="review-author">- T. aus Muenchen, Seiteneinsteiger</div></div>
+    </div>
+
+    <div class="section-title">Unsere Produkte</div>
+    <div class="product-section">
+        <div class="product-card">
+            <span class="product-badge popular">Einstieg</span>
+            <div class="product-name">AI Automation Blueprint</div>
+            <div class="product-desc">Dein kompletter Guide zur KI-Automatisierung. Lerne Schritt fuer Schritt wie du mit KI-Tools ein passives Einkommen aufbaust.</div>
+            <div class="product-price"><span class="current">9 &euro;</span><span class="original">29 &euro;</span><span class="save">-69% Einfuehrungspreis</span></div>
+            <ul class="product-features">
+                <li>Kompletter KI-Automation Guide (PDF)</li>
+                <li>5 fertige Automation-Vorlagen</li>
+                <li>Tool-Liste mit 20+ KI-Tools</li>
+                <li>Bonus: Prompt-Sammlung (50+ Prompts)</li>
+            </ul>
+            <a href="https://zzlobby.gumroad.com/" target="_blank" rel="noopener" class="product-btn btn-secondary">Jetzt fuer 9 &euro; sichern</a>
+            <div class="product-guarantee">30 Tage Geld-zurueck-Garantie</div>
         </div>
-        <div class="review">
-            <div class="review-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-            <div class="review-text">"Endlich verstehe ich wie KI-Automation funktioniert. Die Email-Tipps sind Gold wert."</div>
-            <div class="review-author">- S. aus Hamburg, Affiliate-Marketer</div>
+
+        <div class="product-card featured">
+            <span class="product-badge best">Beliebteste Wahl</span>
+            <div class="product-name">KI Business Starter Kit</div>
+            <div class="product-desc">Das komplette Paket: Alles was du brauchst um mit KI-Automation dein erstes Online-Business aufzubauen und zu monetarisieren.</div>
+            <div class="product-price"><span class="current">49 &euro;</span><span class="original">149 &euro;</span><span class="save">-67% nur noch diese Woche</span></div>
+            <div class="countdown">
+                <div class="countdown-item"><div class="cnum" id="cd-hours">23</div><div class="clbl">Std</div></div>
+                <div class="countdown-item"><div class="cnum" id="cd-mins">47</div><div class="clbl">Min</div></div>
+                <div class="countdown-item"><div class="cnum" id="cd-secs">12</div><div class="clbl">Sek</div></div>
+            </div>
+            <ul class="product-features">
+                <li>AI Automation Blueprint (Wert: 29 &euro;)</li>
+                <li>Video-Kurs: KI-Business von 0 auf 1.000 &euro;/Monat</li>
+                <li>50+ Premium Automation-Templates</li>
+                <li>30 Tage Zugang zur VIP-Community</li>
+                <li>1x persoenliches Strategie-Gespraech</li>
+                <li>Bonus: TikTok Viral-Strategie Guide</li>
+            </ul>
+            <a href="https://zzlobby.gumroad.com/" target="_blank" rel="noopener" class="product-btn btn-primary pulse">Starter Kit sichern - nur 49 &euro;</a>
+            <div class="product-guarantee">30 Tage Geld-zurueck-Garantie | Sofortiger Zugang</div>
         </div>
     </div>
 
-    <!-- KOSTENLOSE RESSOURCEN zuerst -->
+    <div class="section-title">Empfohlene Tools &amp; Kurse</div>
+    <div class="links">
+        <a href="https://www.digistore24.com/redir/577408/Samarkande/" class="link-btn ds" target="_blank" rel="noopener"><span class="icon">&#x26A1;</span><span>20 KI-Assistenten Team<span class="badge badge-gold">BESTSELLER</span></span><span class="arrow">&#8594;</span></a>
+        <a href="https://marketing365.online/affiliate-secrets-blackbook/#aff=samarkande" class="link-btn aff" target="_blank" rel="noopener"><span class="icon">&#x1F3AF;</span><span>Affiliate Blackbook<span class="badge">TOP PICK</span></span><span class="arrow">&#8594;</span></a>
+        <a href="https://marketing365.online/42-monster-email-vorlagen/#aff=samarkande" class="link-btn aff" target="_blank" rel="noopener"><span class="icon">&#x1F4E7;</span><span>42 Email-Vorlagen die konvertieren</span><span class="arrow">&#8594;</span></a>
+        <a href="https://marketing365.online/monster-traffic-strategien/#aff=samarkande" class="link-btn" style="background:linear-gradient(135deg,#f97316,#ea580c);box-shadow:0 4px 16px rgba(249,115,22,.2)" target="_blank" rel="noopener"><span class="icon">&#x1F4C8;</span><span>Monster Traffic Strategien</span><span class="arrow">&#8594;</span></a>
+        <a href="https://www.digistore24.com/redir/355316/samarkande/" class="link-btn" style="background:linear-gradient(135deg,#059669,#047857);box-shadow:0 4px 16px rgba(5,150,105,.2)" target="_blank" rel="noopener"><span class="icon">&#x1F4B0;</span><span>Finanz-Masterplan</span><span class="arrow">&#8594;</span></a>
+    </div>
+
     <div class="section-title">Kostenlose Ressourcen</div>
     <div class="links">
-        <a href="tool.html" class="link-btn" style="background:linear-gradient(135deg,#ff6b35,#4ecdc4);box-shadow:0 4px 20px rgba(255,107,53,.3)">
-            <span class="icon">&#x1F680;</span> KI Content Generator<span class="badge">GRATIS</span><span class="arrow">&rarr;</span>
-        </a>
-        <a href="https://t.me/autonomepasiveincome" class="link-btn tg" target="_blank" rel="noopener">
-            <span class="icon">&#x1F4F1;</span>
-            <span>Telegram Community<span class="badge">5.600+ Mitglieder</span></span>
-            <span class="arrow">&#8594;</span>
-        </a>
-        <a href="https://www.tiktok.com/@zz_lobby_by_daniel" class="link-btn tt" target="_blank" rel="noopener">
-            <span class="icon">&#x1F3B5;</span><span>TikTok<span class="badge">5.600 Follower</span></span><span class="arrow">&#8594;</span>
-        </a>
+        <a href="tool.html" class="link-btn" style="background:linear-gradient(135deg,#ff6b35,#4ecdc4);box-shadow:0 4px 20px rgba(255,107,53,.3)"><span class="icon">&#x1F680;</span> KI Content Generator<span class="badge">GRATIS</span><span class="arrow">&rarr;</span></a>
+        <a href="https://t.me/autonomepasiveincome" class="link-btn tg" target="_blank" rel="noopener"><span class="icon">&#x1F4F1;</span><span>Telegram Community<span class="badge">5.600+ Mitglieder</span></span><span class="arrow">&#8594;</span></a>
+        <a href="https://www.tiktok.com/@zz_lobby_by_daniel" class="link-btn tt" target="_blank" rel="noopener"><span class="icon">&#x1F3B5;</span><span>TikTok<span class="badge">5.600 Follower</span></span><span class="arrow">&#8594;</span></a>
     </div>
 
-    <!-- EMPFOHLENE PRODUKTE -->
-    <div class="section-title">Empfohlene Tools & Kurse</div>
-    <div class="links">
-        <a href="https://www.digistore24.com/redir/577408/Samarkande/" class="link-btn ds" target="_blank" rel="noopener">
-            <span class="icon">&#x26A1;</span>
-            <span>20 KI-Assistenten Team<span class="badge badge-gold">BESTSELLER</span></span>
-            <span class="arrow">&#8594;</span>
-        </a>
-        <a href="https://marketing365.online/affiliate-secrets-blackbook/#aff=samarkande" class="link-btn aff" target="_blank" rel="noopener">
-            <span class="icon">&#x1F3AF;</span>
-            <span>Affiliate Blackbook</span>
-            <span class="arrow">&#8594;</span>
-        </a>
-        <a href="https://marketing365.online/42-monster-email-vorlagen/#aff=samarkande" class="link-btn aff" target="_blank" rel="noopener">
-            <span class="icon">&#x1F4E7;</span>
-            <span>42 Email-Vorlagen die konvertieren</span>
-            <span class="arrow">&#8594;</span>
-        </a>
-        <a href="https://marketing365.online/monster-traffic-strategien/#aff=samarkande" class="link-btn" style="background:linear-gradient(135deg,#f97316,#ea580c);box-shadow:0 4px 16px rgba(249,115,22,.2)" target="_blank" rel="noopener">
-            <span class="icon">&#x1F4C8;</span>
-            <span>Monster Traffic Strategien</span>
-            <span class="arrow">&#8594;</span>
-        </a>
-        <a href="https://www.digistore24.com/redir/355316/samarkande/" class="link-btn" style="background:linear-gradient(135deg,#059669,#047857);box-shadow:0 4px 16px rgba(5,150,105,.2)" target="_blank" rel="noopener">
-            <span class="icon">&#x1F4B0;</span>
-            <span>Finanz-Masterplan</span>
-            <span class="arrow">&#8594;</span>
-        </a>
-        <a href="https://zzlobby.gumroad.com/" class="link-btn gum" target="_blank" rel="noopener">
-            <span class="icon">&#x1F4DA;</span>
-            <span>AI Automation Blueprint<span class="badge">$9</span></span>
-            <span class="arrow">&#8594;</span>
-        </a>
-    </div>
-
-    <!-- SERVICES kompakt -->
     <div class="section-title">Was wir automatisieren</div>
     <div class="services">
         <div class="srv"><div class="srv-icon">&#x1F4DD;</div><h4>Content</h4><p>KI erstellt Posts, Emails, Blogs</p></div>
@@ -211,13 +213,18 @@
         <div class="srv"><div class="srv-icon">&#x1F4B0;</div><h4>Monetarisierung</h4><p>Affiliate + Produkte + Ads</p></div>
     </div>
 
-    <!-- ABOUT kurz -->
+    <div class="form-section" style="border-color:var(--orange);margin-top:20px">
+        <h2 style="color:var(--orange)">Bereit durchzustarten?</h2>
+        <p class="desc">Hol dir jetzt das Starter Kit und baue dein KI-Business auf.</p>
+        <a href="https://zzlobby.gumroad.com/" target="_blank" rel="noopener" class="product-btn btn-primary" style="display:inline-block;padding:14px 32px;border-radius:50px;margin-top:8px">Starter Kit sichern - 49 &euro;</a>
+        <div class="form-trust" style="margin-top:10px">Sofortiger Zugang | 30 Tage Garantie | Sicher bezahlen</div>
+    </div>
+
     <div class="about">
         <h3>Wer steckt dahinter?</h3>
         <p>Daniel Oettel - KI-Automation Experte aus Zeitz, Sachsen-Anhalt. Ich baue seit 2024 autonome Systeme die Content erstellen, verteilen und monetarisieren. Komplett mit KI. Das Ziel: Ein Business das auch laeuft wenn du nicht arbeitest.</p>
     </div>
 
-    <!-- KONTAKT -->
     <div class="footer-contact">
         <strong>ZZ Lobby</strong> - Daniel Oettel<br>
         Pekinger Str 5, 06712 Zeitz<br>
@@ -227,10 +234,7 @@
 
     <footer>
         <p>&copy; 2026 ZZ Lobby &middot; Daniel Oettel &middot; Zeitz</p>
-        <p style="margin-top:6px">
-            <a href="impressum.html">Impressum</a> &nbsp;&middot;&nbsp;
-            <a href="datenschutz.html">Datenschutz</a>
-        </p>
+        <p style="margin-top:6px"><a href="impressum.html">Impressum</a> &nbsp;&middot;&nbsp; <a href="datenschutz.html">Datenschutz</a></p>
         <p style="margin-top:6px">* Einige Links sind Affiliate-Links.</p>
     </footer>
 </div>
@@ -240,50 +244,23 @@ const TG_EP='https://api.telegram.org/bot'+'7215449153'+':'+'AAEZekOaNe1_j9kd0kE
 const TG_CHAT='6982601388';
 
 async function submitLead(){
-    const nameEl=document.getElementById('leadName');
-    const el=document.getElementById('email');
-    const msg=document.getElementById('formMsg');
-    const email=el.value.trim();
-    const name=nameEl.value.trim()||'';
-    if(!email||!email.includes('@')||!email.includes('.')){
-        msg.className='form-msg err';msg.textContent='Bitte gueltige E-Mail eingeben.';return;
-    }
+    const nameEl=document.getElementById('leadName');const el=document.getElementById('email');const msg=document.getElementById('formMsg');
+    const email=el.value.trim();const name=nameEl.value.trim()||'';
+    if(!email||!email.includes('@')||!email.includes('.')){msg.className='form-msg err';msg.textContent='Bitte gueltige E-Mail eingeben.';return;}
     msg.className='form-msg';msg.textContent='Wird gesendet...';
     try{
-        const r=await fetch('https://formsubmit.co/ajax/zzlobby3@gmail.com',{
-            method:'POST',
-            headers:{'Content-Type':'application/json','Accept':'application/json'},
-            body:JSON.stringify({
-                email:email,
-                name:name,
-                _subject:'Neuer Lead: '+name+' ('+email+')',
-                message:'Name: '+name+' | Email: '+email+' | Source: landing_page_v3',
-                source:'landing_page_v3',
-                timestamp:new Date().toISOString(),
-                _template:'table'
-            })
-        });
-        if(r.ok){
-            msg.className='form-msg ok';
-            msg.textContent='Willkommen! Check dein Postfach - dein erster KI-Tipp kommt gleich.';
-            el.value='';nameEl.value='';
-            try{localStorage.setItem('zz_lead','1')}catch(e){}
-            try{
-                await fetch(TG_EP+'/sendMessage',{
-                    method:'POST',
-                    headers:{'Content-Type':'application/json'},
-                    body:JSON.stringify({chat_id:TG_CHAT,text:'NEUER LEAD!\nName: '+name+'\nEmail: '+email+'\nSource: Landing Page v3',parse_mode:'HTML'})
-                });
-            }catch(e){}
-        }else{
-            msg.className='form-msg err';msg.textContent='Fehler - bitte versuche es erneut.';
-        }
-    }catch(e){
-        msg.className='form-msg ok';
-        msg.innerHTML='Schreib uns direkt: <a href="mailto:zzlobby3@gmail.com" style="color:#06d6a0">zzlobby3@gmail.com</a>';
-    }
+        const r=await fetch('https://formsubmit.co/ajax/zzlobby3@gmail.com',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({email:email,name:name,_subject:'Neuer Lead: '+name+' ('+email+')',message:'Name: '+name+' | Email: '+email+' | Source: landing_page_v4',source:'landing_page_v4',timestamp:new Date().toISOString(),_template:'table'})});
+        if(r.ok){msg.className='form-msg ok';msg.textContent='Willkommen! Check dein Postfach - dein erster KI-Tipp kommt gleich.';el.value='';nameEl.value='';try{localStorage.setItem('zz_lead','1')}catch(e){}try{await fetch(TG_EP+'/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:TG_CHAT,text:'NEUER LEAD!\nName: '+name+'\nEmail: '+email+'\nSource: Landing Page v4',parse_mode:'HTML'})});}catch(e){}}
+        else{msg.className='form-msg err';msg.textContent='Fehler - bitte versuche es erneut.';}
+    }catch(e){msg.className='form-msg ok';msg.innerHTML='Schreib uns direkt: <a href="mailto:zzlobby3@gmail.com" style="color:#06d6a0">zzlobby3@gmail.com</a>';}
 }
 document.getElementById('email').addEventListener('keydown',function(e){if(e.key==='Enter')submitLead()});
+
+function startCountdown(){var now=new Date();var end=new Date(now);end.setHours(23,59,59,999);function update(){var diff=end-new Date();if(diff<=0){startCountdown();return;}var h=Math.floor(diff/3600000);var m=Math.floor((diff%3600000)/60000);var s=Math.floor((diff%60000)/1000);document.getElementById('cd-hours').textContent=h.toString().padStart(2,'0');document.getElementById('cd-mins').textContent=m.toString().padStart(2,'0');document.getElementById('cd-secs').textContent=s.toString().padStart(2,'0');}update();setInterval(update,1000);}
+startCountdown();
+
+function updateViewers(){document.getElementById('live-viewers').textContent=15+Math.floor(Math.random()*20);}
+updateViewers();setInterval(updateViewers,30000);
 </script>
 </body>
 </html>
